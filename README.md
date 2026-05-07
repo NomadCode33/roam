@@ -1,3 +1,43 @@
+# ROAM
+
+Summary goes here
+
+**Link to project:** https://sonicverse-y2s6.onrender.com/
+
+<img src="./assets/" img alt = "ROAM Front Page"/>
+
+## SCRUM/Agile Development
+Phase 1: https://trello.com/b/6ZvbHk51/roam-phase-1
+
+## How It's Made:
+
+**Tech used:**
+
+Explaination of how I built the project here
+
+
+## Lessons Learned:
+Explaination goes here
+
+## Docs & Updates
+#### Updates will be shown in the dev log regarding its progress
+
+**Development Log:** coming soon
+
+## More Projects:
+Feel free to explore some of my other projects in my portfolio:
+
+**Project:** [Project](url)
+
+**Project:** [Project](url)
+
+## Repositories
+**Profile:** [NomadCode33](https://github.com/NomadCode33)
+
+**Main Repository:** [DevChronicles](https://github.com/NomadCode33/DevChronicles)
+
+
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 ## Getting Started
