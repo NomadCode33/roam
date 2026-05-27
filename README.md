@@ -1,23 +1,24 @@
 # ROAM
 
-Summary goes here
+Roam is a full-stack social discovery web app built with React, Next.js, Mapbox, PostGIS, and Claude Code that puts people at the center of tourism, prioritizing authentic local insight over algorithmic recommendations while deliberately surfacing hidden and undertrafficked spots alongside well-known landmarks to give every corner of a city a fair chance at visibility. Designed as the foundation of a larger civic platform, it serves as the social and geospatial data layer for future 3D urban visualization and infrastructure planning tools targeting civil engineers and city planners.
 
-**Link to project:** https://sonicverse-y2s6.onrender.com/
+**Link to project:** *Coming Soon*
 
 <img src="./assets/" img alt = "ROAM Front Page"/>
 
-## SCRUM/Agile Development
+## Development and Design
 Phase 1: https://trello.com/b/6ZvbHk51/roam-phase-1
+Figma: https://www.figma.com/design/YZmwBodxfLgd2Nq0umAsRZ/Roam-Design--Copy-?node-id=0-1&t=GKFCZkkxWU8lP9Js-1
 
 ## How It's Made:
 
 **Tech used:**
 
-Explaination of how I built the project here
+*Coming Soon*
 
 
 ## Lessons Learned:
-Explaination goes here
+*Coming Soon*
 
 ## Docs & Updates
 #### Updates will be shown in the dev log regarding its progress
@@ -38,39 +39,3 @@ Feel free to explore some of my other projects in my portfolio:
 
 
 
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
-
-## Getting Started
-
-First, run the development server:
-
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
