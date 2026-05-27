@@ -4,7 +4,7 @@ Roam is a full-stack social discovery web app built with React, Next.js, Mapbox,
 
 **Link to project:** *Coming Soon*
 
-<img src="./assets/roam-logo.png" img alt = "ROAM Logo"/>
+<img src="./assets/roam-logo2.png" img alt = "ROAM Logo"/>
 
 ## Development and Design
 **Phase 1:** https://trello.com/b/6ZvbHk51/roam-phase-1
