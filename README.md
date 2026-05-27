@@ -8,6 +8,7 @@ Roam is a full-stack social discovery web app built with React, Next.js, Mapbox,
 
 ## Development and Design
 Phase 1: https://trello.com/b/6ZvbHk51/roam-phase-1
+
 Figma: https://www.figma.com/design/YZmwBodxfLgd2Nq0umAsRZ/Roam-Design--Copy-?node-id=0-1&t=GKFCZkkxWU8lP9Js-1
 
 ## How It's Made:
