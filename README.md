@@ -1,10 +1,10 @@
-# Roam: Go Where Your Heart Desires
+# Roam: Go Where Your Heart Takes You
 
 Roam is a full-stack social discovery web app built with React, Next.js, Mapbox, PostGIS, and Claude Code that puts people at the center of tourism, prioritizing authentic local insight over algorithmic recommendations while deliberately surfacing hidden and undertrafficked spots alongside well-known landmarks to give every corner of a city a fair chance at visibility. Designed as the foundation of a larger civic platform, it serves as the social and geospatial data layer for future 3D urban visualization and infrastructure planning tools targeting civil engineers and city planners.
 
 **Link to project:** *Coming Soon*
 
-<img src="./assets/" img alt = "ROAM Front Page"/>
+<img src="./assets/roam-logo.png" img alt = "ROAM Logo"/>
 
 ## Development and Design
 **Phase 1:** https://trello.com/b/6ZvbHk51/roam-phase-1
