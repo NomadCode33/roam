@@ -1,4 +1,4 @@
-# ROAM: Go Where Your Heart Desires
+# Roam: Go Where Your Heart Desires
 
 Roam is a full-stack social discovery web app built with React, Next.js, Mapbox, PostGIS, and Claude Code that puts people at the center of tourism, prioritizing authentic local insight over algorithmic recommendations while deliberately surfacing hidden and undertrafficked spots alongside well-known landmarks to give every corner of a city a fair chance at visibility. Designed as the foundation of a larger civic platform, it serves as the social and geospatial data layer for future 3D urban visualization and infrastructure planning tools targeting civil engineers and city planners.
 
@@ -7,9 +7,9 @@ Roam is a full-stack social discovery web app built with React, Next.js, Mapbox,
 <img src="./assets/" img alt = "ROAM Front Page"/>
 
 ## Development and Design
-Phase 1: https://trello.com/b/6ZvbHk51/roam-phase-1
+**Phase 1:** https://trello.com/b/6ZvbHk51/roam-phase-1
 
-Figma: https://www.figma.com/design/YZmwBodxfLgd2Nq0umAsRZ/Roam-Design--Copy-?node-id=0-1&t=GKFCZkkxWU8lP9Js-1
+**Figma:** https://www.figma.com/design/YZmwBodxfLgd2Nq0umAsRZ/Roam-Design--Copy-?node-id=0-1&t=GKFCZkkxWU8lP9Js-1
 
 ## How It's Made:
 
@@ -23,9 +23,9 @@ Figma: https://www.figma.com/design/YZmwBodxfLgd2Nq0umAsRZ/Roam-Design--Copy-?no
 <a href="https://react.dev/" target="_blank" rel="noreferrer"> <img alt="React Badge" src="https://img.shields.io/badge/-React-000000?style=flat&logo=React"></a>
 <a href="https://expressjs.com/" target="_blank" rel="noreferrer"> <img alt="Express Badge" src="https://img.shields.io/badge/-Express-000000?style=flat&logo=Express"></a>
 <a href="https://leafletjs.com/" target="_blank" rel="noreferrer"> <img alt="Leaflet Badge" src="https://img.shields.io/badge/-Leaflet-000000?style=flat&logo=Leaflet"></a>
+<a href="https://supabase.com/" target="_blank" rel="noreferrer"> <img alt="Supabase Badge" src="https://img.shields.io/badge/-Supabase-000000?style=flat&logo=Supabase"></a>
 <a href="https://www.ibm.com/think/topics/structured-query-language" target="_blank" rel="noreferrer"> <img alt="SQL Badge" src="https://img.shields.io/badge/-SQL-000000?style=flat&logo=None"></a>
 <a href="https://postgis.net/" target="_blank" rel="noreferrer"> <img alt="PostGIS Badge" src="https://img.shields.io/badge/-PostGIS-000000?style=flat&logo=None"></a>
-<a href="https://supabase.com/" target="_blank" rel="noreferrer"> <img alt="Supabase Badge" src="https://img.shields.io/badge/-Supabase-000000?style=flat&logo=Supabase"></a>
 <a href="https://tanstack.com/query/latest" target="_blank" rel="noreferrer"> <img alt="TanStack Query Badge" src="https://img.shields.io/badge/-TanStack Query-000000?style=flat&logo=TanStack"></a>
 <a href="https://www.figma.com/" target="_blank" rel="noreferrer"> <img alt="Figma Badge" src="https://img.shields.io/badge/-Figma-000000?style=flat&logo=Figma"></a>
 <a href="https://trello.com/" target="_blank" rel="noreferrer"> <img alt="Trello Badge" src="https://img.shields.io/badge/-Trello-000000?style=flat&logo=Trello"></a>
