@@ -24,9 +24,12 @@ Figma: https://www.figma.com/design/YZmwBodxfLgd2Nq0umAsRZ/Roam-Design--Copy-?no
 <a href="https://expressjs.com/" target="_blank" rel="noreferrer"> <img alt="Express Badge" src="https://img.shields.io/badge/-Express-000000?style=flat&logo=Express"></a>
 <a href="https://leafletjs.com/" target="_blank" rel="noreferrer"> <img alt="Leaflet Badge" src="https://img.shields.io/badge/-Leaflet-000000?style=flat&logo=Leaflet"></a>
 <a href="https://www.ibm.com/think/topics/structured-query-language" target="_blank" rel="noreferrer"> <img alt="SQL Badge" src="https://img.shields.io/badge/-SQL-000000?style=flat&logo=None"></a>
+<a href="https://postgis.net/" target="_blank" rel="noreferrer"> <img alt="PostGIS Badge" src="https://img.shields.io/badge/-PostGIS-000000?style=flat&logo=None"></a>
 <a href="https://supabase.com/" target="_blank" rel="noreferrer"> <img alt="Supabase Badge" src="https://img.shields.io/badge/-Supabase-000000?style=flat&logo=Supabase"></a>
 <a href="https://tanstack.com/query/latest" target="_blank" rel="noreferrer"> <img alt="TanStack Query Badge" src="https://img.shields.io/badge/-TanStack Query-000000?style=flat&logo=TanStack"></a>
 <a href="https://www.figma.com/" target="_blank" rel="noreferrer"> <img alt="Figma Badge" src="https://img.shields.io/badge/-Figma-000000?style=flat&logo=Figma"></a>
+<a href="https://trello.com/" target="_blank" rel="noreferrer"> <img alt="Trello Badge" src="https://img.shields.io/badge/-Trello-000000?style=flat&logo=Trello"></a>
+<a href="https://www.mapbox.com/" target="_blank" rel="noreferrer"> <img alt="Mapbox Badge" src="https://img.shields.io/badge/-Mapbox-000000?style=flat&logo=Mapbox"></a>
 <a href="https://docs.mapbox.com/mapbox-gl-js/guides/" target="_blank" rel="noreferrer"> <img alt="Mapbox GL JS Badge" src="https://img.shields.io/badge/-Mapbox GL JS-000000?style=flat&logo=Mapbox"></a>
 
 
