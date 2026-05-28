@@ -1,4 +1,5 @@
 import Image from "next/image";
+import PostCard from "../components/PostCard"
 
 export default function Home() {
   return (
@@ -59,6 +60,10 @@ export default function Home() {
             Documentation
           </a>
         </div>
+      </main>
+
+      <main>
+        <PostCard post={{ content: "Testing Roam" }} />
       </main>
     </div>
   );
