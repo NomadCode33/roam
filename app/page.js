@@ -62,9 +62,7 @@ export default function Home() {
         </div>
       </main>
 
-      <main>
-        <PostCard post={{ content: "Testing Roam" }} />
-      </main>
+      <PostCard post={{ content: "Testing Roam" }} />
     </div>
   );
 }
