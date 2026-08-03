@@ -1,3 +1,5 @@
+// page.js is the root page. The route is '/'
+
 import Image from "next/image";
 import PostCard from "../components/PostCard"
 
