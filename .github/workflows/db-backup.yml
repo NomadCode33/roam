@@ -1,0 +1,87 @@
+name: Supabase database backup
+
+on:
+  schedule:
+    - cron: '0 3 * * *'
+  workflow_dispatch: {}
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install Supabase CLI
+        run: |
+          curl -sL https://github.com/supabase/cli/releases/latest/download/supabase_linux_amd64.tar.gz | tar xz
+          sudo mv supabase /usr/local/bin/supabase
+          supabase --version
+
+      - name: Set backup filename
+        id: filename
+        run: echo "name=roam-backup-$(date -u +%Y-%m-%dT%H-%M-%SZ).sql" >> "$GITHUB_OUTPUT"
+
+      - name: Dump Supabase database
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          supabase db dump --db-url "$SUPABASE_DB_URL" -f "${{ steps.filename.outputs.name }}"
+
+      - name: Verify dump is non-empty
+        run: |
+          FILE="${{ steps.filename.outputs.name }}"
+          SIZE=$(stat -c%s "$FILE")
+          echo "Dump file size: $SIZE bytes"
+          if [ "$SIZE" -lt 1000 ]; then
+            echo "Dump file is suspiciously small ($SIZE bytes) - failing the job so this doesn't get uploaded as a silent-empty backup."
+            exit 1
+          fi
+
+      - name: Install AWS CLI
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y awscli
+
+      - name: Upload dump to Cloudflare R2
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          R2_BUCKET_ENDPOINT: ${{ secrets.R2_BUCKET_ENDPOINT }}
+        run: |
+          FILE="${{ steps.filename.outputs.name }}"
+          aws s3 cp "$FILE" "s3://roam-db-backups/$FILE" \
+            --endpoint-url "$R2_BUCKET_ENDPOINT"
+
+      - name: Verify upload landed in R2
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          R2_BUCKET_ENDPOINT: ${{ secrets.R2_BUCKET_ENDPOINT }}
+        run: |
+          FILE="${{ steps.filename.outputs.name }}"
+          REMOTE_SIZE=$(aws s3api head-object \
+            --bucket roam-db-backups \
+            --key "$FILE" \
+            --endpoint-url "$R2_BUCKET_ENDPOINT" \
+            --query 'ContentLength' --output text)
+          echo "Uploaded object size in R2: $REMOTE_SIZE bytes"
+          if [ -z "$REMOTE_SIZE" ] || [ "$REMOTE_SIZE" -lt 1000 ]; then
+            echo "Object in R2 is missing or suspiciously small - failing the job."
+            exit 1
+          fi
+
+      - name: Prune backups older than 30 days
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          R2_BUCKET_ENDPOINT: ${{ secrets.R2_BUCKET_ENDPOINT }}
+        run: |
+          CUTOFF=$(date -u -d '30 days ago' +%Y-%m-%d)
+          aws s3api list-objects-v2 \
+            --bucket roam-db-backups \
+            --endpoint-url "$R2_BUCKET_ENDPOINT" \
+            --query "Contents[?LastModified<='${CUTOFF}'].Key" \
+            --output text | tr '\t' '\n' | while read -r KEY; do
+              if [ -n "$KEY" ] && [ "$KEY" != "None" ]; then
+                echo "Deleting old backup: $KEY"
+                aws s3 rm "s3://roam-db-backups/$KEY" --endpoint-url "$R2_BUCKET_ENDPOINT"
+              fi
+            done
