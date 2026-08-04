@@ -30,6 +30,7 @@ jobs:
         run: |
           supabase db dump --db-url "$SUPABASE_DB_URL" -f "${{ steps.filename.outputs.roles }}" --role-only
           supabase db dump --db-url "$SUPABASE_DB_URL" -f "${{ steps.filename.outputs.schema }}" --schema public
+          echo 'CREATE EXTENSION IF NOT EXISTS postgis;' | cat - "${{ steps.filename.outputs.schema }}" > tmp_schema.sql && mv tmp_schema.sql "${{ steps.filename.outputs.schema }}"
           supabase db dump --db-url "$SUPABASE_DB_URL" -f "${{ steps.filename.outputs.data }}" --data-only --use-copy --schema public
 
       - name: Verify schema and data dumps are non-empty
