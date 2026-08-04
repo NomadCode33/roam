@@ -27,8 +27,8 @@ jobs:
         env:
           SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
         run: |
-          supabase db dump --db-url "$SUPABASE_DB_URL" -f "${{ steps.filename.outputs.schema }}"
-          supabase db dump --db-url "$SUPABASE_DB_URL" -f "${{ steps.filename.outputs.data }}" --data-only --use-copy
+          supabase db dump --db-url "$SUPABASE_DB_URL" -f "${{ steps.filename.outputs.schema }}" --schema public
+          supabase db dump --db-url "$SUPABASE_DB_URL" -f "${{ steps.filename.outputs.data }}" --data-only --use-copy --schema public
 
       - name: Verify both dumps are non-empty
         run: |
