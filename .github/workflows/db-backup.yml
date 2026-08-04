@@ -15,56 +15,78 @@ jobs:
           sudo mv supabase /usr/local/bin/supabase
           supabase --version
 
-      - name: Set backup filename
+      - name: Set backup filenames
         id: filename
-        run: echo "name=roam-backup-$(date -u +%Y-%m-%dT%H-%M-%SZ).sql" >> "$GITHUB_OUTPUT"
+        run: |
+          STAMP=$(date -u +%Y-%m-%dT%H-%M-%SZ)
+          echo "stamp=$STAMP" >> "$GITHUB_OUTPUT"
+          echo "schema=roam-schema-$STAMP.sql" >> "$GITHUB_OUTPUT"
+          echo "data=roam-data-$STAMP.sql" >> "$GITHUB_OUTPUT"
 
-      - name: Dump Supabase database
+      - name: Dump Supabase database (schema + data)
         env:
           SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
         run: |
-          supabase db dump --db-url "$SUPABASE_DB_URL" -f "${{ steps.filename.outputs.name }}"
+          supabase db dump --db-url "$SUPABASE_DB_URL" -f "${{ steps.filename.outputs.schema }}"
+          supabase db dump --db-url "$SUPABASE_DB_URL" -f "${{ steps.filename.outputs.data }}" --data-only
 
-      - name: Verify dump is non-empty
+      - name: Verify both dumps are non-empty
         run: |
-          FILE="${{ steps.filename.outputs.name }}"
-          SIZE=$(stat -c%s "$FILE")
-          echo "Dump file size: $SIZE bytes"
-          if [ "$SIZE" -lt 1000 ]; then
-            echo "Dump file is suspiciously small ($SIZE bytes) - failing the job so this doesn't get uploaded as a silent-empty backup."
+          for FILE in "${{ steps.filename.outputs.schema }}" "${{ steps.filename.outputs.data }}"; do
+            if [ ! -f "$FILE" ]; then
+              echo "$FILE was not created - failing the job."
+              exit 1
+            fi
+            SIZE=$(stat -c%s "$FILE")
+            echo "$FILE size: $SIZE bytes"
+            if [ "$SIZE" -lt 1000 ]; then
+              echo "$FILE is suspiciously small ($SIZE bytes) - failing the job so this doesn't get uploaded as a silent-empty backup."
+              exit 1
+            fi
+          done
+
+      - name: Verify data dump actually contains row data
+        run: |
+          FILE="${{ steps.filename.outputs.data }}"
+          COPY_COUNT=$(grep -c "^COPY " "$FILE" || true)
+          echo "COPY statement count in $FILE: $COPY_COUNT"
+          if [ "$COPY_COUNT" -lt 1 ]; then
+            echo "Data dump has zero COPY statements - this is the exact schema-only bug that was caught before. Failing the job."
             exit 1
           fi
 
       - name: Verify AWS CLI is available
         run: aws --version
 
-      - name: Upload dump to Cloudflare R2
+      - name: Upload dumps to Cloudflare R2
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
           R2_BUCKET_ENDPOINT: ${{ secrets.R2_BUCKET_ENDPOINT }}
         run: |
-          FILE="${{ steps.filename.outputs.name }}"
-          aws s3 cp "$FILE" "s3://roam-db-backups/$FILE" \
-            --endpoint-url "$R2_BUCKET_ENDPOINT"
+          for FILE in "${{ steps.filename.outputs.schema }}" "${{ steps.filename.outputs.data }}"; do
+            aws s3 cp "$FILE" "s3://roam-db-backups/$FILE" \
+              --endpoint-url "$R2_BUCKET_ENDPOINT"
+          done
 
-      - name: Verify upload landed in R2
+      - name: Verify uploads landed in R2
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
           R2_BUCKET_ENDPOINT: ${{ secrets.R2_BUCKET_ENDPOINT }}
         run: |
-          FILE="${{ steps.filename.outputs.name }}"
-          REMOTE_SIZE=$(aws s3api head-object \
-            --bucket roam-db-backups \
-            --key "$FILE" \
-            --endpoint-url "$R2_BUCKET_ENDPOINT" \
-            --query 'ContentLength' --output text)
-          echo "Uploaded object size in R2: $REMOTE_SIZE bytes"
-          if [ -z "$REMOTE_SIZE" ] || [ "$REMOTE_SIZE" -lt 1000 ]; then
-            echo "Object in R2 is missing or suspiciously small - failing the job."
-            exit 1
-          fi
+          for FILE in "${{ steps.filename.outputs.schema }}" "${{ steps.filename.outputs.data }}"; do
+            REMOTE_SIZE=$(aws s3api head-object \
+              --bucket roam-db-backups \
+              --key "$FILE" \
+              --endpoint-url "$R2_BUCKET_ENDPOINT" \
+              --query 'ContentLength' --output text)
+            echo "Uploaded object size for $FILE in R2: $REMOTE_SIZE bytes"
+            if [ -z "$REMOTE_SIZE" ] || [ "$REMOTE_SIZE" -lt 1000 ]; then
+              echo "$FILE is missing or suspiciously small in R2 - failing the job."
+              exit 1
+            fi
+          done
 
       - name: Prune backups older than 30 days
         env:
