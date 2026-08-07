@@ -1,7 +1,3 @@
-import "../../css/shared-templates/nav.css"
-import "../../css/shared-templates/footer.css"
-
-
 // page.js is the root page. The route is '/'
 export default function Home() {
   return (
