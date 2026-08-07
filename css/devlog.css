@@ -1,3 +1,8 @@
+html {
+  font-size: 70%; /* 62.5% */
+}
+
+
 /* ─── Root Variables ─────────────────────────────────────── */
 :root {
   --dn-bg:            #050508;
@@ -1163,19 +1168,29 @@
   .dn-body    { flex-direction: column; min-height: unset; }
   .dn-sidebar {
     width: 100%; height: auto; position: static;
-    flex-direction: row;
-    overflow-x: auto; overflow-y: hidden;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem;
+    overflow-x: visible; overflow-y: visible;
     padding: 0 0.4rem;
     border-right: none;
     border-bottom: 1px solid var(--dn-border);
   }
+  .dn-sidebar > div {
+    display: contents;
+  }
   .dn-sidebar-section-label { display: none; }
   .dn-tab {
     flex-direction: column; align-items: center;
+    justify-content: center;
+    text-align: center;
     padding: 0.55rem 0.75rem;
     border-left: none; border-bottom: 2px solid transparent;
-    white-space: nowrap; min-width: 70px; gap: 0.15rem;
+    white-space: nowrap; gap: 0.15rem;
     font-size: 0.72rem;
+  }
+  .dn-tab:nth-child(8) {
+    grid-column: 1 / 3;
   }
   .dn-tab.active         { border-left-color: transparent; border-bottom-color: var(--dn-cyan); }
   .dn-tab-sub            { display: none; }

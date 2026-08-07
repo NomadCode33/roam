@@ -1,8 +1,5 @@
 import { Playfair_Display, DM_Sans, Russo_One, Exo_2 } from "next/font/google"; // How to import fonts
 import "./globals.css";
-import Nav from '../components/shared-templates/Nav';
-//import Footer from '../components/Footer';
-//import { Geist, Geist_Mono } from "next/font/google";
 
 // To add in fonts
 // If you don't want size or weight, don't include them
@@ -47,9 +44,7 @@ export default function RootLayout({ children }) {
       className={`${playfair.variable} ${dmSans.variable} ${russoOne.variable} ${exo2.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <Nav />
-        <main className="flex-1">{children}</main>
-        {/*<Footer />*/}
+        {children}
       </body>
     </html>
   );

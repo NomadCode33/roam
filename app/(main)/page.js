@@ -1,6 +1,21 @@
-// page.js is the root page. The route is '/'
+import "../../css/shared-templates/nav.css"
+import "../../css/shared-templates/footer.css"
 
-import Image from "next/image";
+
+// page.js is the root page. The route is '/'
+export default function Home() {
+  return (
+    <div className="home-page">
+      <h1>Roam homepage placeholder</h1>
+    </div>
+  );
+}
+
+
+
+
+
+/*import Image from "next/image";
 import PostCard from "../components/PostCard"
 
 export default function Home() {
@@ -68,3 +83,4 @@ export default function Home() {
     </div>
   );
 }
+*/

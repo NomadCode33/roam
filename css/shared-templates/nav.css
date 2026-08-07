@@ -1,0 +1,53 @@
+/* 
+Due to tailwind we have to do this math:
+16px = 1rem;
+
+- rem is always relative to the root (html) font-size — one 
+- fixed reference point for the whole page.
+
+- em is relative to that specific element's own font-size
+- So letter-spacing: .04em on .site-nav-logo means "4% of however big this logo text currently is"
+- if the logo's font-size changes (bigger on a hero page, smaller in a compact nav), the letter-spacing scales proportionally with it automatically, no separate adjustment needed.
+*/
+
+.site-nav {
+  background: #1E1535;
+  padding: 1.125rem 3rem;       /* 18px 48px */
+  /*height: 6.25rem;*/
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.site-nav-logo {
+  font-family: var(--font-playfair), serif;
+  color: #EDE8FF;
+  font-size: 1.375rem;
+  letter-spacing: .04em;
+}
+
+.site-nav-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.btn-ghost {
+  font-size: 0.8125rem;          /* 13px */
+  font-weight: 500;
+  color: #EDE8FF;
+  background: transparent;
+  border: 1px solid rgba(237,232,255,.2);
+  border-radius: 1.25rem;        /* 20px */
+  padding: 0.5rem 1.375rem;      /* 8px 22px */
+  cursor: pointer;
+}
+
+.btn-solid {
+  font-size: 0.8123rem;
+  font-weight: 500;
+  color: #2A1F00;
+  background: #E8C547;
+  border-radius: 1.25rem;
+  padding: 0.5rem 1.375rem;
+  cursor: pointer;
+}
