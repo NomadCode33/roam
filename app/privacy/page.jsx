@@ -351,6 +351,6 @@ export default function Privacy() {
       <footer className="doc-footer">
         <p>Roam · Tacoma, WA, USA · <a href="mailto:nomadcode33@gmail.com">nomadcode33@gmail.com</a></p>
       </footer>
-    </ >
+    </>
   );
 }

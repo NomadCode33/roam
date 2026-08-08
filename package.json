@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.105.1",
+    "@tabler/icons-react": "^3.46.0",
     "@tanstack/react-query": "^5.100.6",
     "@turf/turf": "^7.3.5",
     "leaflet": "^1.9.4",

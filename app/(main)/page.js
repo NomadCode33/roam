@@ -1,8 +1,67 @@
+import { IconMapPin, IconRoute, IconFlame } from "@tabler/icons-react";
+
 // page.js is the root page. The route is '/'
 export default function Home() {
   return (
     <div className="home-page">
-      <h1>Roam homepage placeholder</h1>
+      <section className="hero">
+        <div>
+          <div className="hero-tag">Discover your city</div>
+          <h1 className="hero-h">Find the places<br />locals actually love</h1>
+          <p className="hero-sub">A community map where real people share hidden gems, local favorites, and walking trails — not tourist traps.</p>
+          <div className="hero-actions">
+            <button className="btn-primary">Sign up free</button>
+            <button className="btn-secondary">Log in</button>
+          </div>
+        </div>
+        <div className="map-mock">
+          <div className="map-grid"></div>
+          <div className="pulse"></div>
+          <div className="pin" style={{ background: "#E8C547", top: "35%", left: "45%" }}></div>
+          <div className="pin" style={{ background: "#AFA9EC", top: "55%", left: "62%" }}></div>
+          <div className="pin" style={{ background: "#EDE8FF", opacity: 0.6, top: "28%", left: "70%" }}></div>
+          <div className="pin" style={{ background: "#E8C547", opacity: 0.4, top: "65%", left: "30%" }}></div>
+          <div className="feed-card">
+            <div className="feed-card-name">Benny K. · Pike Place side alley</div>
+            <div className="feed-card-sub">3 people saved this · 12 min ago</div>
+          </div>
+        </div>
+      </section>
+
+      <section className="features">
+        <div className="feat">
+          <div className="feat-icon"><IconMapPin size={20} stroke={2} color="#E8C547" /></div>
+          <div className="feat-title">Community pins</div>
+          <div className="feat-desc">
+            Drop a pin anywhere, add photos and a vibe tag. Your spot joins the living map.
+          </div>
+        </div>
+
+        <div className="feat">
+          <div className="feat-icon"><IconRoute size={20} stroke={2} color="#E8C547" /></div>
+          <div className="feat-title">Walking trails</div>
+          <div className="feat-desc">
+            Share multi-stop routes — coffee crawls, sunset walks, taco runs — with up to 5 locations.
+          </div>
+        </div>
+
+        <div className="feat">
+          <div className="feat-icon"><IconFlame size={20} stroke={2} color="#E8C547" /></div>
+          <div className="feat-title">Live heatmap</div>
+          <div className="feat-desc">
+            See what's trending in your neighborhood right now, filtered by vibe.
+          </div>
+        </div>
+      </section>
+
+      <section className="mission">
+        <div className="mission-h">Built for people who actually know their city</div>
+        <p className="mission-sub">
+          Roam exists because the best places don't show up on tourist lists.
+          They live in the minds of locals — and now they live on the map.
+        </p>
+        <button className="mission-cta">Join the map</button>
+      </section>
     </div>
   );
 }

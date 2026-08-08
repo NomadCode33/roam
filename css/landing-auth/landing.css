@@ -1,0 +1,231 @@
+/* 
+Due to tailwind we have to do this math:
+16px = 1rem;
+
+- rem is always relative to the root (html) font-size — one 
+- fixed reference point for the whole page.
+
+- em is relative to that specific element's own font-size
+- So letter-spacing: .04em on .site-nav-logo means "4% of however big this logo text currently is"
+- if the logo's font-size changes (bigger on a hero page, smaller in a compact nav), the letter-spacing scales proportionally with it automatically, no separate adjustment needed.
+*/
+
+/* ── HERO ── */
+.hero {
+  background: #5C4E9E;
+  padding: 4.5rem 4rem 3.75rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3.5rem;
+  align-items: center;
+}
+
+.hero-tag {
+  font-size: 0.6875rem;           /* 11px */
+  font-weight: 500;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: #E8C547;
+  margin-bottom: 1.125rem;        /* 18px */
+}
+
+.hero-h {
+  font-family: var(--font-playfair), serif;
+  font-size: 3rem;                /* 48px */
+  font-weight: 700;
+  line-height: 1.12;
+  color: #EDE8FF;
+  margin-bottom: 1.25rem;         /* 20px */
+}
+
+.hero-sub {
+  font-family: var(--font-dm-sans), sans-serif;
+  font-size: 0.9375rem;           /* 15px */
+  color: rgba(237,232,255,.65);
+  line-height: 1.75;
+  margin-bottom: 2rem;            /* 32px */
+  max-width: 26.25rem;            /* 420px */
+}
+
+.hero-actions {
+  display: flex;
+  gap: 0.75rem;                   /* 12px */
+}
+
+.btn-primary {
+  font-family: var(--font-dm-sans), sans-serif;
+  font-size: 0.875rem;            /* 14px */
+  font-weight: 500;
+  color: #2A1F00;
+  background: #E8C547;
+  border: none;
+  border-radius: 1.25rem;         /* 20px */
+  padding: 0.75rem 1.75rem;       /* 12px 28px */
+  cursor: pointer;
+  transition: background .2s;
+}
+.btn-primary:hover { background: #f0ce55; }
+
+.btn-secondary {
+  font-family: var(--font-dm-sans), sans-serif;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #EDE8FF;
+  background: transparent;
+  border: 1px solid rgba(237,232,255,.2);
+  border-radius: 1.25rem;
+  padding: 0.75rem 1.75rem;
+  cursor: pointer;
+  transition: border-color .2s, background .2s;
+}
+.btn-secondary:hover {
+  border-color: rgba(237,232,255,.5);
+  background: rgba(237,232,255,.06);
+}
+
+/* ── MAP MOCK ── */
+.map-mock {
+  background: #2A1F50;
+  border-radius: 0.875rem;        /* 14px */
+  height: 17.5rem;                /* 280px */
+  position: relative;
+  overflow: hidden;
+}
+
+.map-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    repeating-linear-gradient(0deg,  rgba(237,232,255,.04) 0, rgba(237,232,255,.04) 1px, transparent 1px, transparent 2.75rem),
+    repeating-linear-gradient(90deg, rgba(237,232,255,.04) 0, rgba(237,232,255,.04) 1px, transparent 1px, transparent 2.75rem);
+}
+
+.pin {
+  position: absolute;
+  width: 0.875rem;                /* 14px */
+  height: 0.875rem;
+  border-radius: 50%;
+  border: 2px solid #EDE8FF;      /* border width stays px by convention */
+}
+
+.pulse {
+  position: absolute;
+  top: 32%;
+  left: 42%;
+  width: 1.25rem;                 /* 20px */
+  height: 1.25rem;
+  border-radius: 50%;
+  background: rgba(232,197,71,.3);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%   { transform: scale(1);   opacity: .8; }
+  100% { transform: scale(2.6); opacity: 0;  }
+}
+
+.feed-card {
+  position: absolute;
+  bottom: 0.875rem;               /* 14px */
+  left: 0.875rem;
+  right: 0.875rem;
+  background: rgba(30,21,53,.88);
+  border-radius: 0.625rem;        /* 10px */
+  padding: 0.75rem 0.875rem;      /* 12px 14px */
+  border: .5px solid rgba(232,197,71,.25);
+}
+
+.feed-card-name {
+  font-family: var(--font-dm-sans), sans-serif;
+  font-size: 0.8125rem;           /* 13px */
+  font-weight: 500;
+  color: #EDE8FF;
+  margin-bottom: 0.1875rem;       /* 3px */
+}
+
+.feed-card-sub {
+  font-family: var(--font-dm-sans), sans-serif;
+  font-size: 0.75rem;             /* 12px */
+  color: rgba(237,232,255,.65);
+}
+
+/* ── FEATURES ── */
+.features {
+  padding: 3.25rem 4rem;          /* 52px 48px */
+  background: #F5F3FF;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;                   /* 20px */
+}
+
+.feat {
+  background: #fff;
+  border-radius: 0.875rem;        /* 14px */
+  border: .5px solid rgba(92,78,158,.15);
+  padding: 1.75rem 1.5rem;        /* 28px 24px */
+}
+
+.feat-icon {
+  width: 2.5rem;                  /* 40px */
+  height: 2.5rem;
+  background: #1E1535;
+  border-radius: 0.625rem;        /* 10px */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;            /* 16px */
+}
+.feat-icon svg { width: 1.25rem; height: 1.25rem; color: #E8C547; }
+
+.feat-title {
+  font-family: var(--font-dm-sans), sans-serif;
+  font-size: 0.9375rem;           /* 15px */
+  font-weight: 500;
+  color: #1E1535;
+  margin-bottom: 0.5rem;          /* 8px */
+}
+
+.feat-desc {
+  font-family: var(--font-dm-sans), sans-serif;
+  font-size: 0.8125rem;           /* 13px */
+  color: #6b7280;
+  line-height: 1.65;
+}
+
+/* ── MISSION ── */
+.mission {
+  background: #1E1535;
+  padding: 3.25rem 3rem;          /* 52px 48px */
+  text-align: center;
+}
+
+.mission-h {
+  font-family: var(--font-playfair), serif;
+  font-size: 1.75rem;             /* 28px */
+  color: #EDE8FF;
+  margin-bottom: 0.875rem;        /* 14px */
+}
+
+.mission-sub {
+  font-family: var(--font-dm-sans), sans-serif;
+  font-size: 0.875rem;            /* 14px */
+  color: rgba(237,232,255,.65);
+  line-height: 1.8;
+  max-width: 32.5rem;             /* 520px */
+  margin: 0 auto 1.5rem;          /* 24px bottom */
+}
+
+.mission-cta {
+  display: inline-block;
+  font-family: var(--font-dm-sans), sans-serif;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #2A1F00;
+  background: #E8C547;
+  border: none;
+  border-radius: 1.25rem;         /* 20px */
+  padding: 0.75rem 2rem;          /* 12px 32px */
+  cursor: pointer;
+  transition: background .2s;
+}
+.mission-cta:hover { background: #f0ce55; }

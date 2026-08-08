@@ -12,7 +12,7 @@ Due to tailwind we have to do this math:
 
 .site-footer {
   background: #1E1535;
-  padding: 1.125rem 3rem;
+  padding: 1.125rem 4rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
