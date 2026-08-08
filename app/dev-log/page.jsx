@@ -67,7 +67,15 @@ const TABS = [
 //
 // Leave a tab's entry out entirely (or null) to show no pinned card there.
 const PINNED = {
-  progression: null,
+  progression: {
+    label: "PINNED",
+     title: "Roadmap",
+     body: "Phase boards for the current build-out.",
+     links: [
+       { text: "Phase 1 →", url: "https://trello.com/b/phase1" },
+       { text: "Phase 2 →", url: "https://trello.com/b/phase2" },
+     ],
+  },
   future: null,
   optimize: null,
   learned: null,
@@ -730,7 +738,7 @@ function FuturePane() {
     <>
       <div className="dn-content-header">
         <div className="dn-content-title">🔮 <span>Future Updates</span></div>
-        <div className="dn-content-desc">What's coming next for SonicVerse.</div>
+        <div className="dn-content-desc">What's coming next for Roam.</div>
         <div className="dn-count-line"><span>{items.length}</span> features planned</div>
         {/* Optional pinned card — no-op if PINNED.future is null */}
         <PinnedCard id="future" />
@@ -822,7 +830,7 @@ function LearnedPane() {
     <>
       <div className="dn-content-header">
         <div className="dn-content-title">🧠 <span>What I Learned</span></div>
-        <div className="dn-content-desc">Lessons and insights picked up while building SonicVerse.</div>
+        <div className="dn-content-desc">Lessons and insights picked up while building Roam.</div>
         <div className="dn-count-line"><span>{items.length}</span> lessons logged</div>
         {/* Optional pinned card — no-op if PINNED.learned is null */}
         <PinnedCard id="learned" />
@@ -893,7 +901,7 @@ function StackPane() {
     <>
       <div className="dn-content-header">
         <div className="dn-content-title">⚙️ <span>Tech Stack</span></div>
-        <div className="dn-content-desc">Every tool and service powering SonicVerse.</div>
+        <div className="dn-content-desc">Every tool and service powering Roam.</div>
         {/* Optional pinned card — no-op if PINNED.stack is null */}
         <PinnedCard id="stack" />
       </div>
@@ -1017,7 +1025,7 @@ const DevLog = () => {
       <header className="dn-topbar">
         <div className="dn-topbar-left">
           <div className="dn-logo-dot" />
-          <span className="dn-topbar-title">Sonic<span>Verse</span> — Dev Log</span>
+          <span className="dn-topbar-title">Ro<span>am</span> — Dev Log</span>
         </div>
         <div className="dn-topbar-right">
           <span className="dn-live-badge">● live</span>

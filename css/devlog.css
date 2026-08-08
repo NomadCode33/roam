@@ -11,9 +11,14 @@ html {
   --dn-border:        rgba(255, 255, 255, 0.06);
   --dn-border-hover:  rgba(0, 180, 255, 0.2);
   --dn-border-active: rgba(0, 180, 255, 0.35);
+
+  --dn-border-hover-purple:  rgba(139, 127, 212, 0.2);
+  --dn-border-active-purple: rgba(139, 127, 212, 0.35);
  
   --dn-cyan:       #00b4ff;
   --dn-cyan-dim:   rgba(0, 180, 255, 0.1);
+  --dn-purple:     #5C4E9E;
+  --dn-lpurple-dim: rgba(92, 78, 158, 0.1);
   --dn-blue:       #1a6fff;
   --dn-text:       #e2e8f0;
   --dn-text-muted: #4a5a6a;
@@ -178,7 +183,7 @@ html {
 .dn-logo-dot {
   width: 13px; height: 13px;
   border-radius: 50%;
-  background: var(--dn-cyan);
+  background: var(--dn-purple);
   box-shadow: 0 0 12px rgba(0,180,255,0.6);
   animation: pulse-dot 2.5s ease-in-out infinite;
   flex-shrink: 0;
@@ -197,7 +202,7 @@ html {
   text-transform: uppercase;
 }
  
-.dn-topbar-title span { color: var(--dn-cyan); }
+.dn-topbar-title span { color: var(--dn-purple); }
  
 .dn-topbar-right {
   display: flex;
@@ -283,9 +288,9 @@ html {
 }
  
 .dn-tab.active {
-  color: var(--dn-cyan);
-  background: var(--dn-cyan-dim);
-  border-left-color: var(--dn-cyan);
+  color: var(--dn-purple);
+  background: var(--dn-lpurple-dim);
+  border-left-color: var(--dn-purple);
 }
  
 .dn-tab-icon {
@@ -314,14 +319,14 @@ html {
   color: var(--dn-text-muted);
   font-style: italic;
 }
- 
+/* For the subtext below the tab name */ 
 .dn-tab.active .dn-tab-sub { color: rgba(0,180,255,0.5); }
  
 .dn-tab-badge {
   margin-left: auto;
-  background: var(--dn-cyan-dim);
-  color: var(--dn-cyan);
-  border: 1px solid var(--dn-border-active);
+  background: var(--dn-lpurple-dim);
+  color: var(--dn-purple);
+  border: 1px solid var(--dn-border-active-purple);
   border-radius: 20px;
   font-size: var(--dn-tab-badge-font);
   padding: 0.14rem 0.65rem;
@@ -426,7 +431,7 @@ html {
   line-height: 1;
 }
  
-.dn-content-title span { color: var(--dn-cyan); }
+.dn-content-title span { color: var(--dn-purple); }
  
 .dn-content-desc {
   font-size: var(--dn-desc-size);
@@ -444,7 +449,7 @@ html {
 }
  
 .dn-count-line span {
-  color: var(--dn-cyan);
+  color: var(--dn-purple);
   font-weight: 700;
 }
 
@@ -457,7 +462,7 @@ html {
   padding: 1rem 1.25rem;
   background: var(--dn-surface-2);
   border: 1px solid var(--dn-border);
-  border-left: 3px solid var(--dn-cyan);
+  border-left: 3px solid var(--dn-purple);
   border-radius: var(--dn-card-radius);
 }
 
@@ -466,7 +471,7 @@ html {
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--dn-cyan);
+  color: var(--dn-purple);
   margin-bottom: 0.35rem;
 }
 
@@ -503,7 +508,7 @@ html {
   margin-top: 0.6rem;
   font-size: 0.9rem;
   font-weight: 600;
-  color: var(--dn-cyan);
+  color: var(--dn-purple);
   text-decoration: none;
 }
 
@@ -555,7 +560,7 @@ html {
   margin-top: 0.65rem;
 }
  
-.dn-card-body a { color: var(--dn-cyan); text-decoration: none; transition: color 0.15s ease; }
+.dn-card-body a { color: var(--dn-purple); text-decoration: none; transition: color 0.15s ease; }
 .dn-card-body a:hover { color: #33c9ff; text-decoration: underline; }
 
 /* ─── Card Bullets — nested levels ──────────────────────── */
@@ -599,7 +604,7 @@ html {
   width: 5px;
   height: 5px;
   border-radius: 50%;
-  background: var(--dn-cyan);
+  background: var(--dn-purple);
   opacity: 0.75;
 }
 
@@ -618,7 +623,7 @@ html {
   height: 5px;
   border-radius: 50%;
   background: transparent;
-  border: 1.5px solid var(--dn-cyan);
+  border: 1.5px solid var(--dn-purple);
   opacity: 0.65;
 }
 
@@ -633,7 +638,7 @@ html {
   position: absolute;
   left: 2.4rem;
   top: 0;
-  color: var(--dn-cyan);
+  color: var(--dn-purple);
   opacity: 0.6;
   font-size: 0.9em;
 }
@@ -649,7 +654,7 @@ html {
   position: absolute;
   left: 3.7rem;
   top: 0;
-  color: var(--dn-cyan);
+  color: var(--dn-purple);
   opacity: 0.6;
   font-size: 1em;
 }
@@ -665,7 +670,7 @@ html {
   position: absolute;
   left: 4.95rem;
   top: 0;
-  color: var(--dn-cyan);
+  color: var(--dn-purple);
   opacity: 0.55;
   font-size: 0.85em;
 }
@@ -867,7 +872,7 @@ html {
  
 /* ─── Resources ──────────────────────────────────────────── */
 .dn-resource-link {
-  color: var(--dn-cyan);
+  color: var(--dn-purple);
   text-decoration: none;
   font-family: var(--font-display);
   font-size: var(--dn-card-title);
@@ -1118,7 +1123,7 @@ html {
     white-space: nowrap; min-width: 85px; gap: 0.2rem;
     font-size: 0.78rem;
   }
-  .dn-tab.active         { border-left-color: transparent; border-bottom-color: var(--dn-cyan); }
+  .dn-tab.active         { border-left-color: transparent; border-bottom-color: var(--dn-purple); }
   .dn-tab-sub            { display: none; }
   .dn-tab-badge          { margin-left: 0; font-size: 0.7rem; }
   .dn-tab-icon           { font-size: 1.1rem; width: 22px; }
@@ -1192,7 +1197,7 @@ html {
   .dn-tab:nth-child(8) {
     grid-column: 1 / 3;
   }
-  .dn-tab.active         { border-left-color: transparent; border-bottom-color: var(--dn-cyan); }
+  .dn-tab.active         { border-left-color: transparent; border-bottom-color: var(--dn-purple); }
   .dn-tab-sub            { display: none; }
   .dn-tab-badge          { display: none; }
   .dn-tab-icon           { font-size: 1.05rem; width: 20px; }
