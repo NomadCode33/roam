@@ -13,6 +13,8 @@
     "@tabler/icons-react": "^3.46.0",
     "@tanstack/react-query": "^5.100.6",
     "@turf/turf": "^7.3.5",
+    "@upstash/ratelimit": "^2.0.8",
+    "@upstash/redis": "^1.38.2",
     "leaflet": "^1.9.4",
     "mapbox-gl": "^3.23.0",
     "next": "^16.2.12",
