@@ -102,7 +102,7 @@ const PINNED = {
   progression: {
     label: "PINNED",
      title: "Project Hub",
-     body: "Repo, board, and design files for the current build.",
+     body: "Repo, board, and design files for the current build.d",
      links: [
       { text: "Website →", url: "https://roam-dusky-alpha.vercel.app/" },
       { text: "Roam GitHub Repo →", url: "https://github.com/NomadCode33/roam" }, 
