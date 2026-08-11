@@ -351,21 +351,21 @@ const DATA = {
   // Fields per entry: id, date, title, body (string/array), tag/tags (optional)
   progression: [
     {
-      id: 1,
+      id: 6,
       date: "July 28, 2026",
       title: "ROA-010 closed — Core database schema complete",
       body: "All 14 tables created with correct structure, constraints, and foreign key relationships. PostGIS confirmed. Schema verified. ROA-010 moved to Done.",
       tag: "feature",
     },
     {
-      id: 2,
+      id: 5,
       date: "July 28, 2026",
       title: "Full schema verification completed",
       body: "Ran three confirmation queries against `information_schema.tables`, `information_schema.columns`, and `information_schema.table_constraints`. All 14 tables confirmed present. All named constraints verified. Column types and nullability correct across all tables.",
       tag: "feature",
     },
     {
-      id: 3,
+      id: 4,
       date: "July 28, 2026",
       title: "Remaining 9 tables created",
       body: [
@@ -375,21 +375,21 @@ const DATA = {
       tag: "feature",
     },
     {
-      id: 4,
+      id: 3,
       date: "July 28, 2026",
       title: "post_points_unique_order constraint added",
       body: "Added `UNIQUE (post_id, order_index)` to `post_points` as a separate ALTER TABLE after identifying the gap. This prevents two points on the same post from occupying the same slot — the BETWEEN constraint alone was insufficient.",
       tag: "feature",
     },
     {
-      id: 5,
+      id: 2,
       date: "July 28, 2026",
       title: "users and places tables created",
       body: "Created the `users` table with UUID primary key referencing `auth.users(id)`, soft-deletable profile fields, role system with CHECK constraint, and confirmed-age boolean. Created the `places` table with PostGIS `geometry(Point, 4326)` coordinates column, Mapbox-compatible `place_id` deduplication key, heatmap weight, category array, and all counter columns defaulting to 0.",
       tag: "feature",
     },
     {
-      id: 6,
+      id: 1,
       date: "July 28, 2026",
       title: "PostGIS Extension Enabled",
       body: "Enabled the PostGIS extension in Supabase via `CREATE EXTENSION IF NOT EXISTS postgis`. Confirmed active at version 3.3.7 via `pg_extension` verification query. Required first step before any geometry columns could be created.",
@@ -400,12 +400,12 @@ const DATA = {
   // ── future: grouped by priority ("high" | "medium" | "low") in FuturePane ─
   // Fields per entry: id, title, priority, body (string/array), mediaItems (optional)
   future: [
-    { id: 1, 
+    { id: 2, 
       title: "ROA-008 — Auth (Google + Apple + email/password) + public.users trigger",
       priority: "high",  
       body: "`auth.users` gets a row automatically on signup; `public.users` does not — without this trigger, signed-up users have no row in the app's own users table, breaking everything downstream that joins against it (posts, follows, blocks). Also unblocks ROA-003 Phase D, since `/api/auth/login` doesn't exist until this ships."
     },
-    { id: 2, 
+    { id: 1, 
       title: "Migrate middleware.js → proxy.js/proxy.ts",
       priority: "high",  
       body: "Next.js 16.2.12 logs this as deprecated at every dev server start. Low cost to fix now; becomes actual tech debt if more routes get built against the old convention first. Needs resolving before ROA-003 Phase D is trusted as 'tested against current Next.js behavior.'"
@@ -540,11 +540,22 @@ optimize: [
       date: "Mar 25, 2026", 
       body: [
         "The start script had nodemon and dev had node — completely backwards. Corrected so start uses node for Render and dev uses nodemon.",
+        "The start script had nodemon and dev had node — completely backwards. Corrected so start uses node for Render and dev uses nodemon.",
       ] 
     },
   */
   bugs: [
-    { id: 1, 
+    { 
+      id: 3, 
+      title: "notifications: wrong column name (recipient_id vs user_id)", 
+      status: "fixed", 
+      date: "Mar 25, 2026", 
+      body: [
+        "Symptom: `ERROR 42703: column 'recipient_id' does not exist` when running the notifications policy set. Root cause: assumed a column name instead of verifying the real schema.",
+        "Fix: queried `information_schema.columns`, found the real column was `user_id`, rewrote all three policies using the correct name."
+      ] 
+    },
+    { id: 2, 
       title: "users RLS policy: enabled but zero policies (locked to nobody)", 
       status: "fixed", 
       date: "July 28, 2026", 
@@ -554,7 +565,7 @@ optimize: [
       ] 
     },
     { 
-      id: 2, 
+      id: 1, 
       title: "follows table: only 1 of 3 required policies existed", 
       status: "fixed", 
       date: "July 28, 2026", 
@@ -802,6 +813,42 @@ const parseBodySegments = (text) => {
   return segments;
 };
 
+// ─── parseInlineSegments / InlineText helpers ──────────────────────────────────
+// Handles single-backtick inline code spans (`like_this`) inside plain prose —
+// as opposed to the ```fenced``` blocks parseBodySegments/CardCode handle above.
+// These render as small <code> chips (.dn-inline-code, see devlog.css) instead
+// of showing the literal backtick characters, which is what was happening
+// anywhere a card's body/bullet text used single backticks for things like
+// table or column names.
+//
+// A backtick can be escaped with a backslash (\`) to render as a literal `
+// character instead of opening/closing a code span, for the rare case that's
+// needed. Any text that isn't wrapped in backticks is left completely as-is.
+const parseInlineSegments = (text) => {
+  const ESCAPE_TOKEN = '\u0000'; // placeholder while splitting, restored below
+  const protectedText = text.replace(/\\`/g, ESCAPE_TOKEN);
+  const parts = protectedText.split(/`([^`]+)`/g);
+  // String.split with a capturing group alternates [text, code, text, code, ...]
+  return parts
+    .map((value, i) => ({
+      type: i % 2 === 1 ? 'inline-code' : 'text',
+      value: value.replace(new RegExp(ESCAPE_TOKEN, 'g'), '`'),
+    }))
+    .filter((seg) => seg.value !== '');
+};
+
+// Drop-in replacement for rendering a plain string that may contain inline
+// code spans — use anywhere `{someText}` was rendered directly (card titles,
+// body paragraphs, bullets). Renders untouched if there are no backticks.
+const InlineText = ({ text }) => {
+  if (!text) return null;
+  return parseInlineSegments(text).map((seg, i) =>
+    seg.type === 'inline-code'
+      ? <code className="dn-inline-code" key={i}>{seg.value}</code>
+      : <span key={i}>{seg.value}</span>
+  );
+};
+
 // ─── CardCode helper ───────────────────────────────────────────────────────────
 // Renders one code block. Used for:
 //   1) the standalone `code` (+ optional `lang`) field on any card, in any tab
@@ -844,16 +891,18 @@ const CardBody = ({ body, code, lang }) => {
           return parseBodySegments(entry.text).map((seg, j) =>
             seg.type === 'code'
               ? <CardCode key={`${i}-${j}`} code={seg.value} lang={seg.lang} />
-              : <div className="dn-card-body" key={`${i}-${j}`}>{seg.value}</div>
+              : <div className="dn-card-body" key={`${i}-${j}`}><InlineText text={seg.value} /></div>
           );
         }
         // Plain string — scanned for ```fenced``` code blocks so text and code
-        // can be interleaved within one paragraph's worth of content
+        // can be interleaved within one paragraph's worth of content. Each
+        // resulting text segment is then run through InlineText so single
+        // `backticks` inside it render as inline code chips too.
         if (typeof entry === 'string') {
           return parseBodySegments(entry).map((seg, j) =>
             seg.type === 'code'
               ? <CardCode key={`${i}-${j}`} code={seg.value} lang={seg.lang} />
-              : <div className="dn-card-body" key={`${i}-${j}`}>{seg.value}</div>
+              : <div className="dn-card-body" key={`${i}-${j}`}><InlineText text={seg.value} /></div>
           );
         }
         return null;
@@ -888,14 +937,14 @@ const CardBullets = ({ bullets, depth = 0 }) => {
         if (typeof point === 'string') {
           return (
             <li key={i} className={`dn-card-bullet-item ${levelClass}`}>
-              {point}
+              <InlineText text={point} />
             </li>
           );
         }
         // Object with text + optional children array
         return (
           <li key={i} className={`dn-card-bullet-item ${levelClass}`}>
-            {point.text}
+            <InlineText text={point.text} />
             {/* Recurse one level deeper for any children */}
             {point.children && point.children.length > 0 && (
               <CardBullets bullets={point.children} depth={depth + 1} />
@@ -1201,7 +1250,7 @@ function ProgressionPane() {
               <Tags tag={item.tag} tags={item.tags} />
               <span className="dn-date">{item.date}</span>
             </div>
-            <div className="dn-card-title">{item.title}</div>
+            <div className="dn-card-title"><InlineText text={item.title} /></div>
             {/* Was {item.body && <div className="dn-card-body">{item.body}</div>} */}
             {/* CardBody handles string/array body, embedded bullets/code, and the standalone code+lang fields */}
             <CardBody body={item.body} code={item.code} lang={item.lang} />
@@ -1246,7 +1295,7 @@ function FuturePane() {
             <div className="dn-cards">
               {byPriority(p).map((item) => (
                 <div className="dn-card" key={item.id}>
-                  <div className="dn-card-title">{item.title}</div>
+                  <div className="dn-card-title"><InlineText text={item.title} /></div>
                   {/* CardBody handles string or array, plus standalone code+lang fields */}
                   <CardBody body={item.body} code={item.code} lang={item.lang} />
                   {/* Optional bullet list — omit bullets field on card data to hide */}
@@ -1301,7 +1350,7 @@ function OptimizePane() {
                     <Tags tag={item.tag} tags={item.tags} />
                     <span className="dn-date">{item.date}</span>
                   </div>
-                  <div className="dn-card-title">{item.title}</div>
+                  <div className="dn-card-title"><InlineText text={item.title} /></div>
                   {/* CardBody handles string or array, plus standalone code+lang fields */}
                   <CardBody body={item.body} code={item.code} lang={item.lang} />
                   {/* Optional bullet list — omit bullets field on card data to hide */}
@@ -1344,7 +1393,7 @@ function LearnedPane() {
                 #{String(i + 1).padStart(2, "0")}
               </span>
             </div>
-            <div className="dn-card-title">{item.topic}</div>
+            <div className="dn-card-title"><InlineText text={item.topic} /></div>
             {/* CardBody handles string or array, plus standalone code+lang fields */}
             <CardBody body={item.body} code={item.code} lang={item.lang} />
             {/* Optional bullet list — omit bullets field on card data to hide */}
@@ -1392,7 +1441,7 @@ function BugsPane() {
               <span className={`dn-bug-status ${statusClass(item.status)}`}>{statusLabel(item.status)}</span>
               {item.date && <span className="dn-date">{item.date}</span>}
             </div>
-            <div className="dn-card-title">{item.title}</div>
+            <div className="dn-card-title"><InlineText text={item.title} /></div>
             {/* CardBody handles string or array, plus standalone code+lang fields */}
             <CardBody body={item.body} code={item.code} lang={item.lang} />
             {/* Optional bullet list — omit bullets field on card data to hide */}
@@ -1455,7 +1504,7 @@ function SnippetsPane() {
             <div className="dn-card-meta">
               <span className="dn-snippet-lang">{item.lang}</span>
             </div>
-            <div className="dn-card-title">{item.title}</div>
+            <div className="dn-card-title"><InlineText text={item.title} /></div>
             {/* CardBody handles string or array, plus the code field (lang badge above already
                 shows the language, so no lang prop passed here — avoids showing it twice) */}
             <CardBody body={item.body} code={item.code} />
