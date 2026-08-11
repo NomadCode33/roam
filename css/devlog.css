@@ -869,6 +869,20 @@ html {
   overflow-x: auto;
   line-height: 1.8;
 }
+
+/* ─── Code block language label ─────────────────────────── */
+/* Optional — only renders when a card/body code block carries a `lang`
+   value (e.g. "sql", "js"). Sits above the code inside the same block. */
+.dn-code-lang {
+  font-family: inherit;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--dn-text-dim);
+  opacity: 0.6;
+  margin-bottom: 0.6rem;
+}
  
 /* ─── Resources ──────────────────────────────────────────── */
 .dn-resource-link {
