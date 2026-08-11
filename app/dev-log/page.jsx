@@ -101,11 +101,12 @@ const TABS = [
 const PINNED = {
   progression: {
     label: "PINNED",
-     title: "Roadmap",
-     body: "Phase boards for the current build-out.",
+     title: "Project Hub",
+     body: "Repo, board, and design files for the current build.",
      links: [
+      { text: "Website →", url: "https://roam-dusky-alpha.vercel.app/" },
       { text: "Roam GitHub Repo →", url: "https://github.com/NomadCode33/roam" }, 
-      { text: "Phase 1 →", url: "https://trello.com/b/phase1" },
+      { text: "Phase 1 (Kanban) →", url: "https://trello.com/b/6ZvbHk51/roam-phase-1" },
       { text: "Figma →", url: "https://www.figma.com/design/YZmwBodxfLgd2Nq0umAsRZ/Roam-Website-Flowmap?node-id=0-1&p=f" },
      ],
      appliesTo: ["future", "optimize", "learned", "bugs"]
