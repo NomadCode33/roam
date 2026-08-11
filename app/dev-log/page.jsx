@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 //import Sidebar from "../../components/dev-log/Sidebar";
 import "../../css/devlog.css";
 
@@ -46,6 +46,16 @@ const TABS = [
 // instead of inheriting one via appliesTo.
 // "all" is resolved dynamically off the TABS list, so it auto-covers any tab
 // you add later — no need to touch appliesTo when the tab count grows past 8.
+//
+// ── Section-wide targeting: "section:<SECTION>" (NEW) ──
+// Broadcast a card to every tab within one sidebar section only — PROGRESS or
+// REFERENCE — instead of every tab site-wide. Also resolved live off TABS, so
+// any tab you add later to that section automatically inherits it too, no
+// PINNED edits required.
+//   appliesTo: "section:PROGRESS"      // every tab under PROGRESS, current or future
+//   appliesTo: "section:REFERENCE"     // every tab under REFERENCE, current or future
+// Same precedence rule applies: a tab's own direct PINNED[id] entry always
+// wins over a section-wide inherited one.
 //
 // To take a card down entirely, delete its entry (or set it to null/undefined)
 // and redeploy — no separate on/off flag needed.
@@ -96,13 +106,29 @@ const TABS = [
 //     appliesTo: "all",
 //   },
 //
+// One card, shown on every PROGRESS tab only (current + future ones):
+//   progression: {
+//     title: "Sprint board",
+//     body: "Live task tracking for the current sprint.",
+//     linkText: "Open Trello →",
+//     linkUrl: "https://trello.com/b/yourboard",
+//     appliesTo: "section:PROGRESS",
+//   },
+//
+// One card, shown on every REFERENCE tab only (current + future ones):
+//   stack: {
+//     title: "House rules",
+//     body: "Same conventions apply across every reference doc.",
+//     appliesTo: "section:REFERENCE",
+//   },
+//
 // Leave a tab's entry out entirely (or null) to show no pinned card there
 // (unless it's inheriting one from another tab's `appliesTo`).
 const PINNED = {
   progression: {
     label: "PINNED",
      title: "Project Hub",
-     body: "Repo, board, and design files for the current build.d",
+     body: "Repo, board, and design files for the current build.",
      links: [
       { text: "Website →", url: "https://roam-dusky-alpha.vercel.app/" },
       { text: "Roam GitHub Repo →", url: "https://github.com/NomadCode33/roam" }, 
@@ -933,11 +959,16 @@ const CardMedia = ({ mediaItems }) => {
 // "all" future-proof (adding a 9th tab to TABS just works, no PINNED edits).
 const TAB_IDS = TABS.map((t) => t.id);
 
+// Map of tab id → section name (e.g. "progression" → "PROGRESS"), also pulled
+// live from TABS. Used to resolve "section:<NAME>" appliesTo targeting below.
+const TAB_SECTION = Object.fromEntries(TABS.map((t) => [t.id, t.section]));
+
 // Resolves which pinned card config (if any) should render on a given tab id.
 // Order of precedence:
 //   1. A direct PINNED[id] entry always wins if present.
-//   2. Otherwise, scan PINNED for any entry whose `appliesTo` covers this id
-//      (either an explicit array of tab ids, or the string "all").
+//   2. Otherwise, scan PINNED for any entry whose `appliesTo` covers this id —
+//      an explicit array of tab ids, the string "all", or "section:<NAME>"
+//      (matches every tab whose TABS.section equals <NAME>).
 //   3. No match on either front → no pinned card for this tab.
 function resolvePinnedConfig(id) {
   if (PINNED[id]) return PINNED[id];
@@ -945,7 +976,17 @@ function resolvePinnedConfig(id) {
   for (const key in PINNED) {
     const candidate = PINNED[key];
     if (!candidate || !candidate.appliesTo) continue;
-    const targets = candidate.appliesTo === "all" ? TAB_IDS : candidate.appliesTo;
+
+    const applies = candidate.appliesTo;
+    // "section:PROGRESS" / "section:REFERENCE" — matches every tab sharing
+    // that section, resolved live off TAB_SECTION so future tabs inherit it.
+    if (typeof applies === "string" && applies.startsWith("section:")) {
+      const sectionName = applies.slice("section:".length);
+      if (TAB_SECTION[id] === sectionName) return candidate;
+      continue;
+    }
+
+    const targets = applies === "all" ? TAB_IDS : applies;
     if (targets.includes(id)) return candidate;
   }
 
@@ -991,6 +1032,146 @@ const PinnedCard = ({ id }) => {
         </a>
       )}
     </div>
+  );
+};
+
+// ─── ScrollDock ───────────────────────────────────────────────────────────────
+// Persistent bottom-right control cluster (lives outside .dn-pane so it never
+// unmounts on tab switch — one instance, shared scroll container = .dn-main,
+// the element that actually scrolls in this layout).
+//
+//   scrollRef:    ref to the scrollable container (.dn-main)
+//   activeTab:    current tab id — position memory is scoped per tab, since
+//                 "my spot" on Progression has nothing to do with "my spot"
+//                 on Bug Log. Saved positions are kept in a ref keyed by tab id
+//                 so switching tabs doesn't clobber a different tab's saved spot.
+const SCROLL_EDGE_PX = 12;      // how close to top/bottom counts as "there" (fades arrow)
+const TOAST_DURATION_MS = 1800; // how long "position saved/restored" stays visible
+
+const ScrollDock = ({ scrollRef, activeTab }) => {
+  const [atTop, setAtTop] = useState(true);
+  const [atBottom, setAtBottom] = useState(false);
+  const [canScroll, setCanScroll] = useState(false); // false when content is too short to scroll at all
+  const [armed, setArmed] = useState(false);          // true once a position is saved for this tab
+  const [toast, setToast] = useState("");             // current toast message ("" = hidden)
+
+  // Saved scroll positions, one per tab id — ref (not state) since writing it
+  // shouldn't trigger a re-render, only the button press that reads it should.
+  const savedPositions = useRef({});
+  const toastTimer = useRef(null);
+
+  // Recomputes top/bottom/scrollable flags from the live scroll container.
+  const measure = () => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const { scrollTop, scrollHeight, clientHeight } = el;
+    setAtTop(scrollTop <= SCROLL_EDGE_PX);
+    setAtBottom(scrollTop + clientHeight >= scrollHeight - SCROLL_EDGE_PX);
+    setCanScroll(scrollHeight - clientHeight > SCROLL_EDGE_PX * 2);
+  };
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    measure();
+    el.addEventListener("scroll", measure, { passive: true });
+    // Content height changes on tab switch (different data) — re-measure,
+    // and also drop the "armed" indicator since a new tab has no saved spot
+    // (each tab's saved position lives independently in savedPositions.current).
+    setArmed(Boolean(savedPositions.current[activeTab]));
+    const resizeObserver = new ResizeObserver(measure);
+    resizeObserver.observe(el);
+    return () => {
+      el.removeEventListener("scroll", measure);
+      resizeObserver.disconnect();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTab]);
+
+  // Shows a toast message briefly, replacing any toast already in flight.
+  const showToast = (message) => {
+    setToast(message);
+    if (toastTimer.current) clearTimeout(toastTimer.current);
+    toastTimer.current = setTimeout(() => setToast(""), TOAST_DURATION_MS);
+  };
+
+  const scrollToTop = () => scrollRef.current?.scrollTo({ top: 0, behavior: "smooth" });
+  const scrollToBottom = () => {
+    const el = scrollRef.current;
+    if (!el) return;
+    el.scrollTo({ top: el.scrollHeight, behavior: "smooth" });
+  };
+
+  // Save/restore toggle — one button, two behaviors depending on `armed`.
+  // Not armed: capture the current scroll position for this tab, arm it.
+  // Armed: smooth-scroll back to the captured position, then disarm.
+  const handlePositionClick = () => {
+    const el = scrollRef.current;
+    if (!el) return;
+
+    if (!armed) {
+      savedPositions.current[activeTab] = el.scrollTop;
+      setArmed(true);
+      showToast("Position saved");
+    } else {
+      const target = savedPositions.current[activeTab] ?? 0;
+      el.scrollTo({ top: target, behavior: "smooth" });
+      setArmed(false);
+      delete savedPositions.current[activeTab];
+      showToast("Position restored");
+    }
+  };
+
+  if (!canScroll) return null; // nothing to scroll — dock stays out of the way entirely
+
+  return (
+    <>
+      <div className="dn-scrolldock">
+        {/* Scroll to top — fades out once already at the top */}
+        <button
+          className={`dn-dock-btn dn-dock-pulse${atTop ? " dn-dock-hidden" : ""}`}
+          onClick={scrollToTop}
+          aria-label="Scroll to top"
+          disabled={atTop}
+        >
+          ↑
+          {/* CHANGED: was "Jump to latest entry" — same issue, inverted direction
+              and date-dependent phrasing. "Scroll to top" is neutral and accurate. */}
+          <span className="dn-dock-tooltip">Scroll to top</span>
+        </button>
+
+        {/* Scroll to bottom — fades out once already at the bottom.
+            NEW: reordered below "scroll to top" so the stack reads top→bottom
+            in the same direction as the actions themselves. */}
+        <button
+          className={`dn-dock-btn dn-dock-pulse${atBottom ? " dn-dock-hidden" : ""}`}
+          onClick={scrollToBottom}
+          aria-label="Scroll to bottom"
+          disabled={atBottom}
+        >
+          ↓
+          <span className="dn-dock-tooltip">Scroll to bottom</span>
+        </button>
+
+        {/* Save/restore position toggle — pulses with an offset timing/color
+            so it doesn't beat in sync with the top/bottom buttons */}
+        <button
+          className={`dn-dock-btn dn-dock-pulse-alt${armed ? " dn-dock-armed" : ""}`}
+          onClick={handlePositionClick}
+          aria-label={armed ? "Return to saved position" : "Save current position"}
+        >
+          {armed ? "◎" : "○"}
+          <span className="dn-dock-tooltip">
+            {armed ? "Return to saved spot" : "Save your spot here"}
+          </span>
+        </button>
+      </div>
+
+      {/* Toast — "Position saved" / "Position restored" confirmation */}
+      <div className={`dn-dock-toast${toast ? " dn-dock-toast-show" : ""}`}>
+        {toast}
+      </div>
+    </>
   );
 };
 
@@ -1356,6 +1537,11 @@ const DevLog = () => {
 
   const [activeTab, setActiveTab] = useState("progression");
 
+  // Ref to the scrollable content container — passed to ScrollDock so it can
+  // read/drive scroll position. .dn-main is the actual scrolling element in
+  // this layout (sidebar + topbar stay fixed).
+  const mainScrollRef = useRef(null);
+
   const sections = [...new Set(TABS.map((t) => t.section))];
   const getCount = (id) => { const d = DATA[id]; return Array.isArray(d) ? d.length : 0; };
   const formattedDate = new Date().toLocaleDateString("en-US", {
@@ -1403,7 +1589,7 @@ const DevLog = () => {
           ))}
         </nav>
 
-        <main className="dn-main">
+        <main className="dn-main" ref={mainScrollRef}>
           {TABS.map((tab) => (
             <div key={tab.id} className={`dn-pane${activeTab === tab.id ? " active" : ""}`}>
               {activeTab === tab.id && PANES[tab.id]}
@@ -1411,6 +1597,10 @@ const DevLog = () => {
           ))}
         </main>
       </div>
+
+      {/* Persistent scroll dock — lives outside .dn-main/.dn-pane so it never
+          remounts on tab switch; fixed-position via CSS, bottom-right. */}
+      <ScrollDock scrollRef={mainScrollRef} activeTab={activeTab} />
     </div>
   );
 };
