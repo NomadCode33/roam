@@ -360,169 +360,303 @@ const PINNED = {
 /* 
     {
       id: ,
-      date: "July 28, 2026",
+      date: "Jly, 2026",
       title: "",
       body: "",
-      tag: "feature",
+      tag: "feature"
     },
+    Jy, 2026
 */
 const DATA = {
   // ── progression: flat list, rendered by ProgressionPane ──────────────────
   // Fields per entry: id, date, title, body (string/array), tag/tags (optional)
   progression: [
     {
+      id: 45,
+      date: "August 03, 2026",
+      title: "`saves_select_own` — rewritten (not yet verified)",
+      body: "Rewritten to hide saves of a blocked party's posts, using the same `is_blocked_either_direction()` function. SQL provided and explained; not yet executed or tested as of the end of this session, flagged as the immediate next step.",
+      tag: "refactor"
+    },
+    {
+      id: 44,
+      date: "August 03, 2026",
+      title: "Full blocking product spec agreed",
+      body: "Locked in: full mutual content invisibility everywhere (posts, comments, follows, saves) both directions; one deliberate exception for direct profile navigation showing a 'you're blocked' UI state (frontend, deferred to profile-page build); blocker retains blocklist visibility for unblocking; unblocking does not auto-restore a prior follow relationship; saves from a blocked party are hidden (not deleted) and auto-restore on unblock.",
+      tag: "feature"
+    },
+    {
+      id: 43,
+      date: "August 02, 2026",
+      title: "`remove_follows_on_block()` trigger",
+      body: "`AFTER INSERT` trigger on `blocks`, force-deletes any existing follow relationship in both directions the moment a block is created. Verified with real data: a pre-existing follow row survived a `blocks` DELETE unchanged, then was deleted immediately upon a fresh `blocks` INSERT for the same pair — proving the trigger fires on genuine INSERT events, not just that it compiles.",
+      tag: "feature"
+    },
+    {
+      id: 42,
+      date: "August 02, 2026",
+      title: "`posts_select_not_deleted`, `comments_select_not_deleted`, `follows_select_all` rewritten",
+      body: "All three policies rewritten to call `is_blocked_either_direction()` instead of querying `blocks` directly. Each re-tested with real inserted data using the exact impersonation test that originally caught the bug; all three flipped from returning the blocked user's content to returning `0 rows`.",
+      tag: "refactor"
+    },
+    {
+      id: 41,
+      date: "August 02, 2026",
+      title: "`is_blocked_either_direction()` SECURITY DEFINER function",
+      body: "Built as the fix for the RLS-blocks-RLS bug. It bypasses `blocks`' own RLS internally, returns only a boolean, never exposes the underlying row to a query the blocked user could run themselves. Verified via `pg_proc` and functionally tested for symmetry (both argument orders return `true` on a real blocked pair).",
+      tag: "feature"
+    },
+    {
+      id: 40,
+      date: "August 02, 2026",
+      title: "Blocking mutual-isolation bug (RLS-blocks-RLS)",
+      body: "Discovered via ad-hoc functional testing (not a formal ROA ticket) that `blocks_select_own`'s narrow policy (`auth.uid() = blocker_id` only) silently broke `EXISTS` subqueries against `blocks` from `posts`/`comments`/`follows` SELECT policies. Those subqueries are themselves subject to `blocks`' own RLS, so the blocked party could never see the row that should trigger their own hide-condition. Root-caused through a multi-step elimination process (ruled out owner-bypass, type mismatch, `auth.uid()` resolution failure) before finding the actual policy gap.",
+      tag: "fixed"
+    },
+    {
+      id: 39,
+      date: "August 02, 2026",
+      title: "ROA-012: Missing `blocks.blocked_id` index",
+      body: "Live-checked ROA-001's actual RLS policy SQL and found `blocked_id` was queried standalone in OR branches across `comments`/`follows`/`posts` policies. The pre-existing `blocks_unique_pair` composite index didn't cover this on its own. Added `idx_blocks_blocked_id`.",
+      tag: "fixed"
+    },
+    {
+      id: 38,
+      date: "August 02, 2026",
+      title: "ROA-012: Database Indexes (full description-list build)",
+      body: "Built every index from ROA-012's description, not just the doneWhen checklist. GIST on `places.coordinates`, GIN on `posts.vibe_tags`/`places.categories`, B-tree indexes across `places`, `posts`, `post_points`, `comments`, `reactions`, `follows`, `saves`, `notifications`, and `blocks`. Verified via `pg_indexes` and cross-checked against the Supabase dashboard UI. Confirmed `places_place_id_key` already covered the unique index requirement (skipped as a duplicate).",
+      tag: "feature"
+    },
+    {
+      id: 37,
+      date: "August 01, 2026",
+      title: "ROA-011 confirmed live in Supabase dashboard",
+      body: "All four functions and three triggers confirmed present and enabled under Database → Functions and Database → Triggers.",
+      tag: "deployment"
+    },
+    {
+      id: 36,
+      date: "August 01, 2026",
+      title: "RLS vs. grants layering confirmed on `places`",
+      body: "Verified that blocking client writes to `places` counters holds at both the grant layer and the RLS layer independently, by temporarily granting `UPDATE`, confirming RLS still blocked the write, then revoking and re-verifying the grant was gone.",
+      tag: "fixed"
+    },
+    {
+      id: 35,
+      date: "August 01, 2026",
+      title: "ROA-011 end-to-end verification",
+      body: "Ran real insert and delete tests against posts, reactions, and saves, confirming both the increment and decrement paths update `post_count`, `total_upvotes`, `save_count`, `popularity_score`, and `heatmap_weight` correctly, not just 'success' messages.",
+      tag: "feature"
+    },
+    {
+      id: 34,
+      date: "August 01, 2026",
+      title: "Schema mismatch: trigger functions referencing wrong column",
+      body: "Discovered `places.place_id` is a text slug, not the identifier other tables reference — `posts`, `reactions`, and `saves` all point at `places.id` (uuid). Rewrote all four functions to filter on `id`.",
+      tag: "fixed"
+    },
+    {
+      id: 33,
+      date: "August 01, 2026",
+      title: "ROA-011: Place counter triggers built",
+      body: "Built `recalc_place_metrics()` plus three trigger functions (`trg_posts_count`, `trg_reactions_count`, `trg_saves_count`) and their triggers, so `post_count`, `total_upvotes`, and `save_count` on `places` update automatically from real app activity instead of manual seeding.",
+      tag: "feature"
+    },
+    {
+      id: 32,
+      date: "July 31, 2026",
+      title: "Standing ROA Walkthrough Format Locked In",
+      body: "Established that all future ROA ticket walkthroughs across all conversations use the ROA-001 visual widget format (phases, code blocks, why/trade-off/quiz blocks, Done-When checklist), with sendPrompt branching buttons reserved only for tickets with genuine independent sub-tasks. Saved as a persistent memory rule.",
+      tag: "refactor"
+    },
+    {
+      id: 31,
+      date: "July 31, 2026",
+      title: "ROA-005: Terms of Service Page Live (Content Incomplete)",
+      body: "Built `/terms` using the same `dangerouslySetInnerHTML` pattern as `/privacy`. Route renders and is reachable, but see Bug Log — underlying content has unresolved template fields.",
+      tag: "feature"
+    },
+    {
+      id: 30,
+      date: "July 31, 2026",
+      title: "Next.js Upgraded to Current LTS",
+      body: "Ran `npm install next@latest`, confirmed already on current LTS (16.2.12) via live search verification. Confirmed `npm audit --force`'s proposed downgrade to `next@9.3.3` was a false-positive resolution path tied to a `postcss`/`sharp` transitive dependency, not a real fix — avoided.",
+      tag: "deployment"
+    },
+    {
+      id: 29,
+      date: "July 31, 2026",
+      title: "Removed Accidental TypeScript Toolchain",
+      body: "A `.tsx` file mistakenly introduced during the ROA-005 walkthrough caused Next.js to auto-scaffold a full TypeScript toolchain (`tsconfig.json`, `@types/react`, `next-env.d.ts`) into a JSX-only project. All three artifacts identified and removed; project confirmed to still be pure `.jsx`.",
+      tag: "fixed"
+    },
+    {
+      id: 28,
+      date: "July 31, 2026",
+      title: "ROA-005: Privacy Policy Page Live",
+      body: "Built and deployed `/privacy` as a publicly accessible Next.js App Router route, rendering a Termly-generated privacy policy via `dangerouslySetInnerHTML`. Confirmed working in production by user.",
+      tag: "feature"
+    },
+    {
+      id: 27,
+      date: "July 31, 2026",
+      title: "Service Role Key Rotation",
+      body: "Rotated off the leaked legacy Supabase `service_role` key after it was exposed via an uploaded `.env.local` file. Generated new secret key (`sb_secret_...`) under the non-legacy tab, confirmed no codebase dependencies existed yet (pre-auth-integration stage), and deleted the old legacy key. Confirmed by user as defunct.",
+      tag: "deployment"
+    },
+    {
       id: 26,
       date: "July 30, 2026",
       title: "Live Supabase service\\_role key exposure remediated",
       body: "Uploaded a live `.env.local` into chat, exposing the anon key, service_role key, and Mapbox token. Corrected remediation path researched live (Supabase's key system changed in 2025–2026): generate a new `sb_secret_...` key under the non-legacy tab, migrate server code, then delete the old legacy `service_role` key — avoiding a full JWT-secret rotation that would've invalidated the anon key and dropped all connections unnecessarily.",
-      tag: "fixed",
+      tag: "fixed"
     },
     {
       id: 25,
       date: "July 30, 2026",
       title: "Full Phase 1 dependency-respecting build order established",
       body: "Confirmed and locked the 8-wave sequencing for all remaining Phase 1 tickets (30+ items), based on real dependency chains rather than ticket number order. ROA-002 selected as the priority pick within Wave 1 since it unblocks the most downstream work (003, 008, 015, 017, 018, 021, 024).",
-      tag: "deployment",
+      tag: "deployment"
     },
     {
       id: 24,
       date: "July 30, 2026",
       title: "ROA-002 interactive walkthrough built",
       body: "Created the environment-variable-management walkthrough as an interactive widget matching the ROA-001 format: verify current state, create `.env.local`, protect it via `.gitignore`/`.env.example`, test, Done-When checklist, and sendPrompt buttons routing to the next tickets.",
-      tag: "feature",
+      tag: "feature"
     },
     {
       id: 23,
       date: "July 29, 2026",
       title: "Full RLS Re-Verification With Seeded Data",
       body: "All prior impersonation tests on the 10 affected tables were re-run individually (not batched) against real seeded data (one place, one post, a second test user), since the missing grants meant earlier 'passing' tests may have failed for the wrong reason the whole time.",
-      tag: "refactor",
+      tag: "refactor"
     },
     {
       id: 22,
       date: "July 29, 2026",
       title: "Missing Base Table Grants Across 12 Tables",
       body: "Discovered `authenticated` had zero SELECT/INSERT/UPDATE/DELETE grants on `users` and `datasets` — RLS policies were unreachable underneath a permission-denied wall. Generalized the check project-wide and found the same gap on 10 more tables (`blocks`, `comments`, `follows`, `hidden_posts`, `post_photos`, `post_points`, `post_subscriptions`, `posts`, `reactions`, `saves`). Granted correct privileges to each based on intended access.",
-      tag: "fixed",
+      tag: "fixed"
     },
     {
       id: 21,
       date: "July 29, 2026",
       title: "`datasets` Table RLS Policies (ROA-001 closeout)",
       body: "Wrote and verified `datasets_write_admin_only` (admin-gated ALL) and `datasets_select_all` (open read). This was the last blocked item preventing ROA-001 from being marked fully done.",
-      tag: "feature",
+      tag: "feature"
     },
     {
       id: 20,
       date: "July 29, 2026",
       title: "Leftover Permissive UPDATE Policy on `users`",
       body: "`users_update_own` (no role protection) was still active alongside the correct `users_update_own_not_role` policy. Postgres OR's applicable policies together, so the old one silently permitted client-side self-promotion to admin. Dropped it.",
-      tag: "fixed",
+      tag: "fixed"
     },
     {
       id: 19,
       date: "July 29, 2026",
       title: "Duplicate CHECK Constraint on `users.role`",
       body: "Found two conflicting constraints active on the same column simultaneously (`users_role_check` and stale `users_role_values`), silently blocking the `moderator` value even though the newer constraint allowed it. Dropped the stale one.",
-      tag: "fixed",
+      tag: "fixed"
     },
     {
       id: 18,
       date: "July 29, 2026",
       title: "Admin Role Field (ROA-009)",
       body: "Added a tiered `role` column (`user` / `moderator` / `admin`) to the `users` table with a CHECK constraint. Developer account manually promoted to `admin` via direct SQL, never through client-facing code.",
-      tag: "feature",
+      tag: "feature"
     },
     {
       id: 17,
       date: "July 28, 2026",
       title: "RLS policies: places, saves",
       body: "`places` fully locked to client writes (SELECT only, verified via failed impersonation INSERT test). `saves` locked to owner, with a soft-delete-aware SELECT filter for post-saves.",
-      tag: "feature",
+      tag: "feature"
     },
     {
       id: 16,
       date: "July 28, 2026",
       title: "saves table schema migration",
       body: "Replaced polymorphic `item_id` (uuid, no FK) + `item_type` (text) with typed `post_id`/`place_id` foreign keys and a `saves_exactly_one_target` CHECK constraint. Verified table was empty (`COUNT = 0`) before dropping columns.",
-      tag: "refactor",
+      tag: "refactor"
     },
     {
       id: 15,
       date: "July 28, 2026",
       title: "RLS policies: reactions",
       body: "Owner-only write. Self-reaction blocking was initially implemented via trigger, then explicitly reversed per product decision (see Bug Log — not a bug, but treated as a build-then-revert).",
-      tag: "feature",
+      tag: "feature"
     },
     {
       id: 14,
       date: "July 28, 2026",
       title: "can\\_comment\\_on\\_post() helper function",
       body: "Consolidated two separate `posts` lookups (soft-delete check + block check) inside `comments_insert_own` into one `SECURITY DEFINER`, `STABLE` SQL function.",
-      tag: "refactor",
+      tag: "refactor"
     },
     {
       id: 13,
       date: "July 28, 2026",
       title: "Insert-level block enforcement: comments, follows",
       body: "Extended beyond visibility-only blocking — a blocked user can no longer create a comment or follow request at all, not just have it hidden after the fact.",
-      tag: "feature",
+      tag: "feature"
     },
     {
       id: 12,
       date: "July 28, 2026",
       title: "Mutual block isolation added to posts, comments, follows",
       body: "Rewrote SELECT policies on all three to exclude content between blocked users in either direction, via `NOT EXISTS` subqueries against `blocks`.",
-      tag: "feature",
+      tag: "feature"
     },
     {
       id: 11,
       date: "July 28, 2026",
       title: "RLS policies: follows, notifications",
       body: "`follows` public read with self-follow guard; `notifications` private to recipient, no client-facing INSERT (service-role/trigger only).",
-      tag: "feature",
+      tag: "feature"
     },
     {
       id: 10,
       date: "July 28, 2026",
       title: "RLS policies: posts, comments",
       body: "Public read (soft-delete aware via `deleted_at IS NULL`), owner-only write. Later extended with mutual block-exclusion in SELECT.",
-      tag: "feature",
+      tag: "feature"
     },
     {
       id: 9,
       date: "July 28, 2026",
       title: "RLS policies: hidden\\_posts, post\\_subscriptions, blocks",
       body: "Direct-ownership pattern, no UPDATE policy (binary state, un-hide/un-block = delete). `blocks` includes a self-block guard (`blocker_id != blocked_id`).",
-      tag: "feature",
+      tag: "feature"
     },
     {
       id: 8,
       date: "July 28, 2026",
       title: "RLS policies: post\\_points, post\\_photos",
       body: "Ownership enforced via parent-post lookup (`EXISTS` subquery against `posts.user_id`) since neither table has its own `user_id` column. Later extended to check `posts.deleted_at IS NULL` on insert/update.",
-      tag: "feature",
+      tag: "feature"
     },
     {
       id: 7,
       date: "July 28, 2026",
       title: "RLS policies: users table",
       body: "Wrote and ran SELECT (public) and UPDATE (owner-only) policies for `users`. Discovered mid-session that this table's policy had never actually been executed despite being marked done in a prior handoff — corrected and verified via `pg_policies`.",
-      tag: "feature",
+      tag: "feature"
     },
     {
       id: 6,
       date: "July 28, 2026",
       title: "ROA-010 closed — Core database schema complete",
       body: "All 14 tables created with correct structure, constraints, and foreign key relationships. PostGIS confirmed. Schema verified. ROA-010 moved to Done.",
-      tag: "feature",
+      tag: "feature"
     },
     {
       id: 5,
       date: "July 28, 2026",
       title: "Full schema verification completed",
       body: "Ran three confirmation queries against `information_schema.tables`, `information_schema.columns`, and `information_schema.table_constraints`. All 14 tables confirmed present. All named constraints verified. Column types and nullability correct across all tables.",
-      tag: "feature",
+      tag: "feature"
     },
     {
       id: 4,
@@ -532,28 +666,28 @@ const DATA = {
         "Created `comments`, `reactions`, `follows`, `saves`, `blocks`, `hidden_posts`, `post_subscriptions`, `notifications`, and `datasets`.",
         "All include appropriate CHECK constraints, UNIQUE constraints, and foreign key relationships. Reactions locked to upvote/downvote for Phase 1. Follows include self-follow prevention. Blocks include self-block prevention. Saves use polymorphic `item_id` + `item_type` pattern.",
       ],
-      tag: "feature",
+      tag: "feature"
     },
     {
       id: 3,
       date: "July 28, 2026",
       title: "post\\_points\\_unique\\_order constraint added",
       body: "Added `UNIQUE (post_id, order_index)` to `post_points` as a separate ALTER TABLE after identifying the gap. This prevents two points on the same post from occupying the same slot — the BETWEEN constraint alone was insufficient.",
-      tag: "feature",
+      tag: "feature"
     },
     {
       id: 2,
       date: "July 28, 2026",
       title: "users and places tables created",
       body: "Created the `users` table with UUID primary key referencing `auth.users(id)`, soft-deletable profile fields, role system with CHECK constraint, and confirmed-age boolean. Created the `places` table with PostGIS `geometry(Point, 4326)` coordinates column, Mapbox-compatible `place_id` deduplication key, heatmap weight, category array, and all counter columns defaulting to 0.",
-      tag: "feature",
+      tag: "feature"
     },
     {
       id: 1,
       date: "July 28, 2026",
       title: "PostGIS Extension Enabled",
       body: "Enabled the PostGIS extension in Supabase via `CREATE EXTENSION IF NOT EXISTS postgis`. Confirmed active at version 3.3.7 via `pg_extension` verification query. Required first step before any geometry columns could be created.",
-      tag: "feature",
+      tag: "feature"
     }
   ],
 
@@ -654,7 +788,7 @@ const DATA = {
       id: 2,
       month: "July 2026",
       date: "July 26, 2026",
-      title: "comments_insert_own: consolidate duplicate lookups",
+      title: "",
       body: "",
       bullets: [
         "",
@@ -666,6 +800,56 @@ const DATA = {
     }, 
     */
 optimize: [
+    {
+      id: 8,
+      month: "August 2026",
+      date: "August 03, 2026",
+      title: "`follows_select_all`: four-branch OR logic → two function calls",
+      body: "Realized the original four-branch `OR` check was really just the same two-person check applied twice (once per participant column on a follow row). Collapsing it to `NOT is_blocked_either_direction(auth.uid(), follower_id) AND NOT is_blocked_either_direction(auth.uid(), following_id)` covers all four original branches with clearer, shorter logic.",
+      bullets: [
+        "Each function call already internally checks both directions between two people",
+        "Applying it once per participant column (`follower_id`, `following_id`) mathematically covers all four original OR branches",
+        "Avoids reinventing the function's internal OR logic at the call site"
+      ],
+      tags: "refactor"
+    }, 
+    {
+      id: 7,
+      month: "August 2026",
+      date: "August 02, 2026",
+      title: "RLS Policy Architecture: Direct `blocks` queries → centralized SECURITY DEFINER function",
+      body: "Realized that scattering `EXISTS (SELECT 1 FROM blocks WHERE ...)` logic across every blocking-aware policy was both repetitive and fragile. The same bug (RLS-blocks-RLS) would have to be independently rediscovered and fixed per table. Centralizing the check into one function fixed all three tables' bugs from a single source of truth and makes any future blocking-aware table (like `saves`) a one-line addition instead of a re-derivation.",
+      bullets: [
+        "Function bypasses `blocks`' RLS internally via `SECURITY DEFINER`, closing the exact hole that caused the original bug",
+        "Returns boolean only — no row data ever leaves the function, preserving the 'blocked user gets zero confirmation' privacy requirement",
+        "`SET search_path = public` included specifically to close a known privilege-escalation vector for `SECURITY DEFINER` functions"
+      ],
+      tags: "refactor"
+    }, 
+    {
+      id: 6,
+      month: "August 2026",
+      date: "August 01, 2026",
+      title: "Trigger functions: `place_id` → `id` column reference",
+      body: "Realized partway through testing that the trigger functions were built against an assumed column name rather than the verified schema. Once the actual foreign key relationships were checked directly:",
+      bullets: [
+        "All four functions (`recalc_place_metrics`, `trg_posts_count`, `trg_reactions_count`, `trg_saves_count`) updated to filter `WHERE id = ...` instead of `WHERE place_id = ...`",
+        "Confirmed via `information_schema.columns` and a foreign key lookup query before rewriting, rather than guessing again"
+      ],
+      tags: "refactor"
+    },   
+    {
+      id: 5,
+      month: "July 2026",
+      date: "July 31, 2026",
+      title: "npm Vulnerability Resolution Strategy",
+      body: "Initially defaulted toward the 'fix everything' instinct implied by `npm audit fix --force`. Realized mid-session that npm's auto-resolver was proposing a 6-major-version downgrade of `next` to satisfy a transitive `postcss`/`sharp` advisory — which would have silently gutted App Router support. Shifted approach to: read the 'Will install X, which is a breaking change' line before ever running `--force`, and resolve the actual outdated package directly (`npm install next@latest`) instead of trusting the automated resolution path.",
+      bullets: [
+        "Verified current LTS version via live web search rather than relying on training-data memory, after an earlier session's version-recall error",
+        "Distinguished real risk (dev-only tooling vulnerabilities vs. user-facing runtime exposure) rather than chasing a zero-finding `npm audit` output at a pre-launch stage"
+      ],
+      tags: "refactor"
+    },  
     {
       id: 4,
       month: "July 2026",
@@ -710,7 +894,7 @@ optimize: [
       month: "July 2026",
       date: "July 26, 2026",
       title: "post_points: Composite UNIQUE constraint added post-creation",
-      body: "I realized that the `order_index BETWEEN 0 AND 4` constraint alone only prevents a sixth point from being inserted — it does nothing to prevent two points on the same post sharing the same slot index. A post with five rows all at `order_index = 0` would pass the BETWEEN check but completely break ordered rendering on the map.",
+      body: "I realized that the `order_index BETWEEN 0 AND 4` constraint alone only prevents a sixth point from being inserted, it does nothing to prevent two points on the same post sharing the same slot index. A post with five rows all at `order_index = 0` would pass the BETWEEN check but completely break ordered rendering on the map.",
       bullets: [
         "Added `CONSTRAINT post_points_unique_order UNIQUE (post_id, order_index)` via `ALTER TABLE` after initial table creation",
         "Composite unique means the *combination* of `post_id` and `order_index` must be unique — different posts can share an index value, but the same post cannot have two points at the same position",
@@ -755,6 +939,16 @@ optimize: [
     { id: 24, topic: "Legacy vs. new Supabase key systems are not interchangeable in how they rotate", body: "The old JWT-based `service_role`/`anon` pair shares one signing secret. Rotating it invalidates both keys and restarts the project, killing connections. The newer `sb_publishable_...` / `sb_secret_...` keys are independently revocable, so a single leaked key can be replaced without touching anything else." },
     { id: 25, topic: "Table-level grants and RLS policies are separate failure layers", body: "A `42501` permission error can mean either 'RLS correctly blocked this' or 'the grant doesn't exist and RLS was never reached'. From prior sessions, I discovered 10+ tables where grants were silently missing despite policies appearing to pass tests." },
     { id: 26, topic: "A flagged-items backlog is a set of tripwires, not a parallel task queue", body: "Every flag in the tracking doc is gated behind a ticket that doesn't exist yet (auth, block/unblock feature, post creation). Checking it for 'what can I do right now' independent of active ticket work produces false leads." },
+    { id: 27, topic: "`.tsx` Files Trigger Automatic TypeScript Bootstrapping", body: "Next.js detects the presence of a single `.tsx` file anywhere in the project and automatically installs `@types/react`, generates `tsconfig.json`, and creates `next-env.d.ts` — even in a project that was never intended to use TypeScript. One misnamed file extension can pull an entire toolchain in silently." },
+    { id: 28, topic: "`npm audit fix --force` Optimizes for 'a fix,' not 'the right fix'", body: "npm's automated resolver will walk a dependency tree backward to whatever version satisfies the advisory chain, even if that means reverting a core framework by six major versions. The 'Will install X, which is a breaking change' line in the output is the signal to stop and investigate manually rather than trust the tool's proposed path." },
+    { id: 29, topic: "`dangerouslySetInnerHTML` Is About Content Origin, Not Content Subject Matter", body: "The API name implies broad danger, but the actual risk model is narrow: it's unsafe for rendering user-submitted content (XSS risk), not for any content that happens to be about sensitive topics like privacy or legal data. A static, developer-authored HTML file, even a privacy policy, carries no additional risk from this API versus any other static content." },
+    { id: 30, topic: "JSX and Raw Generator HTML Are Different Syntaxes That Only Look Similar", body: "Termly-style exports use `class` instead of `className`, unclosed void tags (`<br>` instead of `<br />`), string-based inline styles instead of JS style objects, and can contain genuinely malformed nesting that a browser will silently repair but a JSX compiler will hard-fail on. Pasting generator HTML directly into a JSX return statement isn't a stylistic mismatch, it doesn't compile." },
+    { id: 31, topic: "Grants and RLS are separate enforcement layers", body: "A `permission denied` error means Postgres never reached the RLS policy, it was blocked earlier at the table-grant level. A clean '0 rows updated' with no error means RLS itself did the blocking. The two look similar from the outside but prove different things; a passing test at one layer doesn't confirm the other layer is also correct." },
+    { id: 32, topic: "`CREATE OR REPLACE FUNCTION` succeeding doesn't confirm which version is live", body: "A 'Success' message only means the SQL was syntactically valid — not that it's the version you meant to run, especially mid-session when several corrections happen in quick succession. `SELECT prosrc FROM pg_proc WHERE proname = '...'` checks the actual stored function body against the database, catching mismatches before they surface as a downstream runtime error." },
+    { id: 33, topic: "RLS Policies Are Subject to Other Tables' RLS", body: "Any RLS policy that checks another table via a subquery (e.g. `EXISTS (SELECT 1 FROM blocks WHERE ...)`) is itself subject to that other table's RLS. If the referenced table's own policy is narrower than the subquery assumes, the subquery can silently return nothing for the 'wrong' party, even though the outer policy's logic reads correctly on paper. This is a structural gotcha in Postgres RLS, not a typo-class bug, and it's easy to miss because the SQL looks completely correct in isolation." },
+    { id: 34, topic: "The Empty-Test Trap Applies to Every New Test, Not Just the First One", body: "A `0 rows` (or otherwise 'expected') impersonation-test result is not proof of anything unless real data was independently confirmed to exist first. This session hit the exact same trap three separate times in a row (posts, comments, follows) even after catching it the first time. Each new table's first-pass test looked like a pass but was actually testing against a user with zero rows in that table." },
+    { id: 35, topic: "`FORCE ROW LEVEL SECURITY` and Owner Bypass Are Real, Separate Failure Modes", body: "`relrowsecurity = true` does not mean RLS applies to everyone. Table owners and superusers bypass RLS entirely unless `relforcerowsecurity` is also set to true. This was investigated and ruled out as the cause of the blocking bug in this session, but it's a real thing worth checking whenever an impersonation test's result seems inconsistent with the policy text." },
+    { id: 36, topic: "Composite Indexes Only Serve Leftmost-Column Lookups", body: "A composite index like `blocks_unique_pair` on `(blocker_id, blocked_id)` efficiently serves lookups filtering on `blocker_id` (the leftmost column) but does not efficiently serve lookups filtering on `blocked_id` alone. This was previously assumed to be 'covered' in an earlier session and was corrected this session by checking actual query patterns against the real index definition." },
     //{ id: 10, topic: "", body: "" },
   ],
 
@@ -775,13 +969,62 @@ optimize: [
   */
   bugs: [
     { 
-      id: 9, 
-      title: "", 
+      id: 14, 
+      title: "`blocks.blocked_id` had no dedicated index despite being queried standalone", 
+      status: "fixed", 
+      date: "August 03, 2026", 
+      body: [
+        "**Symptom:** none yet in production. Caught proactively during ROA-012 by reading the actual ROA-001 policy SQL instead of trusting an earlier session's assumption that `blocks_unique_pair` already covered this. Root cause: the composite unique index on `(blocker_id, blocked_id)` only serves `blocker_id`-first lookups; `blocked_id` was being queried standalone in OR branches across multiple tables' RLS policies.",
+        "**Fix:** added `idx_blocks_blocked_id`, verified present via `pg_indexes` and the Supabase dashboard.",
+      ] 
+    },
+    { 
+      id: 13, 
+      title: "Blocked users could still see the blocking user's posts, comments, and follow relationships", 
+      status: "fixed", 
+      date: "August 02, 2026", 
+      body: [
+        "**Symptom:** an impersonation test as the blocked user (User B) against the blocking user's (User A) posts returned 1 row instead of the expected 0, mutual isolation only worked in one direction. Root cause: `blocks_select_own`'s policy only exposed rows where the current user was the `blocker_id`, so `EXISTS` subqueries in `posts`/`comments`/`follows` policies checking `blocks` from the blocked party's session could never see the relevant row.",
+        "**Fix:** built `is_blocked_either_direction()` as a `SECURITY DEFINER` function to bypass this RLS layer internally, then rewrote all three affected policies to call it. Verified fixed on all three tables using the exact impersonation tests that originally caught the bug.",
+      ] 
+    },
+    { 
+      id: 12, 
+      title: "Trigger functions silently running an old, incorrect body", 
+      status: "fixed", 
+      date: "August 01, 2026", 
+      body: [
+        "**Symptom:** three separate times, a corrected `CREATE OR REPLACE FUNCTION` reported success, but the next `INSERT`/`DELETE` test threw `operator does not exist: text = uuid`, pointing at the old `WHERE place_id = ...` logic still being live. Root cause: `places.place_id` (text) and `places.id` (uuid) were being confused as the same column. The corrected function body hadn't actually been the last one executed before the test ran.",
+        "**Fix:** re-ran the corrected `CREATE OR REPLACE FUNCTION` block in isolation for each of the three functions, confirmed via direct schema inspection which column was correct, and adopted the `pg_proc` verification habit going forward to catch this before testing instead of after.",
+      ] 
+    },
+    { 
+      id: 11, 
+      title: "React Hydration Mismatch on `/terms` Route", 
       status: "fixed", 
       date: "July 31, 2026", 
       body: [
-        "**Symptom:** ",
-        "",
+        "**Symptom:** console warning on page load reading 'A tree hydrated but some attributes of the server rendered HTML didn't match the client properties,' pointing at the `dangerouslySetInnerHTML` prop on the Terms component. Root cause confirmed via direct file inspection: malformed nesting in the raw Termly export (e.g., unclosed `<strong>` wrapping an `<h1>`, mismatched `<bdt>` tags) parsed inconsistently between server-render and client-hydration passes."
+      ] 
+    },
+    { 
+      id: 10, 
+      title: "`npm audit --force` Proposing Major Framework Downgrade", 
+      status: "fixed", 
+      date: "July 31, 2026", 
+      body: [
+        "**Symptom:** running `npm audit fix --force` offered to resolve `postcss` and `sharp` advisories by installing `next@9.3.3` — a 2020-era release predating App Router entirely. Root cause: the vulnerable packages were buried deep in `next`'s own transitive dependency tree, and npm's resolver found the oldest compatible version rather than the correct upstream fix.",
+        "**Fix:** avoided `--force`, ran `npm install next@latest` directly instead, verified against live search that 16.2.12 is genuinely current (not a stale/broken tag).",
+      ] 
+    },
+    { 
+      id: 9, 
+      title: "Stray TypeScript Scaffolding in JSX Project", 
+      status: "fixed", 
+      date: "July 31, 2026", 
+      body: [
+        "**Symptom:** `npm install` output showed `@types/react` being auto-installed and a message reading 'We detected TypeScript in your project and created a tsconfig.json file for you,' despite the project being JSX-only. Root cause: an incorrectly named `page.tsx` file (introduced via an earlier walkthrough error) triggered Next.js's automatic TypeScript detection.",
+        "**Fix:** deleted `page.tsx`, `tsconfig.json`, uninstalled `@types/react`, and manually located and removed the also-auto-generated `next-env.d.ts`.",
       ] 
     },
     { 
@@ -964,12 +1207,13 @@ optimize: [
   // category, note (used as the card body, not `body`)
 
   resources: [
-    { id: 1, title: "Tailwind CSS v4 Docs", url: "https://tailwindcss.com/docs", category: "styling",    note: "v4 uses @theme in CSS instead of tailwind.config.js." },
-    { id: 2, title: "Supabase Docs", url: "https://supabase.com/docs", category: "backend",    note: "Full documentation for Supabase database, auth, storage, RLS, and JavaScript client. Primary reference for all backend work on Roam." },
-    { id: 3, title: "Supabase RLS Guide", url: "https://supabase.com/docs/guides/database/postgres/row-level-security", category: "styling",    note: "Row Level Security concepts, USING vs WITH CHECK distinction, policy creation patterns, and testing approaches." },
-    { id: 4, title: "Supabase Auth Guide", url: "https://supabase.com/docs/guides/auth", category: "auth",    note: "Session management, user management, OAuth providers, and auth hooks." },
-    { id: 5, title: "Supabase PostGIS Guide", url: "https://supabase.com/docs/guides/database/extensions/postgis", category: "database",    note: "PostGIS extension setup, geometry column types, spatial query functions, and GIST indexing. Reference for all coordinate and proximity query work." },
-    { id: 6, title: "Supabase JavaScript Client Reference", url: "https://supabase.com/docs/reference/javascript/introduction", category: "backend",    note: "Complete API reference for the Supabase JS client. Every Supabase query written in Next.js uses this reference for syntax." },
+    { id: 1, title: "npm audit Documentation", url: "https://docs.npmjs.com/cli/v8/commands/npm-audit", category: "security & vulnerability remediation",    note: "Referenced conceptually while diagnosing the `next@9.3.3` false-positive downgrade path. Covers how `npm audit fix --force` resolves transitive dependency chains and why 'breaking change' warnings should be read before accepting a proposed fix." },
+    { id: 2, title: "Tailwind CSS v4 Docs", url: "https://tailwindcss.com/docs", category: "styling",    note: "v4 uses @theme in CSS instead of tailwind.config.js." },
+    { id: 3, title: "Supabase Docs", url: "https://supabase.com/docs", category: "backend",    note: "Full documentation for Supabase database, auth, storage, RLS, and JavaScript client. Primary reference for all backend work on Roam." },
+    { id: 4, title: "Supabase RLS Guide", url: "https://supabase.com/docs/guides/database/postgres/row-level-security", category: "styling",    note: "Row Level Security concepts, USING vs WITH CHECK distinction, policy creation patterns, and testing approaches." },
+    { id: 5, title: "Supabase Auth Guide", url: "https://supabase.com/docs/guides/auth", category: "auth",    note: "Session management, user management, OAuth providers, and auth hooks." },
+    { id: 6, title: "Supabase PostGIS Guide", url: "https://supabase.com/docs/guides/database/extensions/postgis", category: "database",    note: "PostGIS extension setup, geometry column types, spatial query functions, and GIST indexing. Reference for all coordinate and proximity query work." },
+    { id: 7, title: "Supabase JavaScript Client Reference", url: "https://supabase.com/docs/reference/javascript/introduction", category: "backend",    note: "Complete API reference for the Supabase JS client. Every Supabase query written in Next.js uses this reference for syntax." },
 
     // { id: 4, title: "Tailwind CSS v4 Docs", url: "https://tailwindcss.com/docs", category: "styling",    note: "v4 uses @theme in CSS instead of tailwind.config.js." },
   ],
