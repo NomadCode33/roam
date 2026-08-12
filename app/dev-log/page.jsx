@@ -363,7 +363,7 @@ const PINNED = {
       date: "Jly, 2026",
       title: "",
       body: "",
-      tag: "feature"
+      tag: ""
     },
     Jy, 2026
 */
@@ -371,6 +371,97 @@ const DATA = {
   // ── progression: flat list, rendered by ProgressionPane ──────────────────
   // Fields per entry: id, date, title, body (string/array), tag/tags (optional)
   progression: [
+    {
+      id: 58,
+      date: "August 04, 2026",
+      title: "Local Postgres CLI Tools Not on PATH",
+      body: "`createdb: command not found` in Terminal despite Postgres.app running. Root cause: Postgres.app's CLI binaries live inside the app bundle, not the shell's default PATH. Fixed by writing `/Applications/Postgres.app/Contents/Versions/14/bin` into `/etc/paths.d/postgresapp` and restarting the terminal session.",
+      tag: "fixed"
+    },
+    {
+      id: 57,
+      date: "August 04, 2026",
+      title: "First Verified Backup Landed in R2",
+      body: "Workflow ran green end-to-end. Verified directly in the Cloudflare dashboard (not just the Actions log): `roam-backup-2026-08-04T08-03-07Z.sql`, 348.26 KB, `application/sql`, correct timestamp. Closed the Phase E verification requirement with a real inspected object, not an inferred checkmark.",
+      tag: "deployment"
+    },
+    {
+      id: 56,
+      date: "August 04, 2026",
+      title: "AWS CLI Install Step Failing on Ubuntu Runner",
+      body: "`apt-get install awscli` failed with `Package 'awscli' has no installation candidate`, dropped from Ubuntu `noble`'s default repos. First fix attempt (curl + official installer) then failed with `Found preexisting AWS CLI installation`, since `ubuntu-latest` ships AWS CLI pre-installed. Final fix: replaced the install step entirely with a one-line `aws --version` check.",
+      tag: "fixed"
+    },
+    {
+      id: 55,
+      date: "August 04, 2026",
+      title: "Backup Job Failing — IPv6 Unreachable",
+      body: "`pg_dump` failed with `Network is unreachable` against the direct Supabase connection string. Root cause: GitHub Actions runners don't support IPv6 egress, and the direct connection host resolves IPv6-only. Fixed by swapping `SUPABASE_DB_URL` to the Transaction Pooler connection string (IPv4).",
+      tag: "fixed"
+    },
+    {
+      id: 54,
+      date: "August 04, 2026",
+      title: "GitHub Push Rejected — Missing Workflow Scope",
+      body: "`git push` failed with `refusing to allow a Personal Access Token to create or update workflow... without workflow scope`. Regenerated the PAT with the `workflow` scope explicitly checked. Push succeeded on retry.",
+      tag: "fixed"
+    },
+    {
+      id: 53,
+      date: "August 04, 2026",
+      title: "GitHub Actions Backup Workflow Built",
+      body: "Authored `.github/workflows/db-backup.yml`, daily cron (3:00 AM UTC) plus manual `workflow_dispatch` trigger. Pipeline: install Supabase CLI → dump database → verify dump non-empty → verify AWS CLI available → upload to R2 with dated filename → verify uploaded object size directly in R2 → prune backups older than 30 days.",
+      tag: "feature"
+    },
+    {
+      id: 52,
+      date: "August 04, 2026",
+      title: "GitHub Repository Secrets Configured",
+      body: "Set repository secrets in project repo.",
+      tag: "deployment"
+    },
+    {
+      id: 51,
+      date: "August 04, 2026",
+      title: "R2 Bucket + Scoped API Token Provisioned",
+      body: "Created `roam-db-backups` bucket on Cloudflare R2 (Automatic location, Standard storage class, Public Access disabled). Generated an Account API token, not User API token, since this is a service/production context scoped to Object Read & Write on this bucket only, TTL set to Forever for unattended scheduled use.",
+      tag: "deployment"
+    },
+    {
+      id: 50,
+      date: "August 03, 2026",
+      title: "Tracking doc merged to v3, session handoff doc produced",
+      body: "`roam_flagged_items_v3.md` reconciles all prior open items with this session's resolutions. `roam_session_handoff.md` produced for pasting into the next conversation (starting ROA-014), including the new standing verification rule below.",
+      tag: "deployment"
+    },
+    {
+      id: 49,
+      date: "August 03, 2026",
+      title: "Unblock-doesn't-restore-follows behavior independently tested",
+      body: "Previously assumed true because no restore trigger exists. Directly verified: no follow existed pre-unblock, unblock ran, block's removal confirmed via direct `SELECT`, follows table confirmed still empty afterward.",
+      tag: "feature"
+    },
+    {
+      id: 48,
+      date: "August 03, 2026",
+      title: "Blocklist privacy guarantee independently tested, both directions",
+      body: "`blocks_select_own` had never been tested from the blocked party's side. Confirmed: blocker sees their own block row (`visible_to_blocker = 1`), blocked party sees nothing (`visible_to_blocked = 0`).",
+      tag: "feature"
+    },
+    {
+      id: 47,
+      date: "August 03, 2026",
+      title: "False-positive restore-on-unblock result caught and corrected",
+      body: "The first 'restore' test passed for the wrong reason. The block row was never actually deleted, so the save was never really hidden by an active block during that check. Re-run with an independently verified delete, producing a genuine pass. Full detail in Bug Log.",
+      tag: "fixed"
+    },
+    {
+      id: 46,
+      date: "August 03, 2026",
+      title: "`saves_select_own` — blocking check added and verified",
+      body: "Rewrote the SELECT policy on `saves` to hide a saved post when the post's author is blocked (either direction), via `is_blocked_either_direction()`. Verified with real inserted data: hidden while blocked (`visible_saves = 0`), confirmed restored after unblock (`visible_saves = 1`) on a corrected second pass. Full detail in Bug Log.",
+      tag: "fixed"
+    },
     {
       id: 45,
       date: "August 03, 2026",
@@ -801,6 +892,32 @@ const DATA = {
     */
 optimize: [
     {
+      id: 10,
+      month: "August 2026",
+      date: "August 04, 2026",
+      title: "AWS CLI Install Step: Multi-Method → Single Version Check",
+      body: "I initially treated 'install the AWS CLI' as a fixed requirement without questioning whether the runner already had it. That cost two separate failed iterations (apt package missing, then official installer conflicting with a pre-existing install) before I checked what `ubuntu-latest` actually ships with by default.",
+      bullets: [
+        "Replaced a 4-line curl/unzip/install sequence with a single `aws --version` step",
+        "Removed an unnecessary `sudo apt-get update` call that was only there to support the now-removed install step",
+        "Net result: one fewer network dependency in the pipeline, one fewer thing that can fail between commits"
+      ],
+      tags: "refactor"
+    }, 
+    {
+      id: 9,
+      month: "August 2026",
+      date: "August 03, 2026",
+      title: "`saves_select_own`: static bolt-on avoided in favor of live re-evaluation",
+      body: "Considered a simpler fix — a stored `is_hidden` flag on `saves`, toggled by a trigger on block/unblock. Rejected: a cached flag needs its own restore-on-unblock mechanism and can go stale. Went with a live check inside the RLS policy instead:",
+      bullets: [
+        "`is_blocked_either_direction()` re-evaluates on every query, so there's no cached decision to invalidate.",
+        "Hidden-while-blocked and restored-on-unblock both fall out of the same mechanism, with no separate 'restore' code path needed.",
+        "Trade-off: one extra subquery against `posts` per row read, accepted because `saves` is read relatively rarely compared to `posts` itself, and correctness mattered more than shaving a subquery."
+      ],
+      tags: "refactor"
+    },   
+    {
       id: 8,
       month: "August 2026",
       date: "August 03, 2026",
@@ -949,6 +1066,15 @@ optimize: [
     { id: 34, topic: "The Empty-Test Trap Applies to Every New Test, Not Just the First One", body: "A `0 rows` (or otherwise 'expected') impersonation-test result is not proof of anything unless real data was independently confirmed to exist first. This session hit the exact same trap three separate times in a row (posts, comments, follows) even after catching it the first time. Each new table's first-pass test looked like a pass but was actually testing against a user with zero rows in that table." },
     { id: 35, topic: "`FORCE ROW LEVEL SECURITY` and Owner Bypass Are Real, Separate Failure Modes", body: "`relrowsecurity = true` does not mean RLS applies to everyone. Table owners and superusers bypass RLS entirely unless `relforcerowsecurity` is also set to true. This was investigated and ruled out as the cause of the blocking bug in this session, but it's a real thing worth checking whenever an impersonation test's result seems inconsistent with the policy text." },
     { id: 36, topic: "Composite Indexes Only Serve Leftmost-Column Lookups", body: "A composite index like `blocks_unique_pair` on `(blocker_id, blocked_id)` efficiently serves lookups filtering on `blocker_id` (the leftmost column) but does not efficiently serve lookups filtering on `blocked_id` alone. This was previously assumed to be 'covered' in an earlier session and was corrected this session by checking actual query patterns against the real index definition." },
+    { id: 37, topic: "A 'Success' message from Supabase's SQL editor does not mean rows were affected", body: "`INSERT`/`UPDATE`/`DELETE` statements report 'Success. No rows returned' even when the `WHERE` clause matches nothing. This is indistinguishable from a real success unless followed by a direct `SELECT` confirming the actual state change. This directly caused the false-positive restore-on-unblock result in this session. A `DELETE` against `blocks` silently affected 0 rows, and the test that followed appeared to pass for an unrelated reason." },
+    { id: 38, topic: "An 'expected' empty test result proves nothing without confirming real data existed first", body: "Recurring pattern across this project: an impersonation test returning 0 rows looks identical whether the policy correctly blocked access, or whether there was never any data for it to find in the first place. Always run a plain `count(*)` check before trusting either outcome of an impersonation test." },
+    { id: 39, topic: "Live re-evaluation vs. cached state changes what 'restore' logic requires", body: "A policy that recomputes a boolean condition (like blocking status) on every query never needs explicit 'undo' logic when the underlying condition changes, the next read is simply correct. Cached/denormalized state (a stored flag, a materialized column) always needs a second, explicit mechanism to stay in sync. Worth checking which category any future flag or permission check falls into before assuming a fix is complete." },
+    { id: 40, topic: "GitHub Runners Are IPv4-Only for Egress", body: "GitHub Actions hosted runners cannot make outbound IPv6 connections. Any external service whose 'direct' connection resolves IPv6-only (as Supabase's direct DB connection can) will fail from CI even though it works fine locally or from an IPv6-capable network. The fix is almost always a documented IPv4-compatible alternative (here, Supabase's Transaction Pooler)." },
+    { id: 41, topic: "A Green Checkmark Only Proves the Shell Exited 0 — Not That the Output Is Correct", body: "A pipe like `supabase db dump ... > backup.sql` can fail mid-stream (auth expiry, network blip, wrong flag) while the outer shell still reports success, because the failure happens inside the redirected command, not at the top level. The only way to actually know the output is good is to inspect the artifact directly — file size, content, row counts — not the job's pass/fail status." },
+    { id: 42, topic: "`supabase db dump` Defaults to Schema-Only", body: "Without `--data-only` (or an equivalent explicit flag), Supabase's CLI dump command backs up structure — tables, indexes, triggers, functions — but not row data. This is easy to miss because the dump file is large, looks complete, and every `CREATE TABLE` statement runs successfully; the absence is a missing category of statement (`COPY ... FROM stdin`), not an error." },
+    { id: 43, topic: "GitHub Actions Executes the Workflow File Version Live at Trigger Time", body: "A workflow run uses whichever version of the `.yml` file existed in the repo at the moment it was triggered, not whatever is currently committed. Re-running an old failed job, or triggering before a push finishes landing, replays the old (broken) version and can look identical to a fresh bug. Always check the run's timestamp against the relevant commit before debugging further." },
+    { id: 44, topic: "RLS Subqueries Are Themselves Subject to RLS", body: "When one table's RLS policy checks another table via `EXISTS (SELECT 1 FROM other_table WHERE ...)`, that subquery is evaluated under the querying user's row-level security on `other_table` too. A narrow policy on the referenced table (e.g., only exposing rows where you're the owner) can silently make the subquery return nothing for the 'wrong' party, even though the outer policy's logic is written correctly. The fix is a `SECURITY DEFINER` function that bypasses RLS for just the boolean check, without exposing the underlying row." },
+    { id: 45, topic: "Postgres.app's CLI Tools Are Not on PATH by Default", body: "Postgres.app installs `psql`, `createdb`, `pg_restore`, etc. inside its own `.app` bundle rather than a standard system bin directory. Any terminal session started before this is configured (via `/etc/paths.d/` or similar) will not find these commands, even though the server itself is running and reachable." },
     //{ id: 10, topic: "", body: "" },
   ],
 
@@ -964,17 +1090,74 @@ optimize: [
       body: [
         "",
         "",
+        ""
       ] 
     },
   */
   bugs: [
+    { 
+      id: 19, 
+      title: "`createdb: command not found` on Local Machine", 
+      status: "fixed", 
+      date: "August 04, 2026", 
+      body: [
+        "**Symptom:** running `createdb roam_restore_test` in Terminal returned `command not found`, despite Postgres.app showing the server as Running.",
+        "**Root cause:** Postgres.app's CLI binaries are bundled inside the app package, not linked into the shell's default PATH.",
+        "**Fix:** created `/etc/paths.d/postgresapp` containing the app's bin path, fully quit and reopened Terminal to force a fresh PATH read, confirmed via `which createdb`."
+      ] 
+    },
+    { 
+      id: 18, 
+      title: "AWS CLI Install Step Failing (Two Sequential Errors)", 
+      status: "fixed", 
+      date: "August 04, 2026", 
+      body: [
+        "**Symptom 1:** `E: Package 'awscli' has no installation candidate`, exit code 100 — Ubuntu `noble` no longer carries `awscli` in its default apt repos.",
+        "**Symptom 2:** (after switching to the official curl-based installer): `Found preexisting AWS CLI installation... rerun with --update`, exit code 1. `ubuntu-latest` already ships AWS CLI pre-installed, and the fresh installer refused to overwrite it.",
+        "**Fix:** removed the install step entirely, replaced with a single `aws --version` check to confirm the pre-installed CLI is present and usable."
+      ] 
+    },
+    { 
+      id: 17, 
+      title: "Backup Job Failing at Dump Step — Network Unreachable", 
+      status: "fixed", 
+      date: "August 04, 2026", 
+      body: [
+        "**Symptom:** `pg_dump: error: connection ... failed: Network is unreachable`, followed by Supabase CLI's own diagnostic noting IPv6 is required for direct connections.",
+        "**Root cause:** GitHub-hosted runners have no IPv6 egress; the direct Supabase connection string resolves to an IPv6 address only.",
+        "**Fix:** replaced `SUPABASE_DB_URL` secret value with the Transaction Pooler connection string (IPv4-compatible, different port)."
+      ] 
+    },
+    { 
+      id: 16, 
+      title: "Git Push Rejected on Workflow File", 
+      status: "fixed", 
+      date: "August 04, 2026", 
+      body: [
+        "**Symptom:** `git push` returned `! [remote rejected] main -> main (refusing to allow a Personal Access Token to create or update workflow .github/workflows/db-backup.yml without workflow scope)`.",
+        "**Root cause:** the cached PAT lacked the `workflow` OAuth scope, which GitHub requires specifically for pushes touching `.github/workflows/`, regardless of the token's other repo permissions.",
+        "**Fix:** regenerated a classic PAT with `workflow` checked alongside `repo`, re-authenticated, push succeeded."
+      ] 
+    },
+    { 
+      id: 15, 
+      title: "False-positive proof of 'restore visibility on unblock' for `saves`", 
+      status: "fixed", 
+      date: "August 03, 2026", 
+      body: [
+        "**Symptom:** An impersonation test after 'unblocking' two test users showed `visible_saves = 1`, taken as proof the restore-on-unblock behavior worked.",
+        "**Root cause:** The `DELETE FROM blocks` statement that was supposed to remove the block matched 0 rows and did nothing, the block row was still present the entire time. A direct `SELECT * FROM blocks WHERE ...` afterward showed the original row, same `id`, still there. The passing test result had nothing to do with unblocking; it was measured under conditions nobody had actually verified.",
+        "**Fix:** Ran the `DELETE` again, confirmed via a direct `SELECT` that the row was genuinely gone (`0 rows`), then re-ran the impersonation test. It correctly returned `visible_saves = 1` this time, with the unblocked state independently verified beforehand. Added a permanent verification rule (see What I Learned #01) so this class of false positive can't recur silently."
+      ] 
+    },
     { 
       id: 14, 
       title: "`blocks.blocked_id` had no dedicated index despite being queried standalone", 
       status: "fixed", 
       date: "August 03, 2026", 
       body: [
-        "**Symptom:** none yet in production. Caught proactively during ROA-012 by reading the actual ROA-001 policy SQL instead of trusting an earlier session's assumption that `blocks_unique_pair` already covered this. Root cause: the composite unique index on `(blocker_id, blocked_id)` only serves `blocker_id`-first lookups; `blocked_id` was being queried standalone in OR branches across multiple tables' RLS policies.",
+        "**Symptom:** none yet in production. Caught proactively during ROA-012 by reading the actual ROA-001 policy SQL instead of trusting an earlier session's assumption that `blocks_unique_pair` already covered this.",
+        "**Root cause:** the composite unique index on `(blocker_id, blocked_id)` only serves `blocker_id`-first lookups; `blocked_id` was being queried standalone in OR branches across multiple tables' RLS policies.",
         "**Fix:** added `idx_blocks_blocked_id`, verified present via `pg_indexes` and the Supabase dashboard.",
       ] 
     },
@@ -984,7 +1167,8 @@ optimize: [
       status: "fixed", 
       date: "August 02, 2026", 
       body: [
-        "**Symptom:** an impersonation test as the blocked user (User B) against the blocking user's (User A) posts returned 1 row instead of the expected 0, mutual isolation only worked in one direction. Root cause: `blocks_select_own`'s policy only exposed rows where the current user was the `blocker_id`, so `EXISTS` subqueries in `posts`/`comments`/`follows` policies checking `blocks` from the blocked party's session could never see the relevant row.",
+        "**Symptom:** an impersonation test as the blocked user (User B) against the blocking user's (User A) posts returned 1 row instead of the expected 0, mutual isolation only worked in one direction.", 
+        "**Root cause:** `blocks_select_own`'s policy only exposed rows where the current user was the `blocker_id`, so `EXISTS` subqueries in `posts`/`comments`/`follows` policies checking `blocks` from the blocked party's session could never see the relevant row.",
         "**Fix:** built `is_blocked_either_direction()` as a `SECURITY DEFINER` function to bypass this RLS layer internally, then rewrote all three affected policies to call it. Verified fixed on all three tables using the exact impersonation tests that originally caught the bug.",
       ] 
     },
@@ -994,7 +1178,8 @@ optimize: [
       status: "fixed", 
       date: "August 01, 2026", 
       body: [
-        "**Symptom:** three separate times, a corrected `CREATE OR REPLACE FUNCTION` reported success, but the next `INSERT`/`DELETE` test threw `operator does not exist: text = uuid`, pointing at the old `WHERE place_id = ...` logic still being live. Root cause: `places.place_id` (text) and `places.id` (uuid) were being confused as the same column. The corrected function body hadn't actually been the last one executed before the test ran.",
+        "**Symptom:** three separate times, a corrected `CREATE OR REPLACE FUNCTION` reported success, but the next `INSERT`/`DELETE` test threw `operator does not exist: text = uuid`, pointing at the old `WHERE place_id = ...` logic still being live.", 
+        "**Root cause:** `places.place_id` (text) and `places.id` (uuid) were being confused as the same column. The corrected function body hadn't actually been the last one executed before the test ran.",
         "**Fix:** re-ran the corrected `CREATE OR REPLACE FUNCTION` block in isolation for each of the three functions, confirmed via direct schema inspection which column was correct, and adopted the `pg_proc` verification habit going forward to catch this before testing instead of after.",
       ] 
     },
@@ -1004,7 +1189,8 @@ optimize: [
       status: "fixed", 
       date: "July 31, 2026", 
       body: [
-        "**Symptom:** console warning on page load reading 'A tree hydrated but some attributes of the server rendered HTML didn't match the client properties,' pointing at the `dangerouslySetInnerHTML` prop on the Terms component. Root cause confirmed via direct file inspection: malformed nesting in the raw Termly export (e.g., unclosed `<strong>` wrapping an `<h1>`, mismatched `<bdt>` tags) parsed inconsistently between server-render and client-hydration passes."
+        "**Symptom:** console warning on page load reading 'A tree hydrated but some attributes of the server rendered HTML didn't match the client properties,' pointing at the `dangerouslySetInnerHTML` prop on the Terms component.", 
+        "**Root cause:** confirmed via direct file inspection: malformed nesting in the raw Termly export (e.g., unclosed `<strong>` wrapping an `<h1>`, mismatched `<bdt>` tags) parsed inconsistently between server-render and client-hydration passes."
       ] 
     },
     { 
@@ -1013,7 +1199,8 @@ optimize: [
       status: "fixed", 
       date: "July 31, 2026", 
       body: [
-        "**Symptom:** running `npm audit fix --force` offered to resolve `postcss` and `sharp` advisories by installing `next@9.3.3` — a 2020-era release predating App Router entirely. Root cause: the vulnerable packages were buried deep in `next`'s own transitive dependency tree, and npm's resolver found the oldest compatible version rather than the correct upstream fix.",
+        "**Symptom:** running `npm audit fix --force` offered to resolve `postcss` and `sharp` advisories by installing `next@9.3.3` — a 2020-era release predating App Router entirely.",
+        "**Root cause:** the vulnerable packages were buried deep in `next`'s own transitive dependency tree, and npm's resolver found the oldest compatible version rather than the correct upstream fix.",
         "**Fix:** avoided `--force`, ran `npm install next@latest` directly instead, verified against live search that 16.2.12 is genuinely current (not a stale/broken tag).",
       ] 
     },
@@ -1023,7 +1210,8 @@ optimize: [
       status: "fixed", 
       date: "July 31, 2026", 
       body: [
-        "**Symptom:** `npm install` output showed `@types/react` being auto-installed and a message reading 'We detected TypeScript in your project and created a tsconfig.json file for you,' despite the project being JSX-only. Root cause: an incorrectly named `page.tsx` file (introduced via an earlier walkthrough error) triggered Next.js's automatic TypeScript detection.",
+        "**Symptom:** `npm install` output showed `@types/react` being auto-installed and a message reading 'We detected TypeScript in your project and created a tsconfig.json file for you,' despite the project being JSX-only.", 
+        "**Root cause:** an incorrectly named `page.tsx` file (introduced via an earlier walkthrough error) triggered Next.js's automatic TypeScript detection.",
         "**Fix:** deleted `page.tsx`, `tsconfig.json`, uninstalled `@types/react`, and manually located and removed the also-auto-generated `next-env.d.ts`.",
       ] 
     },
@@ -1033,7 +1221,8 @@ optimize: [
       status: "fixed", 
       date: "July 29, 2026", 
       body: [
-        "**Symptom:** the `users`/`datasets` grant gap raised the question of whether other tables had the same issue. Root cause: a project-wide `information_schema.role_table_grants` query confirmed `blocks`, `comments`, `follows`, `hidden_posts`, `post_photos`, `post_points`, `post_subscriptions`, `posts`, `reactions`, and `saves` all had the identical gap. Which meant that prior sessions' 'passed' RLS tests on these tables may never have reached the policy layer at all.",
+        "**Symptom:** the `users`/`datasets` grant gap raised the question of whether other tables had the same issue.", 
+        "**Root cause:** a project-wide `information_schema.role_table_grants` query confirmed `blocks`, `comments`, `follows`, `hidden_posts`, `post_photos`, `post_points`, `post_subscriptions`, `posts`, `reactions`, and `saves` all had the identical gap. Which meant that prior sessions' 'passed' RLS tests on these tables may never have reached the policy layer at all.",
         "**Fix:** granted correct privileges per table (full CRUD for owned-content tables, SELECT-only for `notifications` and `places` per existing product decisions), then re-verified every table's ownership boundaries individually with real seeded data.",
       ] 
     },
@@ -1043,7 +1232,8 @@ optimize: [
       status: "fixed", 
       date: "July 29, 2026", 
       body: [
-        "**Symptom:** an impersonation test expected to be blocked by RLS instead failed with a raw permission error before RLS logic ever ran. Root cause: the `authenticated` Postgres role had never been granted base SELECT/UPDATE privileges on `users`, only `TRIGGER`, `REFERENCES`, and `TRUNCATE` were present.",
+        "**Symptom:** an impersonation test expected to be blocked by RLS instead failed with a raw permission error before RLS logic ever ran.", 
+        "**Root cause:** the `authenticated` Postgres role had never been granted base SELECT/UPDATE privileges on `users`, only `TRIGGER`, `REFERENCES`, and `TRUNCATE` were present.",
         "**Fix:** ran `GRANT SELECT, UPDATE ON public.users TO authenticated;`, re-tested, and confirmed the failure then correctly came from RLS instead.",
       ] 
     },
@@ -1053,7 +1243,8 @@ optimize: [
       status: "fixed", 
       date: "July 29, 2026", 
       body: [
-        "**Symptom:** a correctly-written role-protection policy (`users_update_own_not_role`) existed, but self-promotion should have been tested as still open. Root cause: an older, unrestricted UPDATE policy (`users_update_own`) was still active on the same table, and Postgres OR's all applicable policies together. The permissive one silently overrode the restrictive one.",
+        "**Symptom:** a correctly-written role-protection policy (`users_update_own_not_role`) existed, but self-promotion should have been tested as still open.", 
+        "**Root cause:** an older, unrestricted UPDATE policy (`users_update_own`) was still active on the same table, and Postgres OR's all applicable policies together. The permissive one silently overrode the restrictive one.",
         "**Fix:** dropped `users_update_own`, leaving only the role-protected policy.",
       ] 
     },
@@ -1063,7 +1254,8 @@ optimize: [
       status: "fixed", 
       date: "July 29, 2026", 
       body: [
-        "**Symptom:** adding `'moderator'` to the role constraint appeared to succeed, but a second, older constraint (`users_role_values`, two-value only) was still silently active on the same column. Root cause: Postgres enforces all CHECK constraints on a column at once — the older one was never dropped when the newer one was added in an earlier session.",
+        "**Symptom:** adding `'moderator'` to the role constraint appeared to succeed, but a second, older constraint (`users_role_values`, two-value only) was still silently active on the same column.", 
+        "**Root cause:** Postgres enforces all CHECK constraints on a column at once — the older one was never dropped when the newer one was added in an earlier session.",
         "**Fix:** identified both constraints via `pg_constraint`, dropped `users_role_values`, kept `users_role_check`.",
       ] 
     },
@@ -1073,7 +1265,8 @@ optimize: [
       status: "fixed", 
       date: "July 28, 2026", 
       body: [
-        "**Symptom:** policy drafted referencing `users.is_admin`, a column that was never built. Root cause: guessed a column name matching a common pattern instead of checking the real schema, same category of mistake as the notifications bug. Caught *before* running (not after, this time) via a schema check that showed the real column is `users.role`, currently unconstrained.",
+        "**Symptom:** policy drafted referencing `users.is_admin`, a column that was never built.", 
+        "**Root cause:** guessed a column name matching a common pattern instead of checking the real schema, same category of mistake as the notifications bug. Caught *before* running (not after, this time) via a schema check that showed the real column is `users.role`, currently unconstrained.",
         "**Fix:** not yet applied — policy correctly held back, flagged as blocked on ROA-009 rather than run against a guessed column.",
       ] 
     },
@@ -1083,7 +1276,8 @@ optimize: [
       status: "fixed", 
       date: "July 28, 2026", 
       body: [
-        "**Symptom:** `ERROR 42703: column 'recipient_id' does not exist` when running the notifications policy set. Root cause: assumed a column name instead of verifying the real schema.",
+        "**Symptom:** `ERROR 42703: column 'recipient_id' does not exist` when running the notifications policy set.", 
+        "**Root cause:** assumed a column name instead of verifying the real schema.",
         "**Fix:** queried `information_schema.columns`, found the real column was `user_id`, rewrote all three policies using the correct name."
       ] 
     },
@@ -1092,7 +1286,8 @@ optimize: [
       status: "fixed", 
       date: "July 28, 2026", 
       body: [
-        "**Symptom:** `rowsecurity = true` on `users`, but `pg_policies` returned 0 rows — meaning the table was inaccessible to everyone. Root cause: the session-1 handoff had marked this table's RLS SQL as 'written' and was mistakenly treated as 'executed' without verification.",
+        "**Symptom:** `rowsecurity = true` on `users`, but `pg_policies` returned 0 rows — meaning the table was inaccessible to everyone.", 
+        "**Root cause:** the session-1 handoff had marked this table's RLS SQL as 'written' and was mistakenly treated as 'executed' without verification.",
         "**Fix:** ran the actual `CREATE POLICY` statements for `users_select_all` and `users_update_own`, then confirmed via `pg_policies`."
       ] 
     },
@@ -1102,7 +1297,8 @@ optimize: [
       status: "fixed", 
       date: "July 28, 2026", 
       body: [
-        "**Symptom:** after adding the block-aware `follows_select_all`, `follows_insert_own` and `follows_delete_own` were assumed to already exist and hadn't been run — meaning follow/unfollow was completely non-functional. Root cause: same as above, assumed-executed SQL that wasn't.",
+        "**Symptom:** after adding the block-aware `follows_select_all`, `follows_insert_own` and `follows_delete_own` were assumed to already exist and hadn't been run — meaning follow/unfollow was completely non-functional.", 
+        "**Root cause:** same as above, assumed-executed SQL that wasn't.",
         "**Fix:** ran both missing policies, verified 3 total rows in `pg_policies` for `follows`."
       ] 
     }
@@ -1122,7 +1318,9 @@ optimize: [
     { id: 9, name: "Supabase",     icon: "⚡", version: "^2.112.2",   role: "Backend-as-a-Service (BaaS)" },
     { id: 10, name: "PostgreSQL",   icon: "🐘", version: "^18.4.0",   role: "Relational database engine" },
     { id: 11, name: "PostGIS",      icon: "🗺️", version: "^3.3.7",    role: "Spatial database extension" },
-    { id: 12, name: "Vercel",       icon: "☁️", version: "Hosting",   role: "Deployment platform" },
+    { id: 12, name: "Cloudflare R2",    icon: "📦", version: "S3 API Compatible", role: "S3-compatible object storage for database backups" },
+    { id: 13, name: "AWS CLI",          icon: "💻", version: "^2 (Pre-installed)", role: "S3 client used for backup orchestration" },
+    { id: 14, name: "Vercel",       icon: "☁️", version: "Hosting",   role: "Deployment platform" },
 
     // { id: 6, name: "MongoDB",      icon: "🍃", version: "Atlas",    role: "NoSQL database" },
   ],
@@ -1214,6 +1412,8 @@ optimize: [
     { id: 5, title: "Supabase Auth Guide", url: "https://supabase.com/docs/guides/auth", category: "auth",    note: "Session management, user management, OAuth providers, and auth hooks." },
     { id: 6, title: "Supabase PostGIS Guide", url: "https://supabase.com/docs/guides/database/extensions/postgis", category: "database",    note: "PostGIS extension setup, geometry column types, spatial query functions, and GIST indexing. Reference for all coordinate and proximity query work." },
     { id: 7, title: "Supabase JavaScript Client Reference", url: "https://supabase.com/docs/reference/javascript/introduction", category: "backend",    note: "Complete API reference for the Supabase JS client. Every Supabase query written in Next.js uses this reference for syntax." },
+    { id: 8, title: "Supabase CLI — `db dump` Reference", url: "https://supabase.com/docs/reference/cli/introduction", category: "deployment",    note: "Covers the full flag set for `supabase db dump`, including `--data-only`, `--schema-only` (the current default behavior), and connection string requirements." },
+    { id: 9, title: "Cloudflare R2 — S3 Compatibility API", url: "https://developers.cloudflare.com/r2/api/s3/api/", category: "database",    note: "Documents R2's S3-compatible endpoint structure and authentication, needed for pointing the AWS CLI at R2 instead of actual AWS S3 (`--endpoint-url` usage)." },
 
     // { id: 4, title: "Tailwind CSS v4 Docs", url: "https://tailwindcss.com/docs", category: "styling",    note: "v4 uses @theme in CSS instead of tailwind.config.js." },
   ],
