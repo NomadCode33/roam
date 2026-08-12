@@ -360,7 +360,7 @@ const PINNED = {
 /* 
     {
       id: ,
-      date: "Jly, 2026",
+      date: "Jloy, 2026",
       title: "",
       body: "",
       tag: ""
@@ -371,6 +371,55 @@ const DATA = {
   // ── progression: flat list, rendered by ProgressionPane ──────────────────
   // Fields per entry: id, date, title, body (string/array), tag/tags (optional)
   progression: [
+    {
+      id: 65,
+      date: "August 04, 2026",
+      title: "ROA-014 Full Restore Verified Against Production",
+      body: "Performed a real restore into a fresh scratch database and matched row counts directly against production (`users` 2/2, `places` 1/1, all other tables 0/0). Closing ROA-014 on proven evidence rather than a passing CI check.",
+      tag: "fixed"
+    },
+    {
+      id: 64,
+      date: "August 04, 2026",
+      title: "ROA-014 Workflow Live-Verified in GitHub Actions",
+      body: "Confirmed via direct inspection of a real automated run's output file (`head -5`), not an assumption that the corrected `.github/workflows/db-backup.yml` was actually live and producing correct output, resolving an earlier dispute over whether the fix had been pushed.",
+      tag: "deployment"
+    },
+    {
+      id: 63,
+      date: "August 04, 2026",
+      title: "Missing PostGIS Extension on Restore",
+      body: "The `--schema public` scoping fix silently dropped the cluster-level `CREATE EXTENSION postgis` statement, breaking every geometry-dependent table (`places`, `post_points`) on restore. Fixed via an idempotent `CREATE EXTENSION IF NOT EXISTS postgis;` prepended to the schema dump.",
+      tag: "fixed"
+    },
+    {
+      id: 62,
+      date: "August 04, 2026",
+      title: "Roles Dump Added to Backup Workflow",
+      body: "Added a third, previously-missing `--role-only` dump alongside schema and data, closing a real coverage gap for any custom Postgres roles beyond Supabase's defaults.",
+      tag: "feature"
+    },
+    {
+      id: 61,
+      date: "August 04, 2026",
+      title: "Sensitive Schema Exposure (`auth`/`storage` in backups)",
+      body: "Discovered the corrected dump was including `auth.users`, `auth.sessions`, `auth.refresh_tokens`, and `storage.objects`. Encrypted passwords and live session tokens are in a file exported to a personal machine and a 30-day-retention R2 bucket. Fixed by scoping both dump calls to `--schema public`.",
+      tag: "fixed"
+    },
+    {
+      id: 60,
+      date: "August 04, 2026",
+      title: "Data Dump Format Bug (`--use-copy` missing)",
+      body: "Adding `--data-only` alone still produced zero `COPY` statements. Root-caused via Supabase CLI documentation that `--data-only` requires the separate `--use-copy` flag to emit restorable COPY-format rows instead of a different internal format.",
+      tag: "fixed"
+    },
+    {
+      id: 59,
+      date: "August 04, 2026",
+      title: "Schema-Only Backup Bug Identified",
+      body: "Root-caused via direct file inspection that `supabase db dump` with no flags produces zero `COPY` statements. The ROA-014 backup workflow had been silently producing structure-only backups with no actual row data since its first successful run.",
+      tag: "fixed"
+    },
     {
       id: 58,
       date: "August 04, 2026",
@@ -892,6 +941,20 @@ const DATA = {
     */
 optimize: [
     {
+      id: 11,
+      month: "August 2026",
+      date: "August 04, 2026",
+      title: "`db-backup.yml`: Dump Scope and File Structure",
+      body: "Realized partway through that 'fix the missing data' and 'back up everything indiscriminately' are not the same goal. A correct backup still needs deliberate scope boundaries, not maximum inclusion.",
+      bullets: [
+        "Split a single combined dump into three independently-verified files: roles, schema, data",
+        "Scoped schema and data dumps to `--schema public`, deliberately excluding `auth`/`storage`",
+        "Applied differentiated verification logic per file type — schema/data get a strict size floor, roles gets an existence-only check since a legitimately tiny roles file shouldn't fail the job",
+        "Added a dedicated CI step that greps the data dump for `^COPY ` statements, so a repeat of the original schema-only bug fails loudly in the pipeline itself instead of requiring manual discovery again"
+      ],
+      tags: "refactor"
+    },  
+    {
       id: 10,
       month: "August 2026",
       date: "August 04, 2026",
@@ -1075,6 +1138,12 @@ optimize: [
     { id: 43, topic: "GitHub Actions Executes the Workflow File Version Live at Trigger Time", body: "A workflow run uses whichever version of the `.yml` file existed in the repo at the moment it was triggered, not whatever is currently committed. Re-running an old failed job, or triggering before a push finishes landing, replays the old (broken) version and can look identical to a fresh bug. Always check the run's timestamp against the relevant commit before debugging further." },
     { id: 44, topic: "RLS Subqueries Are Themselves Subject to RLS", body: "When one table's RLS policy checks another table via `EXISTS (SELECT 1 FROM other_table WHERE ...)`, that subquery is evaluated under the querying user's row-level security on `other_table` too. A narrow policy on the referenced table (e.g., only exposing rows where you're the owner) can silently make the subquery return nothing for the 'wrong' party, even though the outer policy's logic is written correctly. The fix is a `SECURITY DEFINER` function that bypasses RLS for just the boolean check, without exposing the underlying row." },
     { id: 45, topic: "Postgres.app's CLI Tools Are Not on PATH by Default", body: "Postgres.app installs `psql`, `createdb`, `pg_restore`, etc. inside its own `.app` bundle rather than a standard system bin directory. Any terminal session started before this is configured (via `/etc/paths.d/` or similar) will not find these commands, even though the server itself is running and reachable." },
+    { id: 46, topic: "Dump Flags Are Not Additive in the Way Their Names Suggest", body: "`--data-only` does not mean 'also include data'. It's the inverse of `--schema-only`, and even then it doesn't default to a restorable format. Getting real row data required stacking `--data-only` *and* `--use-copy` together; each flag name implies less than what it actually requires in combination." },
+    { id: 47, topic: "Schema Scoping Has Cluster-Level Blind Spots", body: "`--schema public` correctly excludes `auth`/`storage` objects, but extensions like PostGIS aren't schema-owned in the way tables are, they're cluster/database-level. Scoping a dump to one schema can silently drop the very extension that schema's tables depend on." },
+    { id: 48, topic: "File Existence and Size Are Not Proof of Content", body: "A file that's non-empty, uploads successfully, and passes a size check can still be structurally wrong in a way none of those checks would catch. Real verification means opening the file and checking for the specific thing you actually need (a COPY statement, a real row, a table name). Proven three separate times in this same ticket." },
+    { id: 49, topic: "GitHub Actions Runs the Workflow Version Live at Trigger Time", body: "A workflow file's current contents in the repo don't tell you what a past run actually executed. Disputes over 'did the fix actually run' are only settled by inspecting the literal output of a specific run, not by re-reading the YAML." },
+    { id: 50, topic: "`dropdb`/`createdb` Fully Resets Restore-Test State", body: "Restore testing against a database that still has data from a previous failed attempt produces misleading duplicate-key errors that look like new bugs. A full drop-and-recreate between restore attempts is required for a clean, trustworthy test." },
+    { id: 51, topic: "A 'Full Backup' Claim Needs Explicit Scope Boundaries", body: "Neither this DIY approach nor Supabase's own paid-tier native backups cover object/file storage, only the Postgres database. 'True full backup' isn't a DIY-vs-paid distinction; it's a database-vs-files distinction that exists regardless of backup method." },
     //{ id: 10, topic: "", body: "" },
   ],
 
