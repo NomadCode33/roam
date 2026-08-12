@@ -371,6 +371,48 @@ const DATA = {
   // Fields per entry: id, date, title, body (string/array), tag/tags (optional)
   progression: [
     {
+      id: 23,
+      date: "July 29, 2026",
+      title: "Full RLS Re-Verification With Seeded Data",
+      body: "All prior impersonation tests on the 10 affected tables were re-run individually (not batched) against real seeded data (one place, one post, a second test user), since the missing grants meant earlier 'passing' tests may have failed for the wrong reason the whole time.",
+      tag: "refactor",
+    },
+    {
+      id: 22,
+      date: "July 29, 2026",
+      title: "Missing Base Table Grants Across 12 Tables",
+      body: "Discovered `authenticated` had zero SELECT/INSERT/UPDATE/DELETE grants on `users` and `datasets` — RLS policies were unreachable underneath a permission-denied wall. Generalized the check project-wide and found the same gap on 10 more tables (`blocks`, `comments`, `follows`, `hidden_posts`, `post_photos`, `post_points`, `post_subscriptions`, `posts`, `reactions`, `saves`). Granted correct privileges to each based on intended access.",
+      tag: "fixed",
+    },
+    {
+      id: 21,
+      date: "July 29, 2026",
+      title: "`datasets` Table RLS Policies (ROA-001 closeout)",
+      body: "Wrote and verified `datasets_write_admin_only` (admin-gated ALL) and `datasets_select_all` (open read). This was the last blocked item preventing ROA-001 from being marked fully done.",
+      tag: "feature",
+    },
+    {
+      id: 20,
+      date: "July 29, 2026",
+      title: "Leftover Permissive UPDATE Policy on `users`",
+      body: "`users_update_own` (no role protection) was still active alongside the correct `users_update_own_not_role` policy. Postgres OR's applicable policies together, so the old one silently permitted client-side self-promotion to admin. Dropped it.",
+      tag: "fixed",
+    },
+    {
+      id: 19,
+      date: "July 29, 2026",
+      title: "Duplicate CHECK Constraint on `users.role`",
+      body: "Found two conflicting constraints active on the same column simultaneously (`users_role_check` and stale `users_role_values`), silently blocking the `moderator` value even though the newer constraint allowed it. Dropped the stale one.",
+      tag: "fixed",
+    },
+    {
+      id: 18,
+      date: "July 29, 2026",
+      title: "Admin Role Field (ROA-009)",
+      body: "Added a tiered `role` column (`user` / `moderator` / `admin`) to the `users` table with a CHECK constraint. Developer account manually promoted to `admin` via direct SQL, never through client-facing code.",
+      tag: "feature",
+    },
+    {
       id: 17,
       date: "July 28, 2026",
       title: "RLS policies: places, saves",
@@ -592,7 +634,7 @@ const DATA = {
       month: "July 2026",
       date: "July 26, 2026",
       title: "comments_insert_own: consolidate duplicate lookups",
-      body: "Realized the policy was hitting `posts` twice for the same row — once for the soft-delete check, once inside the block check. Extracted both into a single `SECURITY DEFINER` function:",
+      body: "",
       bullets: [
         "",
         "",
@@ -603,7 +645,20 @@ const DATA = {
     }, 
     */
 optimize: [
-  {
+    {
+      id: 4,
+      month: "July 2026",
+      date: "July 29, 2026",
+      title: "RLS Verification Process: Batched → Isolated Testing",
+      body: "I realized running eight impersonation tests in one pasted block was actively hiding information. When the second test threw an error, I couldn't confirm what the first test had actually done, because the SQL editor only surfaces the result of whichever statement executed most recently. A test that 'looked' like it passed might never have been genuinely observed.",
+      bullets: [
+        "Switched from one large multi-statement paste to one `BEGIN`/test/`ROLLBACK` block run at a time",
+        "Every result is now something directly seen, not inferred from what came after it",
+        "Applied this consistently across all 7 re-verified tables (`comments`, `follows`, `reactions`, `blocks`, `saves`, `hidden_posts`, `post_subscriptions`)"
+      ],
+      tags: "refactor"
+    },
+    {
       id: 3,
       month: "July 2026",
       date: "July 28, 2026",
@@ -647,7 +702,6 @@ optimize: [
 
   // ── learned: flat list, numbered by array position in LearnedPane ────────
   // Fields per entry: id, topic (title), body (string/array)
-  // { id: 10, topic: "", body: "" },
   learned: [
     { id: 1, topic: "Correct ticket execution order matters", body: "ROA-010 (schema) must come before ROA-001 (RLS). You cannot write RLS policies on tables that don't exist. The kanban dependency graph exists for a reason, pulling tickets out of order creates work that has to be thrown away." },
     { id: 2, topic: "CREATE EXTENSION IF NOT EXISTS vs CREATE EXTENSION", body: "Without `IF NOT EXISTS`, running `CREATE EXTENSION postgis` on an already-installed extension throws an error and stops script execution. The `IF NOT EXISTS` variant skips silently. It protects the script, not the extension itself." },
@@ -672,6 +726,13 @@ optimize: [
     { id: 16, topic: "USING vs WITH CHECK serve different moments in a write", body: "`USING` gates which existing rows a caller is even allowed to attempt to touch; `WITH CHECK` gates what the resulting row is allowed to look like after the write. For simple ownership checks they often look identical, but they diverge the moment a policy needs to prevent a user from changing a value they shouldn't be able to (e.g., escalating their own role)." },
     { id: 17, topic: "CHECK constraints can't run subqueries — RLS policies and triggers can", body: "Repeated pattern this session: assuming a policy/column/index from an earlier message was run, when it wasn't (`users`, `follows`, `notifications` column name, near-miss on `saves`). The fix is procedural, not clever — always verify current state via `pg_policies` / `information_schema.columns` / direct catalog lookups before writing code that depends on it, especially before any `DROP`." },
     { id: 18, topic: "Never trust that previously-discussed SQL was actually executed", body: "Repeated pattern this session: assuming a policy/column/index from an earlier message was run, when it wasn't (`users`, `follows`, `notifications` column name, near-miss on `saves`). The fix is procedural, not clever — always verify current state via `pg_policies` / `information_schema.columns` / direct catalog lookups before writing code that depends on it, especially before any `DROP`." },
+    { id: 19, topic: "Multiple Postgres CHECK Constraints on One Column Are ALL Enforced Simultaneously", body: "Postgres doesn't let you 'choose' between multiple CHECK constraints on the same column, it enforces every one of them on every write. A duplicate or stale constraint left in place silently narrows what a newer, more permissive constraint would otherwise allow, with no warning that the older one still exists." },
+    { id: 20, topic: "Multiple RLS Policies for the Same Command Are OR'd Together", body: "If two UPDATE policies apply to the same row, a user's write succeeds if it satisfies *either* one. A narrowly-written restrictive policy provides zero real protection if an older, more permissive policy covering the same action is still active on the table." },
+    { id: 21, topic: "Table-Level GRANTs and Row-Level Security Are Two Separate Gates", body: "Enabling RLS and writing correct policies means nothing if the underlying Postgres role (`authenticated`) was never granted base SELECT/INSERT/UPDATE/DELETE privileges on the table. A request denied at the grant layer produces the same `42501` error code as one denied by an RLS policy — the only way to tell them apart is reading the exact error text (`permission denied for table X` vs. `new row violates row-level security policy for table X`) or checking `information_schema.role_table_grants` directly." },
+    { id: 22, topic: "`auth.users` and `public.users` Are Not Automatically Linked", body: "Supabase Auth creating a row in `auth.users` on signup does not create a corresponding row in a custom `public.users` profile table. That link has to be built explicitly, usually via a Postgres trigger. Without it, an authenticated user with no profile row will fail every join that assumes one exists." },
+    { id: 22, topic: "A 'Success' Result Only Proves What You Actually Isolated and Watched", body: "Running several test statements in one batched script means an error partway through can hide or overwrite the result of an earlier statement in the same output panel. A clean-looking result at the end of a multi-statement script is not proof every individual statement inside it behaved as expected. Only isolated, one-at-a-time execution gives that proof." },
+
+    //{ id: 10, topic: "", body: "" },
   ],
 
   // ── bugs: flat list, status drives the open/fixed counts in BugsPane ─────
@@ -696,8 +757,8 @@ optimize: [
       status: "fixed", 
       date: "July 28, 2026", 
       body: [
-        "Symptom: policy drafted referencing `users.is_admin`, a column that was never built. Root cause: guessed a column name matching a common pattern instead of checking the real schema, same category of mistake as the notifications bug. Caught *before* running (not after, this time) via a schema check that showed the real column is `users.role`, currently unconstrained.",
-        "Fix: not yet applied — policy correctly held back, flagged as blocked on ROA-009 rather than run against a guessed column.",
+        "**Symptom:** policy drafted referencing `users.is_admin`, a column that was never built. Root cause: guessed a column name matching a common pattern instead of checking the real schema, same category of mistake as the notifications bug. Caught *before* running (not after, this time) via a schema check that showed the real column is `users.role`, currently unconstrained.",
+        "**Fix:** not yet applied — policy correctly held back, flagged as blocked on ROA-009 rather than run against a guessed column.",
       ] 
     },
     { 
@@ -706,8 +767,8 @@ optimize: [
       status: "fixed", 
       date: "July 28, 2026", 
       body: [
-        "Symptom: `ERROR 42703: column 'recipient_id' does not exist` when running the notifications policy set. Root cause: assumed a column name instead of verifying the real schema.",
-        "Fix: queried `information_schema.columns`, found the real column was `user_id`, rewrote all three policies using the correct name."
+        "**Symptom:** `ERROR 42703: column 'recipient_id' does not exist` when running the notifications policy set. Root cause: assumed a column name instead of verifying the real schema.",
+        "**Fix:** queried `information_schema.columns`, found the real column was `user_id`, rewrote all three policies using the correct name."
       ] 
     },
     { id: 2, 
@@ -715,8 +776,8 @@ optimize: [
       status: "fixed", 
       date: "July 28, 2026", 
       body: [
-        "Symptom: `rowsecurity = true` on `users`, but `pg_policies` returned 0 rows — meaning the table was inaccessible to everyone. Root cause: the session-1 handoff had marked this table's RLS SQL as 'written' and was mistakenly treated as 'executed' without verification.",
-        "Fix: ran the actual `CREATE POLICY` statements for `users_select_all` and `users_update_own`, then confirmed via `pg_policies`."
+        "**Symptom:** `rowsecurity = true` on `users`, but `pg_policies` returned 0 rows — meaning the table was inaccessible to everyone. Root cause: the session-1 handoff had marked this table's RLS SQL as 'written' and was mistakenly treated as 'executed' without verification.",
+        "**Fix:** ran the actual `CREATE POLICY` statements for `users_select_all` and `users_update_own`, then confirmed via `pg_policies`."
       ] 
     },
     { 
@@ -725,15 +786,14 @@ optimize: [
       status: "fixed", 
       date: "July 28, 2026", 
       body: [
-        "Symptom: after adding the block-aware `follows_select_all`, `follows_insert_own` and `follows_delete_own` were assumed to already exist and hadn't been run — meaning follow/unfollow was completely non-functional. Root cause: same as above, assumed-executed SQL that wasn't.",
-        "Fix: ran both missing policies, verified 3 total rows in `pg_policies` for `follows`."
+        "**Symptom:** after adding the block-aware `follows_select_all`, `follows_insert_own` and `follows_delete_own` were assumed to already exist and hadn't been run — meaning follow/unfollow was completely non-functional. Root cause: same as above, assumed-executed SQL that wasn't.",
+        "**Fix:** ran both missing policies, verified 3 total rows in `pg_policies` for `follows`."
       ] 
     }
   ],
 
   // ── stack: tile grid in StackPane, not card-based (no body/bullets/media) ─
   // Fields per entry: id, name, icon, version (optional), role (optional)
-  // { id: 6, name: "MongoDB",      icon: "🍃", version: "Atlas",    role: "NoSQL database" },
   stack: [
     { id: 1, name: "React 19",     icon: "⚛️", version: "^19.2.4",   role: "Frontend UI library" },
     { id: 2, name: "Next.js",      icon: "🔼", version: "^16.2.12",  role: "Full-stack React framework" },
@@ -743,6 +803,8 @@ optimize: [
     { id: 6, name: "PostgreSQL",   icon: "🐘", version: "^18.4.0",   role: "Relational database engine" },
     { id: 7, name: "PostGIS",      icon: "🗺️", version: "^3.3.7",    role: "Spatial database extension" },
     { id: 8, name: "Vercel",       icon: "☁️", version: "Hosting",   role: "Deployment platform" },
+
+    // { id: 6, name: "MongoDB",      icon: "🍃", version: "Atlas",    role: "NoSQL database" },
   ],
 
   // ── snippets: flat list, lang shown once as a meta badge (see SnippetsPane) ─
@@ -824,7 +886,6 @@ optimize: [
   // Fields per entry: id, title, url (optional — plain text if omitted),
   // category, note (used as the card body, not `body`)
 
-  // { id: 4, title: "Tailwind CSS v4 Docs", url: "https://tailwindcss.com/docs", category: "styling",    note: "v4 uses @theme in CSS instead of tailwind.config.js." },
   resources: [
     { id: 1, title: "Tailwind CSS v4 Docs", url: "https://tailwindcss.com/docs", category: "styling",    note: "v4 uses @theme in CSS instead of tailwind.config.js." },
     { id: 2, title: "Supabase Docs", url: "https://supabase.com/docs", category: "backend",    note: "Full documentation for Supabase database, auth, storage, RLS, and JavaScript client. Primary reference for all backend work on Roam." },
@@ -832,17 +893,25 @@ optimize: [
     { id: 4, title: "Supabase Auth Guide", url: "https://supabase.com/docs/guides/auth", category: "auth",    note: "Session management, user management, OAuth providers, and auth hooks." },
     { id: 5, title: "Supabase PostGIS Guide", url: "https://supabase.com/docs/guides/database/extensions/postgis", category: "database",    note: "PostGIS extension setup, geometry column types, spatial query functions, and GIST indexing. Reference for all coordinate and proximity query work." },
     { id: 6, title: "Supabase JavaScript Client Reference", url: "https://supabase.com/docs/reference/javascript/introduction", category: "backend",    note: "Complete API reference for the Supabase JS client. Every Supabase query written in Next.js uses this reference for syntax." },
+
+    // { id: 4, title: "Tailwind CSS v4 Docs", url: "https://tailwindcss.com/docs", category: "styling",    note: "v4 uses @theme in CSS instead of tailwind.config.js." },
   ],
 };
 
 // ─── Style maps ───────────────────────────────────────────────────────────────
 const TAG_STYLES = {
-  deployment:  { bg: "rgba(0,180,255,0.1)",   color: "#00b4ff", border: "rgba(0,180,255,0.25)" },
-  feature:     { bg: "rgba(0,229,160,0.1)",   color: "#00e5a0", border: "rgba(0,229,160,0.25)" },
+  // ── deployment: pushed off cyan toward a deeper, more saturated blue so it
+  // reads distinctly from feature's cyan while still popping against the bg.
+  deployment:  { bg: "rgba(47,111,255,0.12)", color: "#2f6fff", border: "rgba(47,111,255,0.3)" },
+  feature:     { bg: "rgba(34,211,238,0.1)",  color: "#22d3ee", border: "rgba(34,211,238,0.25)" },
   fix:         { bg: "rgba(255,201,60,0.1)",  color: "#ffc93c", border: "rgba(255,201,60,0.25)" },
+  // ── fixed: explicit entry so it stops silently falling back to
+  // TAG_STYLES.feature — pairs with the red "open" status in the Bug Log.
+  fixed:       { bg: "rgba(0,229,160,0.1)",   color: "#00e5a0", border: "rgba(0,229,160,0.25)" },
   refactor:    { bg: "rgba(167,139,250,0.1)", color: "#a78bfa", border: "rgba(167,139,250,0.25)" },
-  // ── New tag for Optimizations tab ─────────────────────────────────────────
-  performance: { bg: "rgba(255,150,0,0.1)",   color: "#ff9600", border: "rgba(255,150,0,0.25)" },
+  // ── performance: lightened toward near-white so it's actually legible —
+  // previous slate was too close to bg/muted text to register as a tag.
+  performance: { bg: "rgba(221,226,234,0.14)", color: "#dde2ea", border: "rgba(221,226,234,0.4)" },
 };
 
 const PRIORITY_STYLES = {
@@ -875,7 +944,10 @@ const Tags = ({ tag, tags }) => {
   return (
     <>
       {tagList.map((t) => {
-        const s = TAG_STYLES[t] || TAG_STYLES.feature;
+        // Neutral fallback instead of TAG_STYLES.feature — an unmapped tag
+        // silently inheriting feature's color is exactly how fixed/feature
+        // collided in the first place.
+        const s = TAG_STYLES[t] || { bg: "rgba(221,226,234,0.14)", color: "#dde2ea", border: "rgba(221,226,234,0.4)" };
         return (
           <span key={t} className="dn-tag" style={{ background: s.bg, color: s.color, borderColor: s.border }}>
             {t}
