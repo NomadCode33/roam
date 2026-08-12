@@ -335,6 +335,25 @@ const PINNED = {
 //     bullets: ["Cut JS payload by 38kb", "First paint improved by ~200ms"],
 //     tags: ["performance", "refactor"],
 //   }
+
+
+// ── Inline text formatting reference ──
+// Bold:          **text**
+// Italic:        *text*  or  _text_
+// Underline:     ++text++
+// Strikethrough: ~~text~~
+// Inline code:   `text`
+// Combos (nest freely): **bold *italic* text**
+//                        ++underlined ~~struck~~ text++
+//                        **bold ~~struck~~ ++underlined++**
+//
+// Escaping a marker to show it literally — in the RENDERED string you need
+// a single backslash before the character: \* \_ \~ \+
+// BUT in your JS source, a single backslash before a non-special char gets
+// silently dropped by JS itself (e.g. "\_" becomes just "_" at runtime) —
+// so in code you must write DOUBLE backslashes: \\* \\_ \\~ \\+
+//   title: "comments\\_insert\\_own"   →  renders as: comments_insert_own
+//   title: "comments\_insert\_own"     →  BROKEN: JS eats the \, renders italic
 // ─────────────────────────────────────────────────────────────────────────────
 
 // 6 total
@@ -377,7 +396,7 @@ const DATA = {
     {
       id: 3,
       date: "July 28, 2026",
-      title: "post_points_unique_order constraint added",
+      title: "post\\_points\\_unique\\_order constraint added",
       body: "Added `UNIQUE (post_id, order_index)` to `post_points` as a separate ALTER TABLE after identifying the gap. This prevents two points on the same post from occupying the same slot — the BETWEEN constraint alone was insufficient.",
       tag: "feature",
     },
@@ -489,7 +508,49 @@ const DATA = {
 
 // ── optimize: grouped by `month` in OptimizePane (see full field docs above) ─
 // 1 total
+   /*
+   {
+      id: 2,
+      month: "July 2026",
+      date: "July 26, 2026",
+      title: "comments_insert_own: consolidate duplicate lookups",
+      body: "Realized the policy was hitting `posts` twice for the same row — once for the soft-delete check, once inside the block check. Extracted both into a single `SECURITY DEFINER` function:",
+      bullets: [
+        "",
+        "",
+        "",
+        ""
+      ],
+      tags: "refactor"
+    }, 
+    */
 optimize: [
+  {
+      id: 3,
+      month: "July 2026",
+      date: "July 28, 2026",
+      title: "saves: eliminate ghost-save risk at the schema level",
+      body: "Realized the original `item_id` design pushed a data-integrity guarantee onto the application layer instead of the database, which meant it could silently fail.",
+      bullets: [
+        "Split `item_id` into `post_id` and `place_id`, each with a real foreign key to its own table",
+        "Added `saves_exactly_one_target` CHECK constraint so a row can never reference both or neither",
+        "Dropped the now-redundant `item_type` column once the two typed columns made it derivable rather than independently tracked"
+      ],
+      tags: "refactor"
+    }, 
+    {
+      id: 2,
+      month: "July 2026",
+      date: "July 28, 2026",
+      title: "comments\\_insert\\_own: consolidate duplicate lookups",
+      body: "Realized the policy was hitting `posts` twice for the same row — once for the soft-delete check, once inside the block check. Extracted both into a single `SECURITY DEFINER` function:",
+      bullets: [
+        "`can_comment_on_post(p_post_id, p_commenter_id)` does one lookup against `posts`, returning a single boolean covering both conditions",
+        "Policy body simplified to a single function call instead of two inline `EXISTS` subqueries",
+        "Traded a small amount of guaranteed speedup (unmeasured, not guaranteed by Postgres's planner) for real maintainability — one source of truth instead of duplicated logic that could drift out of sync"
+      ],
+      tags: "refactor"
+    },  
     {
       id: 1,
       month: "July 2026",
@@ -527,6 +588,12 @@ optimize: [
       // CardBody splits this into paragraph → code block → paragraph automatically.
       body: "I cannot add a value to an existing CHECK constraint. I had to drop and recreate it:\n```sql\nALTER TABLE [table] DROP CONSTRAINT [constraint_name];\nALTER TABLE [table] ADD CONSTRAINT [constraint_name]\n  CHECK ([column] IN (...existing values..., 'new_value'));\n```\nThis applies to `notifications.type` and `users.role` when new values are needed in Phase 2.",
     },
+    { id: 13, topic: "RLS policies are bypassed entirely by the service role", body: "Any backend code using the service role key (triggers, Edge Functions, admin scripts) skips RLS checks completely. Rules that must hold universally, like blocking self-reactions, can't live in RLS alone; they need a table-level trigger as a second, unbypassable enforcement layer." },
+    { id: 14, topic: "A missing policy for a command is an implicit deny, not an open door", body: " If RLS is enabled on a table and no policy exists for a given command (e.g., no INSERT policy), that command is refused by default for the roles it would otherwise apply to — no explicit 'block' rule is needed, just the absence of a 'grant' rule." },
+    { id: 15, topic: "A single column can't hold two different foreign keys", body: "This is *why* the original `saves.item_id` polymorphic design was structurally unable to have real referential integrity, a column can only reference one table. The fix isn't a smarter constraint, it's splitting into multiple typed columns, each with its own FK." },
+    { id: 16, topic: "USING vs WITH CHECK serve different moments in a write", body: "`USING` gates which existing rows a caller is even allowed to attempt to touch; `WITH CHECK` gates what the resulting row is allowed to look like after the write. For simple ownership checks they often look identical, but they diverge the moment a policy needs to prevent a user from changing a value they shouldn't be able to (e.g., escalating their own role)." },
+    { id: 17, topic: "CHECK constraints can't run subqueries — RLS policies and triggers can", body: "Repeated pattern this session: assuming a policy/column/index from an earlier message was run, when it wasn't (`users`, `follows`, `notifications` column name, near-miss on `saves`). The fix is procedural, not clever — always verify current state via `pg_policies` / `information_schema.columns` / direct catalog lookups before writing code that depends on it, especially before any `DROP`." },
+    { id: 18, topic: "Never trust that previously-discussed SQL was actually executed", body: "Repeated pattern this session: assuming a policy/column/index from an earlier message was run, when it wasn't (`users`, `follows`, `notifications` column name, near-miss on `saves`). The fix is procedural, not clever — always verify current state via `pg_policies` / `information_schema.columns` / direct catalog lookups before writing code that depends on it, especially before any `DROP`." },
   ],
 
   // ── bugs: flat list, status drives the open/fixed counts in BugsPane ─────
@@ -539,17 +606,27 @@ optimize: [
       status: "fixed", 
       date: "Mar 25, 2026", 
       body: [
-        "The start script had nodemon and dev had node — completely backwards. Corrected so start uses node for Render and dev uses nodemon.",
-        "The start script had nodemon and dev had node — completely backwards. Corrected so start uses node for Render and dev uses nodemon.",
+        "",
+        "",
       ] 
     },
   */
   bugs: [
     { 
+      id: 4, 
+      title: "datasets policy: assumed is_admin column that doesn't exist", 
+      status: "fixed", 
+      date: "July 28, 2026", 
+      body: [
+        "Symptom: policy drafted referencing `users.is_admin`, a column that was never built. Root cause: guessed a column name matching a common pattern instead of checking the real schema, same category of mistake as the notifications bug. Caught *before* running (not after, this time) via a schema check that showed the real column is `users.role`, currently unconstrained.",
+        "Fix: not yet applied — policy correctly held back, flagged as blocked on ROA-009 rather than run against a guessed column.",
+      ] 
+    },
+    { 
       id: 3, 
       title: "notifications: wrong column name (recipient_id vs user_id)", 
       status: "fixed", 
-      date: "Mar 25, 2026", 
+      date: "July 28, 2026", 
       body: [
         "Symptom: `ERROR 42703: column 'recipient_id' does not exist` when running the notifications policy set. Root cause: assumed a column name instead of verifying the real schema.",
         "Fix: queried `information_schema.columns`, found the real column was `user_id`, rewrote all three policies using the correct name."
@@ -837,16 +914,128 @@ const parseInlineSegments = (text) => {
     .filter((seg) => seg.value !== '');
 };
 
+// ─── parseFormatSegments helper (REWRITTEN — single-pass, no regex) ────────
+// Handles emphasis markup inside prose text: **bold**, *italic* / _italic_,
+// ++underline++, ~~strikethrough~~, and nested combinations of all of them.
+// Only runs on plain-text segments (i.e. text NOT already inside a backtick
+// code span — InlineText below keeps inline-code segments untouched).
+//
+// FIX: the previous version used recursive regex (`[\s\S]+?` non-greedy
+// alternation, re-parsed per match) to support nesting. That's vulnerable to
+// catastrophic backtracking — any card body with a lot of stray/unbalanced
+// *, _, ~, + characters (code snippets, math, typos) could make the regex
+// engine blow up in time/memory with NO thrown error, which is exactly what
+// caused the dev server to OOM and hang instead of showing a JS error.
+//
+// This version is a single left-to-right scan with an explicit stack —
+// O(n) in the length of the text, no backtracking possible no matter how
+// many marker characters (balanced or not) appear. A marker only closes
+// the INNERMOST currently-open span of the same type (standard well-nested
+// behavior — same rule as HTML/markdown), so **bold *italic* text** nests
+// correctly. Any span that's opened but never closed is safely demoted back
+// to literal text at the end instead of swallowing the rest of the string.
+//
+// A marker character can be escaped with a backslash (\*, \_, \~, \+) to
+// render as a literal character instead of opening/closing a span.
+const FORMAT_MARKERS = [
+  { token: '**', type: 'bold' },          // checked before single '*' so ** isn't seen as two italics
+  { token: '++', type: 'underline' },
+  { token: '~~', type: 'strikethrough' },
+  { token: '*',  type: 'italic' },
+  { token: '_',  type: 'italic' },
+];
+
+const parseFormatSegments = (text) => {
+  const root = { type: null, token: null, children: [] };
+  const stack = [root]; // stack of currently-open spans; root is always index 0
+  let textBuf = '';
+
+  const flushText = () => {
+    if (textBuf) {
+      stack[stack.length - 1].children.push({ type: 'text', value: textBuf });
+      textBuf = '';
+    }
+  };
+
+  let i = 0;
+  while (i < text.length) {
+    const ch = text[i];
+
+    // Escaped marker char (\*, \_, \~, \+) — emit the literal character
+    if (ch === '\\' && '*_~+'.includes(text[i + 1])) {
+      textBuf += text[i + 1];
+      i += 2;
+      continue;
+    }
+
+    // Try each marker token at this position, longest first (** before *)
+    const marker = FORMAT_MARKERS.find((m) => text.startsWith(m.token, i));
+    if (marker) {
+      const top = stack[stack.length - 1];
+      if (top.type === marker.type && top.token === marker.token) {
+        // Matches the innermost open span of the same type — close it
+        flushText();
+        const closed = stack.pop();
+        stack[stack.length - 1].children.push({ type: closed.type, children: closed.children });
+      } else {
+        // No matching open span at the top — treat as an opening marker
+        flushText();
+        stack.push({ type: marker.type, token: marker.token, children: [] });
+      }
+      i += marker.token.length;
+      continue;
+    }
+
+    textBuf += ch;
+    i += 1;
+  }
+  flushText();
+
+  // Any spans that opened but never found their closing marker — demote
+  // back to plain text (marker shown literally) instead of losing content
+  while (stack.length > 1) {
+    const frame = stack.pop();
+    const parent = stack[stack.length - 1];
+    parent.children.push({ type: 'text', value: frame.token });
+    parent.children.push(...frame.children);
+  }
+
+  return root.children.length ? root.children : [{ type: 'text', value: '' }];
+};
+
+// ─── FormatSegments renderer (NEW) ─────────────────────────────────────────
+// Recursively renders the segment tree from parseFormatSegments. Text leaves
+// render as-is; every other type wraps its own recursively-rendered children
+// in the matching tag, which is what lets combos like bold+italic stack
+// correctly (outer <strong> wrapping an inner <em>, etc.).
+const FormatSegments = ({ segments }) =>
+  segments.map((seg, i) => {
+    if (seg.type === 'text') return <span key={i}>{seg.value}</span>;
+    const inner = <FormatSegments segments={seg.children} key={i} />;
+    switch (seg.type) {
+      case 'bold':          return <strong className="dn-text-bold" key={i}>{inner}</strong>;
+      case 'italic':        return <em className="dn-text-italic" key={i}>{inner}</em>;
+      case 'underline':     return <u className="dn-text-underline" key={i}>{inner}</u>;
+      case 'strikethrough': return <s className="dn-text-strikethrough" key={i}>{inner}</s>;
+      default:               return inner;
+    }
+  });
+
 // Drop-in replacement for rendering a plain string that may contain inline
 // code spans — use anywhere `{someText}` was rendered directly (card titles,
 // body paragraphs, bullets). Renders untouched if there are no backticks.
+// Non-code text is also scanned for **bold**, *italic*/_italic_,
+// ++underline++, and ~~strikethrough~~ markup via parseFormatSegments —
+// markers can now nest/combine (e.g. **bold *and italic***) — so any card
+// body/bullet/title text can emphasize individual words.
 const InlineText = ({ text }) => {
   if (!text) return null;
-  return parseInlineSegments(text).map((seg, i) =>
-    seg.type === 'inline-code'
-      ? <code className="dn-inline-code" key={i}>{seg.value}</code>
-      : <span key={i}>{seg.value}</span>
-  );
+  return parseInlineSegments(text).map((seg, i) => {
+    if (seg.type === 'inline-code') {
+      return <code className="dn-inline-code" key={i}>{seg.value}</code>;
+    }
+    return <FormatSegments segments={parseFormatSegments(seg.value)} key={i} />;
+  });
 };
 
 // ─── CardCode helper ───────────────────────────────────────────────────────────

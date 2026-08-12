@@ -906,6 +906,31 @@ html {
   word-break: break-word;
 }
 
+/* ─── Inline text formatting (NEW) ──────────────────────────
+   Emphasis spans produced by parseFormatSegments/InlineText in page.jsx:
+   **bold**, *italic* / _italic_, ++underline++, ~~strikethrough~~.
+   Sizing/weight is relative so it scales with whatever it's inside
+   (card body, bullets, titles), same approach as .dn-inline-code above. */
+.dn-text-bold {
+  font-weight: 700;
+  color: inherit;
+}
+
+.dn-text-italic {
+  font-style: italic;
+}
+
+.dn-text-underline {
+  text-decoration: underline;
+  text-decoration-color: rgba(0, 180, 255, 0.55); /* echoes the inline-code accent color */
+  text-underline-offset: 0.15em;
+}
+
+.dn-text-strikethrough {
+  text-decoration: line-through;
+  opacity: 0.65;
+}
+
 /* ─── Resources ──────────────────────────────────────────── */
 .dn-resource-link {
   color: var(--dn-purple);
