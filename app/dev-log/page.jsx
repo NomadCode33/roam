@@ -371,6 +371,27 @@ const DATA = {
   // Fields per entry: id, date, title, body (string/array), tag/tags (optional)
   progression: [
     {
+      id: 26,
+      date: "July 30, 2026",
+      title: "Live Supabase service\\_role key exposure remediated",
+      body: "Uploaded a live `.env.local` into chat, exposing the anon key, service_role key, and Mapbox token. Corrected remediation path researched live (Supabase's key system changed in 2025–2026): generate a new `sb_secret_...` key under the non-legacy tab, migrate server code, then delete the old legacy `service_role` key — avoiding a full JWT-secret rotation that would've invalidated the anon key and dropped all connections unnecessarily.",
+      tag: "fixed",
+    },
+    {
+      id: 25,
+      date: "July 30, 2026",
+      title: "Full Phase 1 dependency-respecting build order established",
+      body: "Confirmed and locked the 8-wave sequencing for all remaining Phase 1 tickets (30+ items), based on real dependency chains rather than ticket number order. ROA-002 selected as the priority pick within Wave 1 since it unblocks the most downstream work (003, 008, 015, 017, 018, 021, 024).",
+      tag: "deployment",
+    },
+    {
+      id: 24,
+      date: "July 30, 2026",
+      title: "ROA-002 interactive walkthrough built",
+      body: "Created the environment-variable-management walkthrough as an interactive widget matching the ROA-001 format: verify current state, create `.env.local`, protect it via `.gitignore`/`.env.example`, test, Done-When checklist, and sendPrompt buttons routing to the next tickets.",
+      tag: "feature",
+    },
+    {
       id: 23,
       date: "July 29, 2026",
       title: "Full RLS Re-Verification With Seeded Data",
@@ -730,8 +751,10 @@ optimize: [
     { id: 20, topic: "Multiple RLS Policies for the Same Command Are OR'd Together", body: "If two UPDATE policies apply to the same row, a user's write succeeds if it satisfies *either* one. A narrowly-written restrictive policy provides zero real protection if an older, more permissive policy covering the same action is still active on the table." },
     { id: 21, topic: "Table-Level GRANTs and Row-Level Security Are Two Separate Gates", body: "Enabling RLS and writing correct policies means nothing if the underlying Postgres role (`authenticated`) was never granted base SELECT/INSERT/UPDATE/DELETE privileges on the table. A request denied at the grant layer produces the same `42501` error code as one denied by an RLS policy — the only way to tell them apart is reading the exact error text (`permission denied for table X` vs. `new row violates row-level security policy for table X`) or checking `information_schema.role_table_grants` directly." },
     { id: 22, topic: "`auth.users` and `public.users` Are Not Automatically Linked", body: "Supabase Auth creating a row in `auth.users` on signup does not create a corresponding row in a custom `public.users` profile table. That link has to be built explicitly, usually via a Postgres trigger. Without it, an authenticated user with no profile row will fail every join that assumes one exists." },
-    { id: 22, topic: "A 'Success' Result Only Proves What You Actually Isolated and Watched", body: "Running several test statements in one batched script means an error partway through can hide or overwrite the result of an earlier statement in the same output panel. A clean-looking result at the end of a multi-statement script is not proof every individual statement inside it behaved as expected. Only isolated, one-at-a-time execution gives that proof." },
-
+    { id: 23, topic: "A 'Success' Result Only Proves What You Actually Isolated and Watched", body: "Running several test statements in one batched script means an error partway through can hide or overwrite the result of an earlier statement in the same output panel. A clean-looking result at the end of a multi-statement script is not proof every individual statement inside it behaved as expected. Only isolated, one-at-a-time execution gives that proof." },
+    { id: 24, topic: "Legacy vs. new Supabase key systems are not interchangeable in how they rotate", body: "The old JWT-based `service_role`/`anon` pair shares one signing secret. Rotating it invalidates both keys and restarts the project, killing connections. The newer `sb_publishable_...` / `sb_secret_...` keys are independently revocable, so a single leaked key can be replaced without touching anything else." },
+    { id: 25, topic: "Table-level grants and RLS policies are separate failure layers", body: "A `42501` permission error can mean either 'RLS correctly blocked this' or 'the grant doesn't exist and RLS was never reached'. From prior sessions, I discovered 10+ tables where grants were silently missing despite policies appearing to pass tests." },
+    { id: 26, topic: "A flagged-items backlog is a set of tripwires, not a parallel task queue", body: "Every flag in the tracking doc is gated behind a ticket that doesn't exist yet (auth, block/unblock feature, post creation). Checking it for 'what can I do right now' independent of active ticket work produces false leads." },
     //{ id: 10, topic: "", body: "" },
   ],
 
@@ -741,7 +764,7 @@ optimize: [
   /* 
     { 
       id: 2, 
-      title: "nodemon/node scripts swapped in package.json", 
+      title: "", 
       status: "fixed", 
       date: "Mar 25, 2026", 
       body: [
@@ -751,6 +774,56 @@ optimize: [
     },
   */
   bugs: [
+    { 
+      id: 9, 
+      title: "", 
+      status: "fixed", 
+      date: "July 31, 2026", 
+      body: [
+        "**Symptom:** ",
+        "",
+      ] 
+    },
+    { 
+      id: 8, 
+      title: "Same Missing-Grant Pattern Found on 10 Additional Tables", 
+      status: "fixed", 
+      date: "July 29, 2026", 
+      body: [
+        "**Symptom:** the `users`/`datasets` grant gap raised the question of whether other tables had the same issue. Root cause: a project-wide `information_schema.role_table_grants` query confirmed `blocks`, `comments`, `follows`, `hidden_posts`, `post_photos`, `post_points`, `post_subscriptions`, `posts`, `reactions`, and `saves` all had the identical gap. Which meant that prior sessions' 'passed' RLS tests on these tables may never have reached the policy layer at all.",
+        "**Fix:** granted correct privileges per table (full CRUD for owned-content tables, SELECT-only for `notifications` and `places` per existing product decisions), then re-verified every table's ownership boundaries individually with real seeded data.",
+      ] 
+    },
+    { 
+      id: 7, 
+      title: "`42501: permission denied for table users` During RLS Testing", 
+      status: "fixed", 
+      date: "July 29, 2026", 
+      body: [
+        "**Symptom:** an impersonation test expected to be blocked by RLS instead failed with a raw permission error before RLS logic ever ran. Root cause: the `authenticated` Postgres role had never been granted base SELECT/UPDATE privileges on `users`, only `TRIGGER`, `REFERENCES`, and `TRUNCATE` were present.",
+        "**Fix:** ran `GRANT SELECT, UPDATE ON public.users TO authenticated;`, re-tested, and confirmed the failure then correctly came from RLS instead.",
+      ] 
+    },
+    { 
+      id: 6, 
+      title: "Client-Side Self-Promotion to Admin Was Possible", 
+      status: "fixed", 
+      date: "July 29, 2026", 
+      body: [
+        "**Symptom:** a correctly-written role-protection policy (`users_update_own_not_role`) existed, but self-promotion should have been tested as still open. Root cause: an older, unrestricted UPDATE policy (`users_update_own`) was still active on the same table, and Postgres OR's all applicable policies together. The permissive one silently overrode the restrictive one.",
+        "**Fix:** dropped `users_update_own`, leaving only the role-protected policy.",
+      ] 
+    },
+    { 
+      id: 5, 
+      title: "Duplicate `users.role` CHECK Constraint Blocking `moderator`", 
+      status: "fixed", 
+      date: "July 29, 2026", 
+      body: [
+        "**Symptom:** adding `'moderator'` to the role constraint appeared to succeed, but a second, older constraint (`users_role_values`, two-value only) was still silently active on the same column. Root cause: Postgres enforces all CHECK constraints on a column at once — the older one was never dropped when the newer one was added in an earlier session.",
+        "**Fix:** identified both constraints via `pg_constraint`, dropped `users_role_values`, kept `users_role_check`.",
+      ] 
+    },
     { 
       id: 4, 
       title: "datasets policy: assumed is_admin column that doesn't exist", 
@@ -763,7 +836,7 @@ optimize: [
     },
     { 
       id: 3, 
-      title: "notifications: wrong column name (recipient_id vs user_id)", 
+      title: "notifications: wrong column name (recipient\\_id vs user\\_id)", 
       status: "fixed", 
       date: "July 28, 2026", 
       body: [
@@ -799,10 +872,14 @@ optimize: [
     { id: 2, name: "Next.js",      icon: "🔼", version: "^16.2.12",  role: "Full-stack React framework" },
     { id: 3, name: "Tailwind v4",  icon: "🎨", version: "^4.2.4",    role: "Utility-first styling" },
     { id: 4, name: "Mapbox GL JS", icon: "📍", version: "^3.28.1",   role: "Interactive client-side maps" },
-    { id: 5, name: "Supabase",     icon: "⚡", version: "^2.112.2",   role: "Backend-as-a-Service (BaaS)" },
-    { id: 6, name: "PostgreSQL",   icon: "🐘", version: "^18.4.0",   role: "Relational database engine" },
-    { id: 7, name: "PostGIS",      icon: "🗺️", version: "^3.3.7",    role: "Spatial database extension" },
-    { id: 8, name: "Vercel",       icon: "☁️", version: "Hosting",   role: "Deployment platform" },
+    { id: 5, name: "react-map-gl",      icon: "🗺️", version: "^8.1.1",    role: "React wrapper for Mapbox GL" },
+    { id: 6, name: "Turf.js",           icon: "📐", version: "^7.3.5",    role: "Client-side geospatial analysis" },
+    { id: 7, name: "shadcn/ui",         icon: "🧩", version: "4.16.x",   role: "Accessible unstyled components" },
+    { id: 8, name: "TanStack Query",    icon: "🔄", version: "^5.100.6",   role: "Client-side state & caching" },
+    { id: 9, name: "Supabase",     icon: "⚡", version: "^2.112.2",   role: "Backend-as-a-Service (BaaS)" },
+    { id: 10, name: "PostgreSQL",   icon: "🐘", version: "^18.4.0",   role: "Relational database engine" },
+    { id: 11, name: "PostGIS",      icon: "🗺️", version: "^3.3.7",    role: "Spatial database extension" },
+    { id: 12, name: "Vercel",       icon: "☁️", version: "Hosting",   role: "Deployment platform" },
 
     // { id: 6, name: "MongoDB",      icon: "🍃", version: "Atlas",    role: "NoSQL database" },
   ],
