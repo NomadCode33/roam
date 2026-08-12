@@ -357,11 +357,12 @@ const PINNED = {
 // ─────────────────────────────────────────────────────────────────────────────
 
 // 6 total
-/* {
-      id: 3,
+/* 
+    {
+      id: ,
       date: "July 28, 2026",
-      title: "PostGIS Extension Enabled",
-      body: "Enabled the PostGIS extension in Supabase via `CREATE EXTENSION IF NOT EXISTS postgis`. Confirmed active at version 3.3.7 via `pg_extension` verification query. Required first step before any geometry columns could be created.",
+      title: "",
+      body: "",
       tag: "feature",
     },
 */
@@ -369,6 +370,83 @@ const DATA = {
   // ── progression: flat list, rendered by ProgressionPane ──────────────────
   // Fields per entry: id, date, title, body (string/array), tag/tags (optional)
   progression: [
+    {
+      id: 17,
+      date: "July 28, 2026",
+      title: "RLS policies: places, saves",
+      body: "`places` fully locked to client writes (SELECT only, verified via failed impersonation INSERT test). `saves` locked to owner, with a soft-delete-aware SELECT filter for post-saves.",
+      tag: "feature",
+    },
+    {
+      id: 16,
+      date: "July 28, 2026",
+      title: "saves table schema migration",
+      body: "Replaced polymorphic `item_id` (uuid, no FK) + `item_type` (text) with typed `post_id`/`place_id` foreign keys and a `saves_exactly_one_target` CHECK constraint. Verified table was empty (`COUNT = 0`) before dropping columns.",
+      tag: "refactor",
+    },
+    {
+      id: 15,
+      date: "July 28, 2026",
+      title: "RLS policies: reactions",
+      body: "Owner-only write. Self-reaction blocking was initially implemented via trigger, then explicitly reversed per product decision (see Bug Log — not a bug, but treated as a build-then-revert).",
+      tag: "feature",
+    },
+    {
+      id: 14,
+      date: "July 28, 2026",
+      title: "can\\_comment\\_on\\_post() helper function",
+      body: "Consolidated two separate `posts` lookups (soft-delete check + block check) inside `comments_insert_own` into one `SECURITY DEFINER`, `STABLE` SQL function.",
+      tag: "refactor",
+    },
+    {
+      id: 13,
+      date: "July 28, 2026",
+      title: "Insert-level block enforcement: comments, follows",
+      body: "Extended beyond visibility-only blocking — a blocked user can no longer create a comment or follow request at all, not just have it hidden after the fact.",
+      tag: "feature",
+    },
+    {
+      id: 12,
+      date: "July 28, 2026",
+      title: "Mutual block isolation added to posts, comments, follows",
+      body: "Rewrote SELECT policies on all three to exclude content between blocked users in either direction, via `NOT EXISTS` subqueries against `blocks`.",
+      tag: "feature",
+    },
+    {
+      id: 11,
+      date: "July 28, 2026",
+      title: "RLS policies: follows, notifications",
+      body: "`follows` public read with self-follow guard; `notifications` private to recipient, no client-facing INSERT (service-role/trigger only).",
+      tag: "feature",
+    },
+    {
+      id: 10,
+      date: "July 28, 2026",
+      title: "RLS policies: posts, comments",
+      body: "Public read (soft-delete aware via `deleted_at IS NULL`), owner-only write. Later extended with mutual block-exclusion in SELECT.",
+      tag: "feature",
+    },
+    {
+      id: 9,
+      date: "July 28, 2026",
+      title: "RLS policies: hidden\\_posts, post\\_subscriptions, blocks",
+      body: "Direct-ownership pattern, no UPDATE policy (binary state, un-hide/un-block = delete). `blocks` includes a self-block guard (`blocker_id != blocked_id`).",
+      tag: "feature",
+    },
+    {
+      id: 8,
+      date: "July 28, 2026",
+      title: "RLS policies: post\\_points, post\\_photos",
+      body: "Ownership enforced via parent-post lookup (`EXISTS` subquery against `posts.user_id`) since neither table has its own `user_id` column. Later extended to check `posts.deleted_at IS NULL` on insert/update.",
+      tag: "feature",
+    },
+    {
+      id: 7,
+      date: "July 28, 2026",
+      title: "RLS policies: users table",
+      body: "Wrote and ran SELECT (public) and UPDATE (owner-only) policies for `users`. Discovered mid-session that this table's policy had never actually been executed despite being marked done in a prior handoff — corrected and verified via `pg_policies`.",
+      tag: "feature",
+    },
     {
       id: 6,
       date: "July 28, 2026",
@@ -413,7 +491,7 @@ const DATA = {
       title: "PostGIS Extension Enabled",
       body: "Enabled the PostGIS extension in Supabase via `CREATE EXTENSION IF NOT EXISTS postgis`. Confirmed active at version 3.3.7 via `pg_extension` verification query. Required first step before any geometry columns could be created.",
       tag: "feature",
-    },
+    }
   ],
 
   // ── future: grouped by priority ("high" | "medium" | "low") in FuturePane ─
@@ -428,7 +506,7 @@ const DATA = {
       title: "Migrate middleware.js → proxy.js/proxy.ts",
       priority: "high",  
       body: "Next.js 16.2.12 logs this as deprecated at every dev server start. Low cost to fix now; becomes actual tech debt if more routes get built against the old convention first. Needs resolving before ROA-003 Phase D is trusted as 'tested against current Next.js behavior.'"
-    },
+    }
     /*{ id: 2, 
       title: "Skeleton Loading & Tile Routes",
       priority: "high",  
@@ -564,7 +642,7 @@ optimize: [
         "Enforced at the database level — no application code or race condition can bypass it"
       ],
       tags: "refactor"
-    },
+    }
   ],
 
   // ── learned: flat list, numbered by array position in LearnedPane ────────
@@ -650,25 +728,7 @@ optimize: [
         "Symptom: after adding the block-aware `follows_select_all`, `follows_insert_own` and `follows_delete_own` were assumed to already exist and hadn't been run — meaning follow/unfollow was completely non-functional. Root cause: same as above, assumed-executed SQL that wasn't.",
         "Fix: ran both missing policies, verified 3 total rows in `pg_policies` for `follows`."
       ] 
-    },
-    /*{ 
-      id: 3, 
-      title: "nodemon/node scripts swapped in package.json", 
-      status: "fixed", 
-      date: "Mar 25, 2026", 
-      body: [
-        "The start script had nodemon and dev had node — completely backwards. Corrected so start uses node for Render and dev uses nodemon.",
-      ] 
-    },
-    { 
-      id: 4, 
-      title: "nodemon/node scripts swapped in package.json", 
-      status: "fixed", 
-      date: "Mar 25, 2026", 
-      body: [
-        "The start script had nodemon and dev had node — completely backwards. Corrected so start uses node for Render and dev uses nodemon.",
-      ] 
-    },*/
+    }
   ],
 
   // ── stack: tile grid in StackPane, not card-based (no body/bullets/media) ─
