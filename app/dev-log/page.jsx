@@ -372,6 +372,37 @@ const DATA = {
   // Fields per entry: id, date, title, body (string/array), tag/tags (optional)
   progression: [
     {
+      id: 69,
+      date: "August 08, 2026",
+      title: "Saves-table purge-vs-hide behavior on block",
+      body: [
+        "Resolved the open question of what happens to a saved post when the post's author blocks the saver.",
+        "**Decision:** hide, not delete. The save row stays in the database; it's already invisible to the blocked user because the underlying post is already unreadable to them under the existing mutual-blocking RLS policy. Hard-deleting the save row was considered and rejected. It would silently destroy the saving user's own data over an action the other person took, and it would contradict the existing 'unblock does not auto-restore follows' precedent for no equivalent reason. No new trigger or code required; closes on existing RLS behavior alone."
+      ],
+      tag: "decision"
+    },
+    {
+      id: 68,
+      date: "August 04, 2026",
+      title: "ROA-019 closed — alert pipeline proven end-to-end",
+      body: "Forced a real outage by removing the health route and redeploying. Confirmed a genuine DOWN email at 12:22 and a genuine recovery/UP email at 12:27, both landing in the inbox. Incident logged in Uptime Robot's dashboard as Resolved with correct 404 root cause and 5m 4s duration, closing out every Phase E Done-When item with actual verified evidence, not configuration alone.",
+      tag: "deployment"
+    },
+    {
+      id: 67,
+      date: "August 04, 2026",
+      title: "Uptime Robot monitoring live for production",
+      body: "Created Uptime Robot account, added an HTTP(s) monitor targeting the health endpoint specifically (not the homepage) on a 5-minute check interval. Alert contact (email) confirmed attached and working via a real Test Notification before moving to the forced-outage test.",
+      tag: "feature"
+    },
+    {
+      id: 66,
+      date: "August 04, 2026",
+      title: "Health check endpoint deployed and verified",
+      body: "Created `/api/health` returning 200 OK with no auth or DB dependency. Verified locally via `npm run dev` + curl against `localhost:3000`, then verified again against the live Vercel deployment (`roam-dusky-alpha.vercel.app`). Both returned clean 200s with correct JSON body before moving to monitor setup.",
+      tag: "deployment"
+    },
+    {
       id: 65,
       date: "August 04, 2026",
       title: "ROA-014 Full Restore Verified Against Production",
@@ -1144,6 +1175,10 @@ optimize: [
     { id: 49, topic: "GitHub Actions Runs the Workflow Version Live at Trigger Time", body: "A workflow file's current contents in the repo don't tell you what a past run actually executed. Disputes over 'did the fix actually run' are only settled by inspecting the literal output of a specific run, not by re-reading the YAML." },
     { id: 50, topic: "`dropdb`/`createdb` Fully Resets Restore-Test State", body: "Restore testing against a database that still has data from a previous failed attempt produces misleading duplicate-key errors that look like new bugs. A full drop-and-recreate between restore attempts is required for a clean, trustworthy test." },
     { id: 51, topic: "A 'Full Backup' Claim Needs Explicit Scope Boundaries", body: "Neither this DIY approach nor Supabase's own paid-tier native backups cover object/file storage, only the Postgres database. 'True full backup' isn't a DIY-vs-paid distinction; it's a database-vs-files distinction that exists regardless of backup method." },
+    { id: 52, topic: "Health checks must be isolated from application dependencies", body: "A monitoring endpoint should answer exactly one question, 'is the server itself responding', and nothing else. Wiring in a database call or auth check means unrelated failures (a Supabase blip, an expired token) get misreported as full app outages. `/api/health` was deliberately built with zero dependencies for this reason." },
+    { id: 53, topic: "Configuration success is not the same as functional proof", body: "Extending the DDL/DML 'Success ≠ verified' principle from earlier sessions: a monitor showing 'Up' with a correctly filled-in alert contact still isn't proof the alert pipeline works. Only a real triggered event, an actual forced outage producing an actual received email, counts as verification. This is now a standing project rule, not a one-off check for ROA-019." },
+    { id: 54, topic: "A dependency field being 'fine in practice' isn't the same as being correct", body: "Build order can be executed correctly by a developer's own judgment even while the tracked metadata (a kanban JSON dependency array) describes something different. The two are separate claims. One about what happened and one about what a document says happened, and only checking the former doesn't verify the latter." },
+    { id: 55, topic: "Shared UI shells shouldn't be finalized before real page designs exist", body: "Committing to a single rigid page layout before knowing whether every page (e.g., a full-bleed map view) can actually use it risks the same retrofit cost as building any other abstraction ahead of its real use cases. Next.js App Router's nested/route-group layouts make it cheap to defer this correctly. Build the minimum shared shell now, add sibling layouts later once real requirements are known." },
     //{ id: 10, topic: "", body: "" },
   ],
 
@@ -1164,6 +1199,61 @@ optimize: [
     },
   */
   bugs: [
+    { 
+      id: 24, 
+      title: "Disputed Whether the Live Workflow Actually Contained the Fix", 
+      status: "fixed", 
+      date: "August 04, 2026", 
+      body: [
+        "**Symptom:** disagreement over whether a pushed YAML change had actually executed in GitHub Actions.",
+        "**Root cause:** assumption made without checking file evidence on either side.",
+        "**Fix:** settled definitively by running `head -5` on the schema file from the most recent real run and confirming the expected line was present."
+      ] 
+    },
+    { 
+      id: 23, 
+      title: "Restore Failed on `type 'public.geometry' does not exist`", 
+      status: "fixed", 
+      date: "August 04, 2026", 
+      body: [
+        "**Symptom:** `places` and `post_points` tables failed to create during restore, cascading into further 'relation does not exist' errors throughout the rest of the schema file.",
+        "**Root cause:** `--schema public` scoping dropped the `CREATE EXTENSION postgis` statement entirely, since extensions live outside any single schema's DDL.",
+        "**Fix:** prepended an idempotent `CREATE EXTENSION IF NOT EXISTS postgis;` to the schema dump."
+      ] 
+    },
+    { 
+      id: 22, 
+      title: "Backup Contained Live Auth/Session Data", 
+      status: "fixed", 
+      date: "August 04, 2026", 
+      body: [
+        "**Symptom:** None. This was caught by inspection, not by an alarm firing.",
+        "**Root cause:** an unscoped dump pulled in `auth.users`, `auth.sessions`, `auth.refresh_tokens`, and `storage.*`, none of which belonged in a portable backup file.",
+        "**Fix:** scoped both schema and data dumps to `--schema public`."
+      ] 
+    },
+    { 
+      id: 21, 
+      title: "Data Dump Still Showed Zero COPY Statements After `--data-only`", 
+      status: "fixed", 
+      date: "August 04, 2026", 
+      body: [
+        "**Symptom:** CI's new COPY-count check failed even with `--data-only` explicitly passed.",
+        "**Root cause:** `--data-only` alone doesn't produce COPY-format output, it needs the separate `--use-copy` flag.",
+        "**Fix:** added `--use-copy` alongside `--data-only`."
+      ] 
+    },
+    { 
+      id: 20, 
+      title: "Backups Contained No Row Data", 
+      status: "fixed", 
+      date: "August 04, 2026", 
+      body: [
+        "**Symptom:** backup files uploaded successfully, passed size checks, and looked correct at every existing check.",
+        "**Root cause:** `supabase db dump` with no flags defaults to schema-only output. Zero `COPY` statements anywhere in the file, confirmed via direct grep.",
+        "**Fix:** added a dedicated `--data-only` dump pass."
+      ] 
+    },
     { 
       id: 19, 
       title: "`createdb: command not found` on Local Machine", 
@@ -1376,20 +1466,21 @@ optimize: [
   // ── stack: tile grid in StackPane, not card-based (no body/bullets/media) ─
   // Fields per entry: id, name, icon, version (optional), role (optional)
   stack: [
-    { id: 1, name: "React 19",     icon: "⚛️", version: "^19.2.4",   role: "Frontend UI library" },
-    { id: 2, name: "Next.js",      icon: "🔼", version: "^16.2.12",  role: "Full-stack React framework" },
-    { id: 3, name: "Tailwind v4",  icon: "🎨", version: "^4.2.4",    role: "Utility-first styling" },
-    { id: 4, name: "Mapbox GL JS", icon: "📍", version: "^3.28.1",   role: "Interactive client-side maps" },
-    { id: 5, name: "react-map-gl",      icon: "🗺️", version: "^8.1.1",    role: "React wrapper for Mapbox GL" },
-    { id: 6, name: "Turf.js",           icon: "📐", version: "^7.3.5",    role: "Client-side geospatial analysis" },
-    { id: 7, name: "shadcn/ui",         icon: "🧩", version: "4.16.x",   role: "Accessible unstyled components" },
-    { id: 8, name: "TanStack Query",    icon: "🔄", version: "^5.100.6",   role: "Client-side state & caching" },
-    { id: 9, name: "Supabase",     icon: "⚡", version: "^2.112.2",   role: "Backend-as-a-Service (BaaS)" },
-    { id: 10, name: "PostgreSQL",   icon: "🐘", version: "^18.4.0",   role: "Relational database engine" },
-    { id: 11, name: "PostGIS",      icon: "🗺️", version: "^3.3.7",    role: "Spatial database extension" },
+    { id: 1, name: "React 19",          icon: "⚛️", version: "^19.2.4",           role: "Frontend UI library" },
+    { id: 2, name: "Next.js",           icon: "🔼", version: "^16.2.12",          role: "Full-stack React framework" },
+    { id: 3, name: "Tailwind v4",       icon: "🎨", version: "^4.2.4",            role: "Utility-first styling" },
+    { id: 4, name: "Mapbox GL JS",      icon: "📍", version: "^3.28.1",           role: "Interactive client-side maps" },
+    { id: 5, name: "react-map-gl",      icon: "🗺️", version: "^8.1.1",            role: "React wrapper for Mapbox GL" },
+    { id: 6, name: "Turf.js",           icon: "📐", version: "^7.3.5",            role: "Client-side geospatial analysis" },
+    { id: 7, name: "shadcn/ui",         icon: "🧩", version: "4.16.x",            role: "Accessible unstyled components" },
+    { id: 8, name: "TanStack Query",    icon: "🔄", version: "^5.100.6",          role: "Client-side state & caching" },
+    { id: 9, name: "Supabase",          icon: "⚡", version: "^2.112.2",           role: "Backend-as-a-Service (BaaS)" },
+    { id: 10, name: "PostgreSQL",       icon: "🐘", version: "^18.4.0",           role: "Relational database engine" },
+    { id: 11, name: "PostGIS",          icon: "🗺️", version: "^3.3.7",            role: "Spatial database extension" },
     { id: 12, name: "Cloudflare R2",    icon: "📦", version: "S3 API Compatible", role: "S3-compatible object storage for database backups" },
     { id: 13, name: "AWS CLI",          icon: "💻", version: "^2 (Pre-installed)", role: "S3 client used for backup orchestration" },
-    { id: 14, name: "Vercel",       icon: "☁️", version: "Hosting",   role: "Deployment platform" },
+    { id: 14, name: "Vercel",           icon: "☁️", version: "Hosting",           role: "Deployment platform" },
+    { id: 15, name: "Uptime Robot",     icon: "🤖", version: "v3 API",             role: "External synthetics & monitoring" },
 
     // { id: 6, name: "MongoDB",      icon: "🍃", version: "Atlas",    role: "NoSQL database" },
   ],
@@ -1425,14 +1516,14 @@ optimize: [
       body: "Spot-check: `places.coordinates` should show `USER-DEFINED`, array columns should show `ARRAY`, `posts.deleted_at` should show `is_nullable = YES`.",
       code: `SELECT table_name, column_name, data_type, is_nullable, column_default\nFROM information_schema.columns\nWHERE table_schema = 'public'\nORDER BY table_name, ordinal_position;`,
     },
-    /*{
-      id: 2,
-      title: "Express Static Serve (Vite build)",
-      lang: "js",
-      body: "Serve the Vite dist folder from Express. Must come after all API routes.",
-      code: `import path from 'path';\nimport { fileURLToPath } from 'url';\n\nconst __dirname = path.dirname(fileURLToPath(import.meta.url));\n\napp.use(express.static(path.join(__dirname, 'react-frontend/dist')));\n\napp.get('*', (req, res) => {\n  res.sendFile(path.join(__dirname, 'react-frontend/dist/index.html'));\n});`,
-    },
     {
+      id: 5,
+      title: "Health check route (`app/api/health/route.js`)",
+      lang: "js",
+      body: "Place directly in the App Router under `app/api/health/`. Must export a `GET` function and return a 2xx status with no external calls, so Uptime Robot's checks reflect server availability only.",
+      code: `export async function GET() {\n  return Response.json({ status: 'ok' }, { status: 200 });\n}`,
+    },
+    /*{
       id: 2,
       title: "Express Static Serve (Vite build)",
       lang: "js",
@@ -1502,6 +1593,7 @@ const TAG_STYLES = {
   // ── performance: lightened toward near-white so it's actually legible —
   // previous slate was too close to bg/muted text to register as a tag.
   performance: { bg: "rgba(221,226,234,0.14)", color: "#dde2ea", border: "rgba(221,226,234,0.4)" },
+  decision:    { bg: "rgba(250,204,21,0.1)",  color: "#facc15", border: "rgba(250,204,21,0.25)" }
 };
 
 const PRIORITY_STYLES = {
