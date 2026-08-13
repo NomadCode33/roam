@@ -360,7 +360,7 @@ const PINNED = {
 /* 
     {
       id: ,
-      date: "Jloy, 2026",
+      date: "Jl0y, 2026",
       title: "",
       body: "",
       tag: ""
@@ -371,6 +371,76 @@ const DATA = {
   // ── progression: flat list, rendered by ProgressionPane ──────────────────
   // Fields per entry: id, date, title, body (string/array), tag/tags (optional)
   progression: [
+    {
+      id: 82,
+      date: "August 08, 2026",
+      title: "",
+      body: "",
+      tag: ""
+    },
+    {
+      id: 81,
+      date: "August 08, 2026",
+      title: "",
+      body: "",
+      tag: ""
+    },
+    {
+      id: 80,
+      date: "August 08, 2026",
+      title: "Upstash Redis database provisioned",
+      body: "Created `roam-ratelimit` Redis DB in `us-west-2` (matched to Supabase's region rather than Vercel's default `us-east-1`), eviction enabled, credentials added to `.env.local`.",
+      tag: "deployment"
+    },
+    {
+      id: 79,
+      date: "August 08, 2026",
+      title: "ROA-003 middleware wiring built",
+      body: "Created root-level `middleware.js` with IP-based route matching (`pickLimiter`) that applies the correct limiter per API path and returns 429 with rate-limit headers on breach.",
+      tag: "feature"
+    },
+    {
+      id: 78,
+      date: "August 08, 2026",
+      title: "ROA-003 rate limiter config built",
+      body: "Created `lib/ratelimit.js` with five named Upstash sliding-window limiters (post: 10/min, auth: 5/min, comment: 20/min, translate: 30/min, general: 100/min), each on its own Redis key prefix so one route's traffic can't eat into another's quota.",
+      tag: "feature"
+    },
+    {
+      id: 77,
+      date: "August 07, 2026",
+      title: "Dev-log cyan → purple token migration",
+      body: "`--dn-border-hover`/`--dn-border-active` and related rgba values switched from cyan to a purple accent (`rgba(139,127,212,...)`), fixing badge borders, card-hover tint, ambient glow, and scrollbar thumb in one shared edit.",
+      tag: "refactor"
+    },
+    {
+      id: 76,
+      date: "August 07, 2026",
+      title: "Tabler icons rendering as blank boxes",
+      body: "CDN webfont link from the original mockup was never ported into the Next.js root layout, icons failed silently with no console error. Migrated to `@tabler/icons-react` components instead of chasing the CDN link, removing the font-load dependency entirely.",
+      tag: "fixed"
+    },
+    {
+      id: 75,
+      date: "August 07, 2026",
+      title: "Landing page shipped",
+      body: "Hero, features, and mission sections built in `app/(main)/page.js` with a dedicated `landing.css`. Matches the approved mockup; `.frame` wrapper deliberately dropped for full-bleed layout inside the real app shell.",
+      tag: "feature"
+    },
+    {
+      id: 74,
+      date: "August 07, 2026",
+      title: "Terms of Service — fully wired",
+      body: "Termly questionnaire completed (address fields filled, liability cap deliberately set to $0.00 USD to match the Disclaimer's no-liability framing), `terms.html` converted to JSX with the same bug-fix pass as `privacy.jsx`. `/terms` is live.",
+      tag: "feature"
+    },
+    {
+      id: 73,
+      date: "August 07, 2026",
+      title: "CSS import scope bug",
+      body: "`nav.css`/`footer.css` were imported in `page.js` instead of `app/(main)/layout.js`, where Nav and Footer actually render. Would've silently left future `(main)`-nested routes (dashboard, etc.) unstyled the moment they shipped. Moved imports to the layout.",
+      tag: "fixed"
+    },
     {
       id: 72,
       date: "August 06, 2026",
@@ -993,6 +1063,44 @@ const DATA = {
     */
 optimize: [
     {
+      id: 16,
+      month: "August 2026",
+      date: "August 07, 2026",
+      title: "Dev-log color tokens: shared-variable edit vs. line-by-line",
+      body: "Instead of hunting down every individual cyan value across the file, targeted the two shared tokens (`--dn-border-hover`, `--dn-border-active`) that multiple elements already referenced.",
+      bullets: [
+        "One two-line edit in `:root` propagated the fix to badge borders, hover tint, and scrollbar thumb simultaneously",
+        "Remaining standalone cyan values (ambient glow, line-320 hover fade) still needed individual swaps since they weren't wired to the shared tokens"
+      ],
+      tags: "refactor"
+    },  
+    {
+      id: 15,
+      month: "August 2026",
+      date: "August 07, 2026",
+      title: "Tabler icons: webfont → component library",
+      body: "Realized the blank-icon bug wasn't a styling issue at all, it was a missing font dependency that would keep failing silently on any future page that used the same icon pattern.",
+      bullets: [
+        "Installed `@tabler/icons-react`, swapped `<i className='ti ti-...'>` for real components",
+        "Updated `.feat-icon i` CSS selector to `.feat-icon svg` since the element type changed",
+        "Set icon color via the `color` prop directly rather than fighting CSS specificity against inline SVG attributes"
+      ],
+      tags: "refactor"
+    },  
+    {
+      id: 14,
+      month: "August 2026",
+      date: "August 07, 2026",
+      title: "Map-mock pins: undefined CSS variables",
+      body: "I assumed `var(--rv-gold)`/`var(--rv-light)` would just work because they were named sensibly, turned out they only ever existed in the original mockup's own `:root` block and were never carried into the real project. `var()` referencing a token that doesn't exist fails silently, no error thrown.",
+      bullets: [
+        "Swapped both pins to hardcoded hex, matching the rest of the file's existing convention",
+        "Confirmed opacity values were unaffected by the background-value change (separate CSS properties)",
+        "Full tokenization was proposed afterward as the 'more correct' long-term fix, but explicitly declined in favor of staying consistent with the hex-based convention already in use"
+      ],
+      tags: "refactor"
+    },  
+    {
       id: 13,
       month: "August 2026",
       date: "August 06, 2026",
@@ -1233,6 +1341,12 @@ optimize: [
     { id: 58, topic: "CSS specificity ties break by source order, not 'weight'", body: "When two selectors have identical specificity, the one imported later in the file/build order wins. When specificity actually differs (an ID vs. a class, for example), specificity wins regardless of import order. These are two separate rules, not one 'which is bigger' comparison." },
     { id: 59, topic: "`display: contents` changes how `:last-child` and similar pseudo-selectors resolve", body: "Flattening a wrapper element out of the layout tree with `display: contents` can cause child-position selectors to match differently than expected, since the browser's notion of sibling order shifts once the wrapper visually disappears. Explicit `nth-child(n)` targeting sidesteps the ambiguity." },
     { id: 60, topic: "Route groups `(name)` are excluded from the URL, not the layout tree", body: "A folder in Next.js App Router wrapped in parentheses is invisible to the resulting URL path but fully real for layout nesting purposes. `app/(main)/dashboard/page.js` renders at `/dashboard`, not `/main/dashboard`, while still inheriting `(main)/layout.js`." },
+    /*{ id: 61, topic: "", body: "" },
+    { id: 62, topic: "", body: "" },
+    { id: 63, topic: "", body: "" },
+    { id: 64, topic: "", body: "" },
+    { id: 65, topic: "", body: "" },
+    { id: 66, topic: "", body: "" },*/
     //{ id: 10, topic: "", body: "" },
   ],
 
@@ -1253,17 +1367,38 @@ optimize: [
     },
   */
   bugs: [
-    /*{ 
-      id: 29, 
-      title: "", 
+    { 
+      id: 32, 
+      title: "`hero-h` not rendering bold despite CSS edit", 
       status: "fixed", 
-      date: "Mar 25, 2026", 
+      date: "August 07, 2026", 
+      body: "First fix attempt was reported as applied, but checking the devtools *Styles* panel (not just Computed) showed `font-weight: 700` was never actually present in the live `.hero-h` rule, the edit hadn't saved to the file actually being served. Re-applied and reconfirmed via Styles panel before moving on, per the project's own verify-before-assuming rule."
+    },
+    { 
+      id: 31, 
+      title: "Tabler icons rendering as blank boxes", 
+      status: "fixed", 
+      date: "August 07, 2026", 
       body: [
-        "",
-        "",
+        "**Root cause:** the CDN `<link>` for the Tabler webfont, present in the original standalone HTML mockup, was never added to the Next.js root layout. No console error, just empty rounded squares where icons should be.",
+        "Fixed by migrating to `@tabler/icons-react` (see Optimizations).",
         ""
       ] 
-    },*/
+    },
+    { 
+      id: 30, 
+      title: "Terms JSX — unclosed `<br>` and malformed fragment close", 
+      status: "fixed", 
+      date: "August 07, 2026", 
+      body: "Four bare `<br>` tags (missing self-close) and a stray space inside the closing fragment tag (`</ >` instead of `</>`) were breaking the JSX parser, cascading into an 11-problem error count. Found via direct inspection of the pasted code rather than guessing from the 'red file' screenshot alone."
+    },
+    { 
+      id: 29, 
+      title: "Dashboard/future routes would've rendered unstyled", 
+      status: "fixed", 
+      date: "August 07, 2026", 
+      body: "Nav and Footer CSS was imported in `page.js`, not the layout that actually renders them. Any new route added under `(main)/` — the file tree already showed a placeholder `dashboard` folder — would've inherited zero styling with no error to flag it. Moved both imports into `app/(main)/layout.js`."
+    },
     { 
       id: 28, 
       title: "Missing bullet points on plain `<ul>` lists in privacy.jsx", 
@@ -1290,7 +1425,7 @@ optimize: [
       title: "Dev log rendering oversized compared to SonicVerse reference", 
       status: "fixed", 
       date: "August 06, 2026", 
-      body: "Initially suspected the CSS token values themselves were tuned larger. A full read of both `:root` blocks showed they were identical, the real cause was a missing root font-size override (see in Optimizations tab). Fixed by scoping a `70%` root font-size rule inside `devlog.css`."
+      body: "Initially suspected the CSS token values themselves were tuned larger. A full read of both `:root` blocks showed they were identical, the real cause was a missing root font-size override (see Optimizations). Fixed by scoping a `70%` root font-size rule inside `devlog.css`."
     },
     { 
       id: 24, 
