@@ -372,8 +372,29 @@ const DATA = {
   // Fields per entry: id, date, title, body (string/array), tag/tags (optional)
   progression: [
     {
+      id: 72,
+      date: "August 06, 2026",
+      title: "Dev log sizing and phone layout",
+      body: "Diagnosed and fixed a rendering-size mismatch between the Next.js dev log and its SonicVerse source, then rebuilt the phone-width sidebar from a horizontal scroll into a proper 3/3/2 grid. Full detail in Bug Log below.",
+      tag: "fixed"
+    },
+    {
+      id: 71,
+      date: "August 06, 2026",
+      title: "Privacy and Terms converted to JSX",
+      body: "Replaced the `dangerouslySetInnerHTML` approach with real `.jsx` components for both legal pages, each with a dedicated scoped CSS file instead of an unscoped inline `<style>` block. Resolved several real bugs in the process: a `clas` typo instead of `className`, an unclosed `<br>` (JSX requires self-closing tags), an inline `style='margin-top:0;'` string where JSX requires an object (`style={{ marginTop: '0' }}`), and missing bullet points on plain `<ul>` elements caused by Tailwind's global Preflight reset silently stripping list styling site-wide.",
+      tag: "feature"
+    },
+    {
+      id: 70,
+      date: "August 06, 2026",
+      title: "Route-group shell restructure",
+      body: "Split root `app/layout.js` from a combined Nav/Footer/fonts file into two layers: root layout now holds only `globals.css`, font variables, and `<html>/<body>`, genuinely universal content every route needs. A new `app/(main)/layout.js` holds Nav and Footer, wrapping only pages nested inside `(main)/`. `privacy`, `terms`, and `dev-log` sit as siblings to `(main)`, not children, giving them standalone rendering with no Nav/Footer. Confirmed working via live screenshots showing correct layout application on both sides of the split.",
+      tag: "feature"
+    },
+    {
       id: 69,
-      date: "August 08, 2026",
+      date: "August 05, 2026",
       title: "Saves-table purge-vs-hide behavior on block",
       body: [
         "Resolved the open question of what happens to a saved post when the post's author blocks the saver.",
@@ -972,6 +993,34 @@ const DATA = {
     */
 optimize: [
     {
+      id: 13,
+      month: "August 2026",
+      date: "August 06, 2026",
+      title: "devlog.css: phone sidebar layout (xs breakpoint)",
+      body: "The original horizontal-scrolling tab row didn't match what was wanted for narrow phones. Getting to a clean 3/3/2 grid took two attempts because the first fix (`display: grid` alone) only grouped tabs by their section wrapper, not individually.",
+      bullets: [
+        "Added `display: contents` on each section's wrapper `<div>` so grid treats individual tabs as direct children instead of section-bundles",
+        "First attempt at filling the trailing empty grid slot used `:last-child`, which misfired — `display: contents` changes how `:last-child` resolves across the flattened boundary, so it targeted the wrong tile",
+        "Replaced with an explicit `.dn-tab:nth-child(8) { grid-column: 1 / 3 }`, using absolute position instead of relative-to-parent, which fixed it correctly",
+        "Known fragility: `nth-child(8)` is a magic number tied to today's exact 8-tab count and order — flagged for a code comment or future revisit if the tab list ever changes"
+      ],
+      tags: "refactor"
+    },
+    {
+      id: 12,
+      month: "August 2026",
+      date: "August 06, 2026",
+      title: "devlog.css: root font-size scoping",
+      body: "I realized the size mismatch between the Next.js dev log and its SonicVerse source wasn't a token problem, the `:root` token values were byte-for-byte identical between both files. The actual cause was a missing `html { font-size: 62.5% }` rule that SonicVerse's global CSS had and Next.js's didn't, since every token in the file is written in `rem`, which always resolves against the root `<html>` element, not any local wrapper.",
+      bullets: [
+        "Confirmed via dev tools' computed-style panel on both pages side by side, not by eyeballing screenshots",
+        "Ruled out applying the fix globally, since it would silently break every Tailwind utility class elsewhere in the app (Tailwind assumes `1rem = 16px`)",
+        "Scoped the fix by placing `html { font-size: 70% }` directly inside `devlog.css` itself — safe because that file only ever loads on the standalone `/dev-log` route, so the rule never reaches any Tailwind-using page",
+        "Landed on `70%` (11.2px root) as a deliberate middle ground between SonicVerse's `10px` and Tailwind's native `16px`, rather than matching either exactly"
+      ],
+      tags: "refactor"
+    },
+    {
       id: 11,
       month: "August 2026",
       date: "August 04, 2026",
@@ -1179,6 +1228,11 @@ optimize: [
     { id: 53, topic: "Configuration success is not the same as functional proof", body: "Extending the DDL/DML 'Success ≠ verified' principle from earlier sessions: a monitor showing 'Up' with a correctly filled-in alert contact still isn't proof the alert pipeline works. Only a real triggered event, an actual forced outage producing an actual received email, counts as verification. This is now a standing project rule, not a one-off check for ROA-019." },
     { id: 54, topic: "A dependency field being 'fine in practice' isn't the same as being correct", body: "Build order can be executed correctly by a developer's own judgment even while the tracked metadata (a kanban JSON dependency array) describes something different. The two are separate claims. One about what happened and one about what a document says happened, and only checking the former doesn't verify the latter." },
     { id: 55, topic: "Shared UI shells shouldn't be finalized before real page designs exist", body: "Committing to a single rigid page layout before knowing whether every page (e.g., a full-bleed map view) can actually use it risks the same retrofit cost as building any other abstraction ahead of its real use cases. Next.js App Router's nested/route-group layouts make it cheap to defer this correctly. Build the minimum shared shell now, add sibling layouts later once real requirements are known." },
+    { id: 56, topic: "rem vs. em vs. px are not interchangeable defaults", body: "`rem` always resolves against the root `<html>` element's font-size, regardless of any parent element's own font-size. `em` is the one that cascades from the nearest ancestor. This distinction is why a root font-size override can't be 'scoped' to a wrapper div using `rem`-based CSS; the unit definition itself ignores local scoping." },
+    { id: 57, topic: "Tailwind's Preflight reset silently overrides hand-written CSS", body: "Any page that loads `globals.css` inherits Tailwind's base reset, even pages that never use a single Tailwind utility class. This showed up first as a root-font-size conflict (blocking the 62.5% trick globally) and again as missing list bullets on plain `<ul>` elements. Same underlying cause, two different symptoms." },
+    { id: 58, topic: "CSS specificity ties break by source order, not 'weight'", body: "When two selectors have identical specificity, the one imported later in the file/build order wins. When specificity actually differs (an ID vs. a class, for example), specificity wins regardless of import order. These are two separate rules, not one 'which is bigger' comparison." },
+    { id: 59, topic: "`display: contents` changes how `:last-child` and similar pseudo-selectors resolve", body: "Flattening a wrapper element out of the layout tree with `display: contents` can cause child-position selectors to match differently than expected, since the browser's notion of sibling order shifts once the wrapper visually disappears. Explicit `nth-child(n)` targeting sidesteps the ambiguity." },
+    { id: 60, topic: "Route groups `(name)` are excluded from the URL, not the layout tree", body: "A folder in Next.js App Router wrapped in parentheses is invisible to the resulting URL path but fully real for layout nesting purposes. `app/(main)/dashboard/page.js` renders at `/dashboard`, not `/main/dashboard`, while still inheriting `(main)/layout.js`." },
     //{ id: 10, topic: "", body: "" },
   ],
 
@@ -1199,6 +1253,45 @@ optimize: [
     },
   */
   bugs: [
+    /*{ 
+      id: 29, 
+      title: "", 
+      status: "fixed", 
+      date: "Mar 25, 2026", 
+      body: [
+        "",
+        "",
+        ""
+      ] 
+    },*/
+    { 
+      id: 28, 
+      title: "Missing bullet points on plain `<ul>` lists in privacy.jsx", 
+      status: "fixed", 
+      date: "August 06, 2026", 
+      body: "Tailwind's Preflight reset strips default list styling globally, including on hand-styled pages that never use Tailwind utilities directly. Fixed with a targeted override: `ul:not(.pills-list):not(.rights-list):not(.toc-list) { list-style: disc; padding-left: 20px; }`. The exclusion list had to be corrected mid-fix after it initially over-applied bullets to the 'On this page' table of contents."
+    },
+    { 
+      id: 27, 
+      title: "JSX build errors in privacy.jsx", 
+      status: "fixed", 
+      date: "August 06, 2026", 
+      body: "Three separate invalid-JSX issues: `clas='hero-eyebrow'` (typo, not a real attribute), a bare `<br>` (JSX requires self-closing `<br />`), and `style='margin-top:0;'` written as a string where JSX requires a camelCased object (`style={{ marginTop: '0' }}`)."
+    },
+    { 
+      id: 26, 
+      title: "Dev log phone sidebar rendering as an uneven grid", 
+      status: "fixed", 
+      date: "August 06, 2026", 
+      body: "Tabs were wrapping into visually uneven rows instead of a clean 3/3/2 pattern. Root cause was per-section wrapper `<div>`s being treated as single grid items by CSS Grid instead of their individual tab children. Fixed with `display: contents` on the wrappers plus explicit `nth-child(8)` positioning for the trailing slot."
+    },
+    { 
+      id: 25, 
+      title: "Dev log rendering oversized compared to SonicVerse reference", 
+      status: "fixed", 
+      date: "August 06, 2026", 
+      body: "Initially suspected the CSS token values themselves were tuned larger. A full read of both `:root` blocks showed they were identical, the real cause was a missing root font-size override (see in Optimizations tab). Fixed by scoping a `70%` root font-size rule inside `devlog.css`."
+    },
     { 
       id: 24, 
       title: "Disputed Whether the Live Workflow Actually Contained the Fix", 
