@@ -374,16 +374,16 @@ const DATA = {
     {
       id: 82,
       date: "August 08, 2026",
-      title: "",
-      body: "",
-      tag: ""
+      title: "Flagged-items tracker merged to v10",
+      body: "Reconciled prior master list with this session's findings; promoted the proxy migration and ROA-003 blocker into active sections.",
+      tag: "documentation"
     },
     {
       id: 81,
       date: "August 08, 2026",
-      title: "",
-      body: "",
-      tag: ""
+      title: "middleware.js misplaced inside app/",
+      body: "File was created at `app/middleware.js`, where Next.js's middleware convention never looks. Moved to project root, sibling to `app/`.",
+      tag: "fixed"
     },
     {
       id: 80,
@@ -1341,10 +1341,10 @@ optimize: [
     { id: 58, topic: "CSS specificity ties break by source order, not 'weight'", body: "When two selectors have identical specificity, the one imported later in the file/build order wins. When specificity actually differs (an ID vs. a class, for example), specificity wins regardless of import order. These are two separate rules, not one 'which is bigger' comparison." },
     { id: 59, topic: "`display: contents` changes how `:last-child` and similar pseudo-selectors resolve", body: "Flattening a wrapper element out of the layout tree with `display: contents` can cause child-position selectors to match differently than expected, since the browser's notion of sibling order shifts once the wrapper visually disappears. Explicit `nth-child(n)` targeting sidesteps the ambiguity." },
     { id: 60, topic: "Route groups `(name)` are excluded from the URL, not the layout tree", body: "A folder in Next.js App Router wrapped in parentheses is invisible to the resulting URL path but fully real for layout nesting purposes. `app/(main)/dashboard/page.js` renders at `/dashboard`, not `/main/dashboard`, while still inheriting `(main)/layout.js`." },
-    /*{ id: 61, topic: "", body: "" },
-    { id: 62, topic: "", body: "" },
-    { id: 63, topic: "", body: "" },
-    { id: 64, topic: "", body: "" },
+    { id: 61, topic: "Serverless functions don't share memory across invocations", body: "Upstash Redis (not an in-memory counter) is required for rate limiting on Vercel because a plain in-process counter resets on every cold start and is invisible across concurrent lambda instances, so it silently limits nothing in production." },
+    { id: 62, topic: "Next.js middleware location is convention-locked", body: "`middleware.js` is only recognized at project root or inside `src/`, never inside `app/`. A misplaced file doesn't error, it's just silently inert, which makes it a dangerous-quiet failure mode." },
+    { id: 63, topic: "Dependency graphs can be technically satisfied but practically incomplete", body: "ROA-003 listed only ROA-002 as a dependency and was 'unblocked' per the kanban, but its own Phase D tests require routes that come from ROA-008. A real gap the ticket structure didn't surface until testing was attempted." },
+    /*{ id: 64, topic: "", body: "" },
     { id: 65, topic: "", body: "" },
     { id: 66, topic: "", body: "" },*/
     //{ id: 10, topic: "", body: "" },
@@ -1367,6 +1367,17 @@ optimize: [
     },
   */
   bugs: [
+    { 
+      id: 33, 
+      title: "middleware.js placed inside app/, never executes", 
+      status: "fixed", 
+      date: "August 08, 2026", 
+      body: [
+        "**Symptom:** no errors, no warnings — the file just never ran, which is the dangerous part.",
+        "**Root cause:** Next.js's middleware convention only scans project root (or `src/`), not `app/`.",
+        "**Fix:** moved the file up one level to sit beside `app/`, `package.json`, and `lib/`."
+      ] 
+    },
     { 
       id: 32, 
       title: "`hero-h` not rendering bold despite CSS edit", 
@@ -1702,13 +1713,15 @@ optimize: [
     { id: 6, name: "Turf.js",           icon: "📐", version: "^7.3.5",            role: "Client-side geospatial analysis" },
     { id: 7, name: "shadcn/ui",         icon: "🧩", version: "4.16.x",            role: "Accessible unstyled components" },
     { id: 8, name: "TanStack Query",    icon: "🔄", version: "^5.100.6",          role: "Client-side state & caching" },
-    { id: 9, name: "Supabase",          icon: "⚡", version: "^2.112.2",           role: "Backend-as-a-Service (BaaS)" },
-    { id: 10, name: "PostgreSQL",       icon: "🐘", version: "^18.4.0",           role: "Relational database engine" },
-    { id: 11, name: "PostGIS",          icon: "🗺️", version: "^3.3.7",            role: "Spatial database extension" },
-    { id: 12, name: "Cloudflare R2",    icon: "📦", version: "S3 API Compatible", role: "S3-compatible object storage for database backups" },
-    { id: 13, name: "AWS CLI",          icon: "💻", version: "^2 (Pre-installed)", role: "S3 client used for backup orchestration" },
-    { id: 14, name: "Vercel",           icon: "☁️", version: "Hosting",           role: "Deployment platform" },
-    { id: 15, name: "Uptime Robot",     icon: "🤖", version: "v3 API",             role: "External synthetics & monitoring" },
+    { id: 9, name: "@upstash/ratelimit", icon: "🛑", version: "^2.0.x",           role: "Sliding-window rate limiting framework" },
+    { id: 10, name: "@upstash/redis",    icon: "🔴", version: "^1.34.x",          role: "HTTP-based serverless state & session storage" },
+    { id: 11, name: "Supabase",          icon: "⚡", version: "^2.112.2",           role: "Backend-as-a-Service (BaaS)" },
+    { id: 12, name: "PostgreSQL",       icon: "🐘", version: "^18.4.0",           role: "Relational database engine" },
+    { id: 13, name: "PostGIS",          icon: "🗺️", version: "^3.3.7",            role: "Spatial database extension" },
+    { id: 14, name: "Cloudflare R2",    icon: "📦", version: "S3 API Compatible", role: "S3-compatible object storage for database backups" },
+    { id: 15, name: "AWS CLI",          icon: "💻", version: "^2 (Pre-installed)", role: "S3 client used for backup orchestration" },
+    { id: 16, name: "Vercel",           icon: "☁️", version: "Hosting",           role: "Deployment platform" },
+    { id: 17, name: "Uptime Robot",     icon: "🤖", version: "v3 API",             role: "External synthetics & monitoring" },
 
     // { id: 6, name: "MongoDB",      icon: "🍃", version: "Atlas",    role: "NoSQL database" },
   ],
@@ -1821,7 +1834,8 @@ const TAG_STYLES = {
   // ── performance: lightened toward near-white so it's actually legible —
   // previous slate was too close to bg/muted text to register as a tag.
   performance: { bg: "rgba(221,226,234,0.14)", color: "#dde2ea", border: "rgba(221,226,234,0.4)" },
-  decision:    { bg: "rgba(250,204,21,0.1)",  color: "#facc15", border: "rgba(250,204,21,0.25)" }
+  decision:    { bg: "rgba(250,204,21,0.1)",  color: "#facc15", border: "rgba(250,204,21,0.25)" },
+  documentation: { bg: "rgba(201,168,118,0.1)", color: "#c9a876", border: "rgba(201,168,118,0.25)" },
 };
 
 const PRIORITY_STYLES = {
