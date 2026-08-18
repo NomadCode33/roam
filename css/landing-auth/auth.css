@@ -1,0 +1,134 @@
+/* 
+Due to tailwind we have to do this math:
+16px = 1rem;
+
+- rem is always relative to the root (html) font-size — one 
+- fixed reference point for the whole page.
+
+- em is relative to that specific element's own font-size
+- So letter-spacing: .04em on .site-nav-logo means "4% of however big this logo text currently is"
+- if the logo's font-size changes (bigger on a hero page, smaller in a compact nav), the letter-spacing scales proportionally with it automatically, no separate adjustment needed.
+*/
+
+
+.auth-nav {
+  background: #1E1535;
+  padding: 1.25rem 3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  flex-shrink: 0;
+}
+
+.auth-nav-logo {
+  font-family: 'Playfair Display', serif;
+  color: #EDE8FF;
+  font-size: 1.375rem;
+  letter-spacing: .04em;
+}
+
+.auth-nav-tagline {
+  font-size: 0.75rem;
+  color: rgba(237, 232, 255, .65);
+}
+
+.auth-content {
+  flex: 1;
+  background: #F5F3FF;
+  display: flex;
+  align-items: center;
+  /*justify-content: center;
+  padding: 3rem 1.5rem;*/
+}
+
+.auth-panel-body {
+  flex: 1;
+  width: 100%;
+  background: #fff;
+  padding: 2.5rem 3rem;           /* 40px 48px */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.auth-form-inner {
+  width: 100%;
+  max-width: 32rem;   /* 512 px */
+  margin: 0 auto;
+}
+
+.auth-title {
+  font-size: 1.375rem;            /* 22px */
+  font-weight: 500;
+  color: #111827;
+  margin-bottom: 0.375rem;        /* 6px */
+}
+
+.auth-sub {
+  font-size: 0.8125rem;           /* 13px */
+  color: #6b7280;
+  margin-bottom: 1.75rem;         /* 28px */
+  line-height: 1.55;
+}
+
+.oauth-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.625rem;                  /* 10px */
+  padding: 0.75rem 1rem;          /* 12px 16px */
+  border-radius: 0.625rem;        /* 10px */
+  border: .5px solid rgba(92,78,158,.2);
+  background: #fff;
+  font-size: 0.8125rem;           /* 13px */
+  font-weight: 500;
+  color: #111827;
+  cursor: pointer;
+  margin-bottom: 0.625rem;        /* 10px */
+  transition: background .15s;
+}
+
+.oauth-btn:hover {
+  background: #F0EEFF;
+}
+
+.oauth-btn i {
+  font-size: 1.125rem;            /* 18px */
+}
+
+.auth-footer {
+  background: #120E2A;
+  padding: 1rem 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+
+.auth-footer-logo {
+  font-family: 'Playfair Display', serif;
+  color: #EDE8FF;
+  font-size: 0.9375rem;
+}
+
+.footer-links {
+  display: flex;
+  gap: 1.25rem;
+}
+
+.footer-links a {
+  font-size: 0.75rem;
+  color: rgba(237, 232, 255, .4);
+  text-decoration: none;
+  transition: color .2s;
+}
+
+.footer-links a:hover {
+  color: rgba(237, 232, 255, .7);
+}
+
+.footer-copy {
+  font-size: 0.75rem;
+  color: rgba(237, 232, 255, .25);
+}

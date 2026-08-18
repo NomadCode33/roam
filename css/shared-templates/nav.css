@@ -40,6 +40,12 @@ Due to tailwind we have to do this math:
   border-radius: 1.25rem;        /* 20px */
   padding: 0.5rem 1.375rem;      /* 8px 22px */
   cursor: pointer;
+  transition: border-color .2s, background .2s;
+}
+
+.btn-ghost:hover {
+  border-color: rgba(237,232,255,.5);
+  background: rgba(237,232,255,.06);
 }
 
 .btn-solid {
@@ -50,4 +56,9 @@ Due to tailwind we have to do this math:
   border-radius: 1.25rem;
   padding: 0.5rem 1.375rem;
   cursor: pointer;
+  transition: background .2s;
+}
+
+.btn-solid:hover {
+  background: #f0ce55;
 }

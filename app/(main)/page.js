@@ -1,4 +1,5 @@
 import { IconMapPin, IconRoute, IconFlame } from "@tabler/icons-react";
+import Link from 'next/link';
 
 // page.js is the root page. The route is '/'
 export default function Home() {
@@ -10,8 +11,8 @@ export default function Home() {
           <h1 className="hero-h">Find the places<br />locals actually love</h1>
           <p className="hero-sub">A community map where real people share hidden gems, local favorites, and walking trails — not tourist traps.</p>
           <div className="hero-actions">
-            <button className="btn-primary">Sign up free</button>
-            <button className="btn-secondary">Log in</button>
+            <Link href="/signup" className="btn-primary">Sign up free</Link>
+            <Link href="/login" className="btn-secondary">Log in</Link>
           </div>
         </div>
         <div className="map-mock">
@@ -60,7 +61,7 @@ export default function Home() {
           Roam exists because the best places don't show up on tourist lists.
           They live in the minds of locals — and now they live on the map.
         </p>
-        <button className="mission-cta">Join the map</button>
+        <Link href="/signup" className="mission-cta">Join the map</Link>
       </section>
     </div>
   );

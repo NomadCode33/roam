@@ -1,3 +1,5 @@
+import Link from 'next/link';
+
 export default function Nav() {
   return (
     <>
@@ -5,8 +7,8 @@ export default function Nav() {
       <nav className="site-nav">
         <div className="site-nav-logo">Roam</div>
         <div className="site-nav-actions">
-          <button className="btn-ghost">Log in</button>
-          <button className="btn-solid">Sign up</button>
+          <Link href="/login" className="btn-ghost">Log in</Link>
+          <Link href="/signup" className="btn-solid">Sign up</Link>
         </div>
       </nav>
     </>
