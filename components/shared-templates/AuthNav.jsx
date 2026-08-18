@@ -1,6 +1,7 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
+import Link from 'next/link';
 
 export default function AuthNav() {
   const pathname = usePathname();
@@ -11,7 +12,7 @@ export default function AuthNav() {
 
   return (
     <nav className="auth-nav">
-      <div className="auth-nav-logo">Roam</div>
+      <Link href="/" className="auth-nav-logo">Roam</Link>
       <div className="auth-nav-tagline">{tagline}</div>
     </nav>
   );

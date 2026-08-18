@@ -5,7 +5,7 @@ export default function Nav() {
     <>
       {/* NAV */}
       <nav className="site-nav">
-        <div className="site-nav-logo">Roam</div>
+        <Link href="/" className="site-nav-logo">Roam</Link>
         <div className="site-nav-actions">
           <Link href="/login" className="btn-ghost">Log in</Link>
           <Link href="/signup" className="btn-solid">Sign up</Link>

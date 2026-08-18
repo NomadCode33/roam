@@ -53,7 +53,7 @@ Due to tailwind we have to do this math:
 
 .auth-form-inner {
   width: 100%;
-  max-width: 32rem;   /* 512 px */
+  max-width: 33rem;   /* 512 px */
   margin: 0 auto;
 }
 

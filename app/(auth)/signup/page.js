@@ -79,10 +79,11 @@ export default function Signup() {
               id="agegate"
               checked={ageConfirmed}
               onChange={(e) => setAgeConfirmed(e.target.checked)}
+              required
             />
             <label className="age-text" htmlFor="agegate">
               I confirm I am 13 years or older (16 if in the EU). I agree to Roam's{' '}
-              <Link href="/terms">Terms</Link> and <Link href="/privacy">Privacy Policy</Link>.
+              <Link href="/terms" target="_blank" rel="noopener noreferrer">Terms</Link> and <Link href="/privacy" target="_blank" rel="noopener noreferrer">Privacy Policy</Link>.
             </label>
           </div>
 
