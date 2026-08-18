@@ -1,0 +1,60 @@
+.auth-nav {
+  background: #1E1535;
+  padding: 1.125rem 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+
+.auth-nav-logo {
+  font-family: 'Playfair Display', serif;
+  color: #EDE8FF;
+  font-size: 1.375rem;
+  letter-spacing: .04em;
+}
+
+.auth-content {
+  flex: 1;
+  background: #F5F3FF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1.5rem;
+}
+
+.auth-footer {
+  background: #120E2A;
+  padding: 1rem 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+
+.auth-footer-logo {
+  font-family: 'Playfair Display', serif;
+  color: #EDE8FF;
+  font-size: 0.9375rem;
+}
+
+.footer-links {
+  display: flex;
+  gap: 1.25rem;
+}
+
+.footer-links a {
+  font-size: 0.75rem;
+  color: rgba(237, 232, 255, .4);
+  text-decoration: none;
+  transition: color .2s;
+}
+
+.footer-links a:hover {
+  color: rgba(237, 232, 255, .7);
+}
+
+.footer-copy {
+  font-size: 0.75rem;
+  color: rgba(237, 232, 255, .25);
+}

@@ -1,8 +1,8 @@
-import "../../css/web-documents/terms.css"
+import "../../css/legal/terms.css"
 
 export default function Terms() {
   return (
-    <>
+    <div className="terms-page">
       <header>
         <h1>Terms and Conditions</h1>
         <p><strong>Last updated</strong> July 31, 2026</p>
@@ -437,6 +437,6 @@ export default function Terms() {
 
         <p>This Terms and Conditions was created using Termly's <a href="https://termly.io/products/terms-and-conditions-generator/" target="_blank" rel="noopener external">Terms and Conditions Generator</a></p>
       </main>
-    </>
+    </div>
   );
 }

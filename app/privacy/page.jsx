@@ -1,8 +1,8 @@
-import "../../css/web-documents/privacy.css"
+import "../../css/legal/privacy.css"
 
 export default function Privacy() {
   return (
-    <>
+    <div className="privacy-page">
       <div className="hero">
         <div className="hero-inner">
           <span className="hero-eyebrow">Legal · Privacy</span>
@@ -351,6 +351,6 @@ export default function Privacy() {
       <footer className="doc-footer">
         <p>Roam · Tacoma, WA, USA · <a href="mailto:nomadcode33@gmail.com">nomadcode33@gmail.com</a></p>
       </footer>
-    </>
+    </div>
   );
 }

@@ -44,7 +44,9 @@ export default function RootLayout({ children }) {
       className={`${playfair.variable} ${dmSans.variable} ${russoOne.variable} ${exo2.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        {children}
+        <main id="page-root" className="flex-1 flex flex-col">
+          {children}
+        </main>
       </body>
     </html>
   );

@@ -1,13 +1,13 @@
-  /* ============================================================
+/* ============================================================
    ROAM — Legal Document Stylesheet
-   Terms & Conditions / Privacy Policy
+   Terms & Conditions
    Typography: Playfair Display (display) + DM Sans (body)
    Palette: Roam Dark Mode tokens
    ============================================================ */
 
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400&display=swap');
 
-:root {
+.terms-page {
   /* Brand */
   --roam-deep-base:      #0D0A1A;
   --roam-sidebar:        #17112B;
@@ -34,15 +34,9 @@
 
   --font-display: 'Playfair Display', Georgia, serif;
   --font-body: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-}
 
-* { box-sizing: border-box; }
-
-html {
   scroll-behavior: smooth;
-}
 
-body {
   margin: 0;
   padding: 0;
   background:
@@ -57,11 +51,13 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+.terms-page * { box-sizing: border-box; }
+
 /* ============================================================
    HEADER
    ============================================================ */
 
-header {
+.terms-page header {
   position: relative;
   max-width: 820px;
   margin: 0 auto;
@@ -70,7 +66,7 @@ header {
   border-bottom: 1px solid var(--roam-border);
 }
 
-header::before {
+.terms-page header::before {
   content: "";
   position: absolute;
   top: 0;
@@ -82,7 +78,7 @@ header::before {
   border-radius: 2px;
 }
 
-header h1 {
+.terms-page header h1 {
   font-family: var(--font-display);
   font-weight: 700;
   font-style: italic;
@@ -96,7 +92,7 @@ header h1 {
   -webkit-text-fill-color: transparent;
 }
 
-header p {
+.terms-page header p {
   font-size: 0.92rem;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -104,7 +100,7 @@ header p {
   margin: 0;
 }
 
-header p strong {
+.terms-page header p strong {
   color: var(--roam-gold);
   font-weight: 500;
   letter-spacing: 0.02em;
@@ -114,7 +110,7 @@ header p strong {
    MAIN CONTAINER
    ============================================================ */
 
-main {
+.terms-page main {
   max-width: 820px;
   margin: 0 auto;
   padding: 56px 32px 120px;
@@ -124,7 +120,7 @@ main {
    TABLE OF CONTENTS
    ============================================================ */
 
-nav#table-of-contents {
+.terms-page nav#table-of-contents {
   background: linear-gradient(155deg, var(--roam-sidebar) 0%, rgba(23, 17, 43, 0.6) 100%);
   border: 1px solid var(--roam-border);
   border-radius: 16px;
@@ -134,7 +130,7 @@ nav#table-of-contents {
   overflow: hidden;
 }
 
-nav#table-of-contents::after {
+.terms-page nav#table-of-contents::after {
   content: "";
   position: absolute;
   top: -40%;
@@ -145,7 +141,7 @@ nav#table-of-contents::after {
   pointer-events: none;
 }
 
-nav#table-of-contents h2 {
+.terms-page nav#table-of-contents h2 {
   font-family: var(--font-display);
   font-style: italic;
   font-weight: 600;
@@ -156,11 +152,11 @@ nav#table-of-contents h2 {
   border: none;
 }
 
-nav#table-of-contents h2::before {
+.terms-page nav#table-of-contents h2::before {
   display: none;
 }
 
-nav#table-of-contents ol {
+.terms-page nav#table-of-contents ol {
   columns: 2;
   column-gap: 40px;
   counter-reset: toc-counter;
@@ -169,7 +165,7 @@ nav#table-of-contents ol {
   padding: 0;
 }
 
-nav#table-of-contents li {
+.terms-page nav#table-of-contents li {
   counter-increment: toc-counter;
   break-inside: avoid;
   margin-bottom: 12px;
@@ -178,7 +174,7 @@ nav#table-of-contents li {
   padding-left: 28px;
 }
 
-nav#table-of-contents li::before {
+.terms-page nav#table-of-contents li::before {
   content: counter(toc-counter, decimal-leading-zero);
   position: absolute;
   left: 0;
@@ -189,14 +185,14 @@ nav#table-of-contents li::before {
   opacity: 0.75;
 }
 
-nav#table-of-contents a {
+.terms-page nav#table-of-contents a {
   color: var(--roam-text-secondary);
   text-decoration: none;
   border-bottom: 1px solid transparent;
   transition: color 0.18s ease, border-color 0.18s ease;
 }
 
-nav#table-of-contents a:hover {
+.terms-page nav#table-of-contents a:hover {
   color: var(--roam-text-primary);
   border-bottom-color: var(--roam-gold);
 }
@@ -205,17 +201,17 @@ nav#table-of-contents a:hover {
    SECTIONS
    ============================================================ */
 
-section {
+.terms-page section {
   margin-bottom: 56px;
   padding-bottom: 48px;
   border-bottom: 1px solid var(--roam-border);
 }
 
-section:last-of-type {
+.terms-page section:last-of-type {
   border-bottom: none;
 }
 
-section h2 {
+.terms-page section h2 {
   font-family: var(--font-display);
   font-style: italic;
   font-weight: 600;
@@ -227,7 +223,7 @@ section h2 {
   line-height: 1.3;
 }
 
-section h3 {
+.terms-page section h3 {
   font-family: var(--font-body);
   font-weight: 700;
   font-size: 1.05rem;
@@ -236,7 +232,7 @@ section h3 {
   margin: 32px 0 14px;
 }
 
-section p {
+.terms-page section p {
   margin: 0 0 18px;
   color: var(--roam-text-secondary);
 }
@@ -245,17 +241,18 @@ section p {
    LISTS
    ============================================================ */
 
-ul, ol {
+.terms-page ul,
+.terms-page ol {
   padding-left: 0;
   margin: 0 0 20px;
 }
 
-section ul,
-section ol {
+.terms-page section ul,
+.terms-page section ol {
   margin-left: 4px;
 }
 
-section li {
+.terms-page section li {
   list-style: none;
   position: relative;
   padding-left: 26px;
@@ -263,7 +260,7 @@ section li {
   color: var(--roam-text-secondary);
 }
 
-section ul > li::before {
+.terms-page section ul > li::before {
   content: "";
   position: absolute;
   left: 2px;
@@ -274,15 +271,15 @@ section ul > li::before {
   background: var(--roam-gold);
 }
 
-section ol {
+.terms-page section ol {
   counter-reset: item-counter;
 }
 
-section ol > li {
+.terms-page section ol > li {
   counter-increment: item-counter;
 }
 
-section ol > li::before {
+.terms-page section ol > li::before {
   content: counter(item-counter) ".";
   position: absolute;
   left: 0;
@@ -293,9 +290,8 @@ section ol > li::before {
   color: var(--roam-purple-active);
 }
 
-/* Nested lists inside sections (not TOC) de-emphasize markers slightly */
-section li ul li::before,
-section li ol li::before {
+.terms-page section li ul li::before,
+.terms-page section li ol li::before {
   opacity: 0.7;
   transform: scale(0.9);
 }
@@ -304,7 +300,7 @@ section li ol li::before {
    LINKS
    ============================================================ */
 
-a {
+.terms-page a {
   color: var(--roam-tag-text);
   text-decoration: none;
   background-image: linear-gradient(var(--roam-gold), var(--roam-gold));
@@ -315,12 +311,12 @@ a {
   padding-bottom: 1px;
 }
 
-a:hover {
+.terms-page a:hover {
   color: var(--roam-gold);
   background-size: 100% 1px;
 }
 
-a:visited {
+.terms-page a:visited {
   color: var(--roam-purple-active);
 }
 
@@ -328,14 +324,12 @@ a:visited {
    EMPHASIS
    ============================================================ */
 
-strong {
+.terms-page strong {
   color: var(--roam-text-primary);
   font-weight: 700;
 }
 
-/* All-caps legal warning paragraphs (common pattern: short strong-only lines
-   or sentences in caps) get a subtle callout treatment via :has() where supported */
-p:has(> strong:only-child) {
+.terms-page p:has(> strong:only-child) {
   background: var(--roam-gold-dim);
   border-left: 3px solid var(--roam-gold);
   border-radius: 0 10px 10px 0;
@@ -347,7 +341,7 @@ p:has(> strong:only-child) {
    BREAKS / DIVIDERS
    ============================================================ */
 
-br {
+.terms-page br {
   content: "";
 }
 
@@ -355,7 +349,7 @@ br {
    SELECTION
    ============================================================ */
 
-::selection {
+.terms-page ::selection {
   background: var(--roam-surface);
   color: var(--roam-text-primary);
 }
@@ -364,21 +358,21 @@ br {
    SCROLLBAR (Webkit)
    ============================================================ */
 
-::-webkit-scrollbar {
+.terms-page ::-webkit-scrollbar {
   width: 10px;
 }
 
-::-webkit-scrollbar-track {
+.terms-page ::-webkit-scrollbar-track {
   background: var(--roam-deep-base);
 }
 
-::-webkit-scrollbar-thumb {
+.terms-page ::-webkit-scrollbar-thumb {
   background: var(--roam-card);
   border-radius: 6px;
   border: 2px solid var(--roam-deep-base);
 }
 
-::-webkit-scrollbar-thumb:hover {
+.terms-page ::-webkit-scrollbar-thumb:hover {
   background: var(--roam-input-fill);
 }
 
@@ -387,23 +381,23 @@ br {
    ============================================================ */
 
 @media (max-width: 640px) {
-  header {
+  .terms-page header {
     padding: 64px 20px 40px;
   }
 
-  main {
+  .terms-page main {
     padding: 40px 20px 80px;
   }
 
-  nav#table-of-contents {
+  .terms-page nav#table-of-contents {
     padding: 28px 24px;
   }
 
-  nav#table-of-contents ol {
+  .terms-page nav#table-of-contents ol {
     columns: 1;
   }
 
-  section h2 {
+  .terms-page section h2 {
     font-size: 1.3rem;
   }
 }
