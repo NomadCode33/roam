@@ -382,7 +382,7 @@ const DATA = {
   progression: [
     {
       id: 82,
-      date: "August 08, 2026",
+      date: "August 08, 2026a",
       title: "Flagged-items tracker merged to v10",
       body: "Reconciled prior master list with this session's findings; promoted the proxy migration and ROA-003 blocker into active sections.",
       tag: "documentation"
