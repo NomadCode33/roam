@@ -1,5 +1,6 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, Suspense } from "react";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 //import Sidebar from "../../components/dev-log/Sidebar";
 import "../../css/devlog.css";
 
@@ -14,6 +15,14 @@ const TABS = [
   { id: "snippets",    icon: "📎", label: "Code Snippets",  sublabel: "Reusable refs",        section: "REFERENCE" },
   { id: "resources",   icon: "🔗", label: "Resources",      sublabel: "Docs & links",         section: "REFERENCE" },
 ];
+
+// ─── Badge count formatting ─────────────────────────────────────────────────
+// Fixed-width sidebar badge: raw counts stay untouched everywhere else (DATA
+// arrays, any real length checks) — this only governs what the pill DISPLAYS.
+// Caps at 99+ so the badge never reflows the sidebar column regardless of
+// how large a tab's dataset grows.
+const BADGE_CAP = 99;
+const formatCount = (n) => (n > BADGE_CAP ? `${BADGE_CAP}+` : String(n));
 
 // ─── Pinned Cards — FEATURE REFERENCE (read this once, it covers everything) ──
 // Optional card shown at the top of a tab, inside the content header (below
@@ -2817,7 +2826,14 @@ const PANES = {
 };
 
 // ─── Main Component ───────────────────────────────────────────────────────────
-const DevLog = () => {
+// Routing model: tab state lives in the URL as ?tab=<id>, e.g. /dev-log?tab=bugs.
+// Config-driven off TABS — any tab you add there gets a working route for
+// free, no changes needed here. VALID_TAB_IDS below is derived live from
+// TABS, so it never drifts out of sync as tabs are added/removed.
+const VALID_TAB_IDS = new Set(TABS.map((t) => t.id));
+const DEFAULT_TAB = "progression";
+
+const DevLogInner = () => {
   // BEFORE: const [darkMode, setDarkMode] = useState(false);
   // AFTER: reads from localStorage on mount, same pattern as VerseHubLayout
   /*const [darkMode, setDarkMode] = useState(() => {
@@ -2829,7 +2845,40 @@ const DevLog = () => {
     localStorage.setItem('darkMode', darkMode);
   }, [darkMode]);*/
 
-  const [activeTab, setActiveTab] = useState("progression");
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  // Read initial tab straight from the URL on mount. Falls back to the
+  // default tab if ?tab= is missing or references an id that doesn't exist
+  // in TABS (e.g. a stale bookmark from a tab you later removed).
+  const requestedTab = searchParams.get("tab");
+  const initialTab = VALID_TAB_IDS.has(requestedTab) ? requestedTab : DEFAULT_TAB;
+
+  const [activeTab, setActiveTabState] = useState(initialTab);
+
+  // Keeps state and URL in sync in both directions:
+  //  - back/forward navigation and direct/bookmarked links update `activeTab`
+  //  - clicking a sidebar tab pushes a new URL (see setActiveTab below)
+  // Guards against invalid/missing ?tab= by silently normalizing to default
+  // rather than rendering a blank pane.
+  useEffect(() => {
+    const urlTab = searchParams.get("tab");
+    const normalized = VALID_TAB_IDS.has(urlTab) ? urlTab : DEFAULT_TAB;
+    if (normalized !== activeTab) {
+      setActiveTabState(normalized);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
+
+  // Single entry point for tab switches — updates local state immediately
+  // (no flash while the URL updates) and pushes the new query string.
+  // `scroll: false` keeps the existing ScrollDock/mainScrollRef behavior
+  // intact instead of Next.js jumping the page to top on navigation.
+  const setActiveTab = (id) => {
+    setActiveTabState(id);
+    router.push(`${pathname}?tab=${id}`, { scroll: false });
+  };
 
   // Ref to the scrollable content container — passed to ScrollDock so it can
   // read/drive scroll position. .dn-main is the actual scrolling element in
@@ -2875,7 +2924,7 @@ const DevLog = () => {
                     <span className="dn-tab-sub">{tab.sublabel}</span>
                   </span>
                   {getCount(tab.id) > 0 && (
-                    <span className="dn-tab-badge">{getCount(tab.id)}</span>
+                    <span className="dn-tab-badge">{formatCount(getCount(tab.id))}</span>
                   )}
                 </button>
               ))}
@@ -2898,5 +2947,17 @@ const DevLog = () => {
     </div>
   );
 };
+
+// ─── Suspense Boundary ────────────────────────────────────────────────────────
+// useSearchParams() requires a Suspense boundary in App Router — omitting
+// this causes the route to bail out of static rendering and throw in dev.
+// Fallback renders nothing visible (page content mounts near-instantly;
+// a skeleton here would just flash) — swap in a real loading state if the
+// bundle grows heavy enough to need one.
+const DevLog = () => (
+  <Suspense fallback={null}>
+    <DevLogInner />
+  </Suspense>
+);
 
 export default DevLog;
