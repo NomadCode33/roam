@@ -13,7 +13,7 @@ const playfair = Playfair_Display({
 const dmSans = DM_Sans({
   variable: "--font-dm-sans",
   subsets: ["latin"],
-  weight: ["300", "400", "500"]
+  weight: ["300", "400", "500", "600", "700"]
 })
 
 const russoOne = Russo_One({

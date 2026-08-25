@@ -13,7 +13,7 @@ Due to tailwind we have to do this math:
 /* ── HERO ── */
 .hero {
   background: #5C4E9E;
-  padding: 4.5rem 4rem 3.75rem;
+  padding: 4.5rem 3.5rem 3.75rem;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 3.5rem;
@@ -151,7 +151,7 @@ Due to tailwind we have to do this math:
 
 /* ── FEATURES ── */
 .features {
-  padding: 3.25rem 4rem;          /* 52px 48px */
+  padding: 3.25rem 3.5rem;          /* 52px 48px */
   background: #F5F3FF;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
