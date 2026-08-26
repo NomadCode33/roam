@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { IconBrandGoogle } from '@tabler/icons-react';
-//import { supabase } from '../../../lib/supabase';
+import { supabase } from '../../../lib/supabase';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -11,20 +11,20 @@ export default function Login() {
   const [error, setError] = useState('');
 
   const handleGoogleLogin = async () => {
-    /*const { error } = await supabase.auth.signInWithOAuth({
+    const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: { redirectTo: `${window.location.origin}/auth/callback` }
     });
-    if (error) setError(error.message);*/
-    console.log('Google login disabled temporarily');
+    if (error) setError(error.message);
+    //console.log('Google login disabled temporarily');
   };
 
   const handleEmailLogin = async (e) => {
     e.preventDefault();
-    /*setError('');
-    const { error } = await supabase.auth.signInWithOAuth({ email, password });
-    if (error) setError(error.message);*/
-    console.log('Email login disabled temporarily');
+    setError('');
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) setError(error.message);
+    //console.log('Email login disabled temporarily');
   };
 
   return (
