@@ -5,8 +5,6 @@ import {
 } from "./lib/ratelimit";
 
 function pickLimiter(pathname) {
-  if (pathname.startsWith("/api/posts") && pathname !== "/api/posts")
-    return null;
   if (pathname === "/api/posts") return postLimiter;
   if (pathname.startsWith("/api/auth")) return authLimiter;
   if (pathname.startsWith("/api/comments")) return commentLimiter;
