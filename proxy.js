@@ -13,7 +13,7 @@ function pickLimiter(pathname) {
   return null;
 }
 
-export async function middleware(req) {
+export async function proxy(req) {
   const limiter = pickLimiter(req.nextUrl.pathname);
 
   if (limiter) {
