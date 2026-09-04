@@ -16,7 +16,23 @@ export async function GET(request) {
         cookiesToSet.forEach(({ name, value, options }) => cookieStore.set(name, value, options))
       }}}
     )
-    await supabase.auth.exchangeCodeForSession(code)
+
+    const { data: { session } } = await supabase.auth.exchangeCodeForSession(code)
+
+    if (session?.user) {
+      const { data: userRow } = await supabase
+        .from('users')
+        .select('date_of_birth, signup_country, tos_accepted_at')
+        .eq('id', session.user.id)
+        .single()
+
+      const missingAgeGateInfo =
+        !userRow?.date_of_birth || !userRow?.signup_country || !userRow?.tos_accepted_at
+
+      if (missingAgeGateInfo) {
+        return NextResponse.redirect(`${origin}/auth/age-gate`)
+      }
+    }
   }
 
   return NextResponse.redirect(`${origin}/`)

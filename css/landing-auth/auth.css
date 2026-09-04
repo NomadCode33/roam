@@ -130,6 +130,28 @@ Due to tailwind we have to do this math:
   display: block;
 }
 
+.dob-row {
+  display: flex;
+  gap: 0.5rem;    /* 8px */
+}
+
+.dob-row select {
+  flex: 1;
+  font-size: 0.8125rem;    /* 13px */
+  padding: 0.6875rem 0.875rem;    /* 11px 14px */
+  border-radius: 0.625rem;    /* 10px */
+  border: .5px solid rgba(92,78,158,.2);
+  background: #F0EEFF;
+  color: #111827;
+  outline: none;
+  cursor: pointer;
+  transition: border-color .15s;
+}
+
+.dob-row select:focus {
+  border-color: #5C4E9E;
+}
+
 input[type="email"],
 input[type="password"] {
   width: 100%;
