@@ -87,6 +87,16 @@ export async function proxy(req) {
     return response;
   }
 
+  // No-session guard for /age-gate itself — logged-out visitors shouldn't see this form
+  if (req.nextUrl.pathname === "/age-gate") {
+    const hasSession = req.cookies.getAll().some(
+      (cookie) => cookie.name.startsWith("sb-") && cookie.name.includes("-auth-token")
+    );
+    if (!hasSession) {
+      return NextResponse.redirect(new URL("/login", req.url));
+    }
+  }
+
   return NextResponse.next();
 }
 
