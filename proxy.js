@@ -37,7 +37,7 @@ export async function proxy(req) {
   // Route protection — ROA-008 Phase E, presence-check only
   if (req.nextUrl.pathname.startsWith("/dashboard")) {
     const hasSession = req.cookies.getAll().some(
-      (cookie) => cookie.name.startsWith("sb-") && cookie.name.endsWith("-auth-token")
+      (cookie) => cookie.name.startsWith("sb-") && cookie.name.includes("-auth-token")
     );
     if (!hasSession) {
       return NextResponse.redirect(new URL("/login", req.url));
