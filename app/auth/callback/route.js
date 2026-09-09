@@ -30,7 +30,7 @@ export async function GET(request) {
         !userRow?.date_of_birth || !userRow?.signup_country || !userRow?.tos_accepted_at
 
       if (missingAgeGateInfo) {
-        return NextResponse.redirect(`${origin}/auth/age-gate`)
+        return NextResponse.redirect(`${origin}/age-gate`)
       }
     }
   }
