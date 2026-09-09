@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { createServerClient } from "@supabase/ssr";
 import {
   postLimiter, authLimiter, commentLimiter,
   translateLimiter, generalLimiter
@@ -43,8 +44,51 @@ export async function proxy(req) {
     }
   }
 
+  // Age-gate redirect-guard — ROA-004 Phase F, step 17
+  // Skip this check on /age-gate itself to avoid an infinite redirect loop
+  if (
+    req.nextUrl.pathname.startsWith("/dashboard") &&
+    req.nextUrl.pathname !== "/age-gate"
+  ) {
+    let response = NextResponse.next();
+
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+      {
+        cookies: {
+          getAll: () => req.cookies.getAll(),
+          setAll: (cookiesToSet) => {
+            cookiesToSet.forEach(({ name, value, options }) =>
+              response.cookies.set(name, value, options)
+            );
+          },
+        },
+      }
+    );
+
+    const { data: { session } } = await supabase.auth.getSession();
+
+    if (session?.user) {
+      const { data: userRow } = await supabase
+        .from("users")
+        .select("date_of_birth, signup_country, tos_accepted_at")
+        .eq("id", session.user.id)
+        .single();
+
+      const missingAgeGateInfo =
+        !userRow?.date_of_birth || !userRow?.signup_country || !userRow?.tos_accepted_at;
+
+      if (missingAgeGateInfo) {
+        return NextResponse.redirect(new URL("/age-gate", req.url));
+      }
+    }
+
+    return response;
+  }
+
   return NextResponse.next();
 }
 
-export const config = { matcher: ["/api/:path*", "/dashboard/:path*"] };
+export const config = { matcher: ["/api/:path*", "/dashboard/:path*", "/age-gate"] };
 //export const config = { matcher: "/api/:path*" };
