@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { CONSENT_COOKIE, parseConsent, hasConsentDecision } from "@/lib/consent";
-import "@/css/CookieBanner.css";
+import { CONSENT_COOKIE, parseConsent, hasConsentDecision } from "../lib/consent";
+import "../css/cookieBanner.css";
 
 export default function CookieBanner() {
   const [visible, setVisible] = useState(false);

@@ -1,0 +1,65 @@
+/* 
+Due to tailwind we have to do this math:
+16px = 1rem;
+
+- rem is always relative to the root (html) font-size — one 
+- fixed reference point for the whole page.
+
+- em is relative to that specific element's own font-size
+- So letter-spacing: .04em on .site-nav-logo means "4% of however big this logo text currently is"
+- if the logo's font-size changes (bigger on a hero page, smaller in a compact nav), the letter-spacing scales proportionally with it automatically, no separate adjustment needed.
+*/
+
+.roam-cookie-banner {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 9999;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  background-color: #1a1a1a;
+  border-top: 1px solid #333333;
+}
+
+.roam-cookie-banner__text {
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: #e5e5e5;
+  max-width: 60ch;
+}
+
+.roam-cookie-banner__link {
+  color: #ffffff;
+  text-decoration: underline;
+}
+
+.roam-cookie-banner__actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-shrink: 0;
+}
+
+.roam-cookie-banner__btn {
+  padding: 0.5rem 1.25rem;
+  font-size: 0.875rem;
+  border-radius: 0.375rem;
+  border: 1px solid transparent;
+  cursor: pointer;
+}
+
+.roam-cookie-banner__btn--decline {
+  background-color: transparent;
+  border-color: #555555;
+  color: #e5e5e5;
+}
+
+.roam-cookie-banner__btn--accept {
+  background-color: #ffffff;
+  color: #111111;
+}
