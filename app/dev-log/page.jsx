@@ -1821,6 +1821,7 @@ optimize: [
     { id: 15, name: "AWS CLI",          icon: "💻", version: "^2 (Pre-installed)", role: "S3 client used for backup orchestration" },
     { id: 16, name: "Vercel",           icon: "☁️", version: "Hosting",           role: "Deployment platform" },
     { id: 17, name: "Uptime Robot",     icon: "🤖", version: "v3 API",             role: "External synthetics & monitoring" },
+    { id: 18, name: "Google Cloud Console / Google Auth Platform",      icon: "☁️🛡️", version: "Google OAuth 2.0 API",    role: "External / OAuth provider" },
 
     // { id: 6, name: "MongoDB",      icon: "🍃", version: "Atlas",    role: "NoSQL database" },
   ],
