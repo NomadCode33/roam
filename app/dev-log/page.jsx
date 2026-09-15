@@ -380,6 +380,73 @@ const DATA = {
   // ── progression: flat list, rendered by ProgressionPane ──────────────────
   // Fields per entry: id, date, title, body (string/array), tag/tags (optional)
   progression: [
+    // ROA-007
+    {
+      id: 120,
+      date: "September 09, 2026",
+      title: "Clarified Redis Fix 'Applied' vs. 'Verified' Status",
+      body: "User corrected an assumption that the Upstash Redis production fix being *applied* to `main` meant `/api/health` was confirmed working. These are being tracked as two separate claims going forward. The fix is applied, but the endpoint's live response has not been checked this session.",
+      tag: "fixed"
+    },
+    {
+      id: 119,
+      date: "September 09, 2026",
+      title: "Internal Privacy Link Changed to Same-Tab",
+      body: "Changed the banner's Privacy Policy link from `target='_blank'` to same-tab navigation. `target='_blank'` exists to protect a user's place in the app when linking *away* for an internal link there's no 'elsewhere' to protect against, so it was only adding friction (two open tabs, one unresolved banner).",
+      tag: "refactor"
+    },
+    {
+      id: 118,
+      date: "September 09, 2026",
+      title: "Scoped CSS for Banner (`css/CookieBanner.css`)",
+      body: "Added component-scoped stylesheet, every rule nested under a single `.roam-cookie-banner` wrapper class. A direct, deliberate application of the CSS-bleed lesson from ROA-005 (unscoped bare-tag selectors leak across client-side route transitions in the App Router).",
+      tag: "feature"
+    },
+    {
+      id: 117,
+      date: "September 09, 2026",
+      title: "Cookie Consent Banner Component (`CookieBanner.jsx`)",
+      body: "Built the client-side banner component. Reads `document.cookie` on mount, renders nothing if a decision already exists, and writes a 1-year `SameSite=Lax` cookie on Accept or Decline. The PostHog init call inside `handleAccept` was left as an explicit comment/marker rather than a stub call, since the package isn't installed yet.",
+      tag: "feature"
+    },
+    {
+      id: 116,
+      date: "September 09, 2026",
+      title: "Cookie Consent Utility (`lib/consent.js`)",
+      body: "Built the consent-state utility: `parseConsent`, `hasConsentDecision`, and the `CONSENT_COOKIE` export. Returns exactly one of `'accepted'`, `'declined'`, or `null`. Never guesses a default state from a missing or malformed cookie.",
+      tag: "feature"
+    },
+    {
+      id: 115,
+      date: "September 09, 2026",
+      title: "Scoped ROA-007 to Binary Consent, Not Categorized",
+      body: "Initially proposed a categorized (Necessary/Analytics/Marketing) consent model with per-category toggles. Cross-checked against the actual kanban ticket spec and found ROA-007 is written as strictly binary (Accept/Decline only). Reversed course and built to the real written scope instead of the richer assumed version.",
+      tag: "decision"
+    },
+    // ROA-007
+
+
+    {
+      id: 85,
+      date: "August 17, 2026",
+      title: "Auth pages confirmed as separate route group from (main)",
+      body: "Reviewed uploaded auth and landing mockups directly. Confirmed the auth nav has no button markup at all (logo only) versus (main)'s nav which has Log in/Sign up buttons. Two structurally different components, not one with conditional visibility. Auth pages will get their own minimal layout outside (main).",
+      tag: "decision"
+    },
+    {
+      id: 84,
+      date: "August 17, 2026",
+      title: "Apple Sign-In deferred, no free tier",
+      body: "Confirmed Apple Sign-In requires a $99/yr Developer membership with no workaround. Chukwuemeka chose to skip it for now rather than pay immediately. Flagged as a hard blocker for Phase 5 App Store submission specifically, not for the rest of ROA-008.",
+      tag: "decision"
+    },
+    {
+      id: 83,
+      date: "August 17, 2026",
+      title: "Google OAuth fully configured end to end",
+      body: "Created Google Cloud project roam-auth, configured the OAuth consent screen (External audience, Roam branding), created a Web application OAuth client with the Supabase callback URL registered, and saved the Client ID/Secret into Supabase's Google provider. Nonce and email-fallback settings confirmed at correct defaults.",
+      tag: "deployment"
+    },
     {
       id: 82,
       date: "August 08, 2026",
@@ -965,17 +1032,37 @@ const DATA = {
   // ── future: grouped by priority ("high" | "medium" | "low") in FuturePane ─
   // Fields per entry: id, title, priority, body (string/array), mediaItems (optional)
   future: [
-    { id: 2, 
-      title: "ROA-008 — Auth (Google + Apple + email/password) + public.users trigger",
+    /* high */
+    { id: 3, 
+      title: "Verify `redact()` against a real sensitive payload",
       priority: "high",  
-      body: "`auth.users` gets a row automatically on signup; `public.users` does not — without this trigger, signed-up users have no row in the app's own users table, breaking everything downstream that joins against it (posts, follows, blocks). Also unblocks ROA-003 Phase D, since `/api/auth/login` doesn't exist until this ships."
+      body: "The redaction logic in `lib/logger.js` was explained and understood via code walkthrough but never exercised with a live call passing a real `password`/`token`-shaped key through `logRequest`. Needed before trusting the 'no sensitive data leaks' Done-When item in a real production scenario rather than on code-reading alone."
+    },
+    { id: 2, 
+      title: "ROA-017 — Sentry error tracking",
+      priority: "high",  
+      body: "Confirmed as the next ticket to start. No dependency blockers; equally unblocked alongside ROA-016 per Wave 2 sequencing, but explicitly chosen as next. Needed so real errors in production (currently only visible via the ROA-015 logger's stdout) get proper alerting and aggregation instead of requiring a manual log search."
     },
     { id: 1, 
-      title: "Migrate middleware.js → proxy.js/proxy.ts",
+      title: "ROA-018 — Install and Initialize PostHog",
       priority: "high",  
-      body: "Next.js 16.2.12 logs this as deprecated at every dev server start. Low cost to fix now; becomes actual tech debt if more routes get built against the old convention first. Needs resolving before ROA-003 Phase D is trusted as 'tested against current Next.js behavior.'"
+      body: "Now fully unblocked (`deps: ['ROA-002','ROA-007'], both closed`). The consent gate point already exists inside `CookieBanner.jsx`'s `handleAccept`. This ticket just needs to install `posthog-js`, wire the init call into that exact gate, and add the seven listed manual tracking events (post created, upvoted, map pin clicked, place viewed, user followed, translate clicked, profile viewed)."
+    },
+    
+    /* medium */
+
+
+    /* low */
+
+
+    /*
+    { id: , 
+      title: "",
+      priority: "",  
+      body: ""
     }
-    /*{ id: 2, 
+    
+    { id: 2, 
       title: "Skeleton Loading & Tile Routes",
       priority: "high",  
       body: [
@@ -985,7 +1072,9 @@ const DATA = {
       mediaItems: [
         { type: "image", src: "/img/planning-development/skeleton-button-tile-links.png", caption: "Example of skeleton loading states and character tile routing." },
       ]
-    },*/
+    },
+    
+    */
   ],
 
   // ── Optimizations data ────────────────────────────────────────────────────
@@ -1353,9 +1442,10 @@ optimize: [
     { id: 61, topic: "Serverless functions don't share memory across invocations", body: "Upstash Redis (not an in-memory counter) is required for rate limiting on Vercel because a plain in-process counter resets on every cold start and is invisible across concurrent lambda instances, so it silently limits nothing in production." },
     { id: 62, topic: "Next.js middleware location is convention-locked", body: "`middleware.js` is only recognized at project root or inside `src/`, never inside `app/`. A misplaced file doesn't error, it's just silently inert, which makes it a dangerous-quiet failure mode." },
     { id: 63, topic: "Dependency graphs can be technically satisfied but practically incomplete", body: "ROA-003 listed only ROA-002 as a dependency and was 'unblocked' per the kanban, but its own Phase D tests require routes that come from ROA-008. A real gap the ticket structure didn't surface until testing was attempted." },
-    /*{ id: 64, topic: "", body: "" },
-    { id: 65, topic: "", body: "" },
-    { id: 66, topic: "", body: "" },*/
+    { id: 64, topic: "auth.users and public.users are never automatically linked", body: "Supabase creates a row in auth.users on signup but has no built-in assumption about your own public schema. It won't guess whether you want a mirrored users table, three tables, or none. Bridging them requires an explicit SECURITY DEFINER trigger, every time, on every Supabase project." },
+    { id: 65, topic: "OAuth Client ID vs Client Secret is an identification vs. proof distinctio", body: "The Client ID is public and travels in the browser redirect URL, it just says who's asking. The Client Secret is exchanged server-to-server and proves the request genuinely comes from Roam's backend. A leaked Secret enables impersonation/phishing of the login flow, not direct data exposure but it's still gitignore-critical." },
+    { id: 66, topic: "Shared components should reflect genuinely shared structure, not be forced to", body: "When two UI pieces look similar but one is a strict subset of the other's markup (auth nav has zero buttons, main nav has two), collapsing them into one component with conditional hiding creates a hidden coupling. Every future change to the shared component has to remember the special case exists. Two small separate components can be simpler than one component with a mode flag." },
+
     //{ id: 10, topic: "", body: "" },
   ],
 
