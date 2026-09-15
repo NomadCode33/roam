@@ -1,7 +1,9 @@
 // app/api/posts/route.js
-// ROA-003 stub, replace with real logic when the posts ticket is built
 import { NextResponse } from "next/server";
+import { withLogging } from '@/lib/withLogging';
 
-export async function POST() {
+async function handler() {
   return NextResponse.json({ status: "stub ok" });
 }
+
+export const POST = withLogging(handler);

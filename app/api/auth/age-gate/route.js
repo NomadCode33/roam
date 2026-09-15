@@ -1,10 +1,12 @@
+// app/api/auth/age-gate/route.js
 import { NextResponse } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import { lookupCountryFromIp } from '@/lib/geo';
 import { meetsMinimumAge } from '@/lib/age';
+import { withLogging } from '@/lib/withLogging';
 
-export async function POST(req) {
+async function handler(req) {
   const cookieStore = await cookies();
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -61,3 +63,5 @@ export async function POST(req) {
 
   return NextResponse.json({ success: true });
 }
+
+export const POST = withLogging(handler);

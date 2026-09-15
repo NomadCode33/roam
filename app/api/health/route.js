@@ -1,4 +1,8 @@
 //app/api/health/route.js
-export async function GET() {
-    return Response.json({ status: 'ok' }, { status: 200 });
+import { withLogging } from '@/lib/withLogging';
+
+async function handler() {
+  return Response.json({ status: 'ok' }, { status: 200 });
 }
+
+export const GET = withLogging(handler);

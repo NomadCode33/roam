@@ -4,6 +4,7 @@ import {
   postLimiter, authLimiter, commentLimiter,
   translateLimiter, generalLimiter
 } from "./lib/ratelimit";
+import { createRequestId, logRequest } from "./lib/logger";
 
 function pickLimiter(pathname) {
   if (pathname === "/api/posts") return postLimiter;
@@ -22,12 +23,22 @@ export async function proxy(req) {
     const { success, limit, remaining, reset } = await limiter.limit(ip);
 
     if (!success) {
+      const requestId = createRequestId();
+      logRequest({
+        requestId,
+        method: req.method,
+        path: req.nextUrl.pathname,
+        status: 429,
+        durationMs: 0,
+      });
+
       return NextResponse.json(
         { error: "Too many requests. Please slow down and try again shortly." },
         { status: 429, headers: {
             "X-RateLimit-Limit": String(limit),
             "X-RateLimit-Remaining": String(remaining),
             "X-RateLimit-Reset": String(reset),
+            "x-request-id": requestId,
           } }
       );
     }
