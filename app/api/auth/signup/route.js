@@ -4,6 +4,7 @@ import { createClient } from '@supabase/supabase-js';
 import { lookupCountryFromIp } from '@/lib/geo';
 import { meetsMinimumAge } from '@/lib/age';
 import { withLogging } from '@/lib/withLogging';
+import * as Sentry from "@sentry/nextjs";
 
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -56,6 +57,8 @@ async function handler(req) {
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 400 });
   }
+
+  Sentry.setUser({ id: data.user.id });
 
   const { error: updateError } = await supabaseAdmin
     .from('users')

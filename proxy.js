@@ -5,6 +5,7 @@ import {
   translateLimiter, generalLimiter
 } from "./lib/ratelimit";
 import { createRequestId, logRequest } from "./lib/logger";
+import * as Sentry from "@sentry/nextjs";
 
 function pickLimiter(pathname) {
   if (pathname === "/api/posts") return postLimiter;
@@ -81,6 +82,9 @@ export async function proxy(req) {
     const { data: { session } } = await supabase.auth.getSession();
 
     if (session?.user) {
+      Sentry.setUser({ id: session.user.id });
+      //throw new Error("Sentry user-context test");  // TEMP
+      
       const { data: userRow } = await supabase
         .from("users")
         .select("date_of_birth, signup_country, tos_accepted_at")
