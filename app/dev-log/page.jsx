@@ -2932,13 +2932,13 @@ const DevLogInner = () => {
           ))}
         </nav>
 
-        <main className="dn-main" ref={mainScrollRef}>
+        <div className="dn-main" ref={mainScrollRef}>
           {TABS.map((tab) => (
             <div key={tab.id} className={`dn-pane${activeTab === tab.id ? " active" : ""}`}>
               {activeTab === tab.id && PANES[tab.id]}
             </div>
           ))}
-        </main>
+        </div>
       </div>
 
       {/* Persistent scroll dock — lives outside .dn-main/.dn-pane so it never

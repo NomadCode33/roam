@@ -8,7 +8,7 @@ export default function AuthLayout({ children }) {
   return (
     <>
       <AuthNav />
-      <main className="auth-content">{children}</main>
+      <div className="auth-content">{children}</div>
       <AuthFooter />
     </>
   );

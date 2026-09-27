@@ -57,7 +57,7 @@ export default function AgeGate() {
   };
 
   return (
-    <main className="auth-panel-body">
+    <div className="auth-panel-body">
       <div className="auth-form-inner">
         <div className="auth-title">One more thing</div>
         <div className="auth-sub">We need a couple details before you continue.</div>
@@ -102,6 +102,6 @@ export default function AgeGate() {
           </button>
         </form>
       </div>
-    </main>
+    </div>
   );
 }

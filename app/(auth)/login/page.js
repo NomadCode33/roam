@@ -35,7 +35,7 @@ export default function Login() {
   };
 
   return (
-    <main className="auth-panel-body">
+    <div className="auth-panel-body">
       <div className="auth-form-inner">
         <div className="auth-title">Log in</div>
         <div className="auth-sub">Continue to see what's new on the map.</div>
@@ -87,6 +87,6 @@ export default function Login() {
           Don't have an account? <Link href="/signup">Sign up</Link>
         </div>
       </div>
-    </main>
+    </div>
   )
 }

@@ -8,7 +8,7 @@ export default function Terms() {
         <p><strong>Last updated</strong> July 31, 2026</p>
       </header>
 
-      <main>
+      <div>
 
         <section id="agreement">
           <h2>Agreement to Our Legal Terms</h2>
@@ -436,7 +436,7 @@ export default function Terms() {
         </section>
 
         <p>This Terms and Conditions was created using Termly's <a href="https://termly.io/products/terms-and-conditions-generator/" target="_blank" rel="noopener external">Terms and Conditions Generator</a></p>
-      </main>
+      </div>
     </div>
   );
 }

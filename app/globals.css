@@ -1,5 +1,16 @@
 @import "tailwindcss";
 
+@layer base, components, utilities;
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
@@ -17,6 +28,11 @@
     --background: #0a0a0a;
     --foreground: #ededed;
   }
+}
+
+:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
 }
 
 body {

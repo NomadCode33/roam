@@ -75,7 +75,7 @@ export default function Signup() {
   };
 
   return (
-    <main className="auth-panel-body">
+    <div className="auth-panel-body">
       <div className="auth-form-inner">
         <div className="auth-title">Create account</div>
         <div className="auth-sub">Drop your first pin and start sharing the places you love.</div>
@@ -179,6 +179,6 @@ export default function Signup() {
           Already have an account? <Link href="/login">Log in</Link>
         </div>
       </div>
-    </main>
+    </div>
   );
 }

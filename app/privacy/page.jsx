@@ -36,7 +36,7 @@ export default function Privacy() {
           </ul>
           </aside>
 
-          <main>
+          <div>
 
             <section id="summary">
               <h2>Summary</h2>
@@ -344,7 +344,7 @@ export default function Privacy() {
               </div>
             </section>
 
-          </main>
+          </div>
         </div>
       </div>
 

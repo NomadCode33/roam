@@ -46,3 +46,5 @@ next-env.d.ts
 .vscode/*
 # Sentry Config File
 .env.sentry-build-plugin
+a11y-baseline.txt
+audit-report.json
