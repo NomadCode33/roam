@@ -11,6 +11,16 @@
 - [ ] Color is never the only signal (add text or icon)
 - [ ] Tested with keyboard only, no mouse
 
+## Map-specific (ROA-034, 035, 036)
+
+- Mapbox canvas is not keyboard navigable by default. Provide a
+  non-map alternative for pin content (list view or place page).
+- Popups must be reachable by keyboard, not hover only.
+- Popup content uses a heading and readable text, not just an image.
+- Pin meaning never relies on color alone (icon or label too).
+- flyTo animations check prefers-reduced-motion before animating.
+- Clustered pin counts announced via LiveRegion when they change.
+
 ## CSS gotchas (project-specific)
 
 - Tailwind v4's cascade layers mean unlayered CSS always beats layered
