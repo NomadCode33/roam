@@ -91,6 +91,7 @@ export default function Signup() {
           <div className="div-line"></div>
         </div>
 
+        {/* Get rid of 'or phone' */}
         <form onSubmit={handleEmailSignup}>
           <div className="field-wrap">
             <label className="field-label" htmlFor="email">Email or phone</label>
@@ -115,9 +116,10 @@ export default function Signup() {
             />
           </div>
 
-          <div className="field-wrap">
-            <label className="field-label">Date of birth</label>
+          <fieldset className="field-wrap dob-fieldset">
+            <legend className="field-label">Date of birth</legend>
             <div className="dob-row">
+              <label htmlFor="dob-month" className="sr-only">Month</label>
               <select
                 id="dob-month"
                 value={dobMonth}
@@ -129,6 +131,7 @@ export default function Signup() {
                   <option key={m} value={m}>{m}</option>
                 ))}
               </select>
+              <label htmlFor="dob-day" className="sr-only">Day</label>
               <select
                 id="dob-day"
                 value={dobDay}
@@ -140,6 +143,7 @@ export default function Signup() {
                   <option key={d} value={d}>{d}</option>
                 ))}
               </select>
+              <label htmlFor="dob-year" className="sr-only">Year</label>
               <select
                 id="dob-year"
                 value={dobYear}
@@ -152,7 +156,7 @@ export default function Signup() {
                 ))}
               </select>
             </div>
-          </div>
+          </fieldset>
 
           <div className="age-row">
             <input

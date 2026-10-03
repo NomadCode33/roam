@@ -63,23 +63,26 @@ export default function AgeGate() {
         <div className="auth-sub">We need a couple details before you continue.</div>
 
         <form onSubmit={handleSubmit}>
-          <div className="field-wrap">
-            <label className="field-label">Date of birth</label>
+          <fieldset className="field-wrap dob-fieldset">
+            <legend className="field-label">Date of birth</legend>
             <div className="dob-row">
-              <select value={dobMonth} onChange={(e) => setDobMonth(e.target.value)} required>
+              <label htmlFor="dob-month" className="sr-only">Month</label>
+              <select id="dob-month" value={dobMonth} onChange={(e) => setDobMonth(e.target.value)} required>
                 <option value="">Month</option>
                 {months.map((m) => <option key={m} value={m}>{m}</option>)}
               </select>
-              <select value={dobDay} onChange={(e) => setDobDay(e.target.value)} required>
+              <label htmlFor="dob-day" className="sr-only">Day</label>
+              <select id="dob-day" value={dobDay} onChange={(e) => setDobDay(e.target.value)} required>
                 <option value="">Day</option>
                 {days.map((d) => <option key={d} value={d}>{d}</option>)}
               </select>
-              <select value={dobYear} onChange={(e) => setDobYear(e.target.value)} required>
+              <label htmlFor="dob-year" className="sr-only">Year</label>
+              <select id="dob-year" value={dobYear} onChange={(e) => setDobYear(e.target.value)} required>
                 <option value="">Year</option>
                 {years.map((y) => <option key={y} value={y}>{y}</option>)}
               </select>
             </div>
-          </div>
+          </fieldset>
 
           <div className="age-row">
             <input
