@@ -381,7 +381,7 @@ const PINNED = {
 /* 
     {
       id: ,
-      date: "Jl0y, 2026",
+      date: "Jly, 2026",
       title: "",
       body: "",
       tag: ""
@@ -438,6 +438,65 @@ const DATA = {
     // ROA-007
 
 
+    {
+      id: 93,
+      date: "August 18, 2026",
+      title: "Conversation tracker rule corrected to idle-gap-triggered, not length-triggered",
+      body: "Originally worded ambiguously as re-checking the date if a conversation ran 4-6+ hours; corrected to mean 4-6+ hours of inactivity within an ongoing conversation, not total length or message count.",
+      tag: "decision"
+    },
+    {
+      id: 92,
+      date: "August 18, 2026",
+      title: "Flagged-items tracker merged and updated to v12",
+      body: "Reconciled the prior master list against this session's progress. Items promoted, resolved, or newly flagged (see Bug Log and Optimizations below for specifics).",
+      tag: "documentation"
+    },
+    {
+      id: 91,
+      date: "August 18, 2026",
+      title: "Nav.jsx converted from `<button>` to `<Link>` for Log in / Sign up",
+      body: "`<button>` doesn't navigate on its own; `<Link>` does client-side routing. Since these elements' job is navigation, not an in-page action, they were the wrong element type. `nav.css`'s `.btn-ghost`/`.btn-solid` were also given `:hover` states and `transition` properties they were previously missing, mirroring the existing pattern in `landing.css`.",
+      tag: "refactor"
+    },
+    {
+      id: 90,
+      date: "August 18, 2026",
+      title: "Client-side navigation CSS bleeding between /privacy, /terms, and the landing page",
+      body: [
+        "**Root cause:** `privacy.css` and `terms.css` used unscoped `:root` variables and bare-tag selectors (`body`, `header`, `a`, `section`), which persist across Next.js client-side route changes since the DOM isn't fully torn down.",
+        "**Fixed** by scoping every selector under `.privacy-page` / `.terms-page` wrapper classes and adding matching outer `<div>` wrappers in each page's JSX. Also required wrapping root `layout.js`'s `{children}` in a consistent `<main id='page-root'>` element so every route, including ones outside any route group, gets a stable DOM anchor for React to diff against."
+      ],
+      tag: "fixed"
+    },
+    {
+      id: 89,
+      date: "August 18, 2026",
+      title: "auth.css built incrementally: nav, content panel, form-inner, title/sub, oauth button",
+      body: "Styled and visually confirmed via screenshots: `.auth-nav` (stacked logo + tagline), `.auth-content`/`.auth-panel-body` (full-height flex panel), `.auth-form-inner` (width-capped inner column, settled at 32rem after live iteration), `.auth-title`/`.auth-sub`, and `.oauth-btn` with hover state and icon.",
+      tag: "feature"
+    },
+    {
+      id: 88,
+      date: "August 18, 2026",
+      title: "Per-page auth tagline merged into AuthNav via usePathname()",
+      body: "Originally built as a separate `.auth-panel-top` block per page; redesigned mid-session to live inside the shared `AuthNav` component instead, using `usePathname()` to switch between 'Welcome back' and 'Join the map' based on the current route. Avoids duplicating the block across both pages while keeping the tagline page-accurate.",
+      tag: "decision"
+    },
+    {
+      id: 87,
+      date: "August 18, 2026",
+      title: "login/page.js and signup/page.js built",
+      body: "Both pages written with Google OAuth handlers (`supabase.auth.signInWithOAuth`), email/password handlers (`signInWithPassword` / `signUp`), controlled form state, signup's age-gate checkbox with client-side validation, and Terms/Privacy links wired to real routes. Apple Sign-In intentionally omitted, matching the prior session's deferral decision.",
+      tag: "feature"
+    },
+    {
+      id: 86,
+      date: "August 18, 2026",
+      title: "Auth route group scaffolded",
+      body: "Built `app/(auth)/layout.js`, `AuthNav.jsx`, and `AuthFooter.jsx` as a sibling route group to `(main)`, giving `/login` and `/signup` their own minimal shell (logo-only nav, 3-link footer) separate from the main site's full Nav/Footer.",
+      tag: "feature"
+    },
     {
       id: 85,
       date: "August 17, 2026",
@@ -1173,6 +1232,35 @@ const DATA = {
     */
 optimize: [
     {
+      id: 18,
+      month: "August 2026",
+      date: "August 18, 2026",
+      title: "terms.css / privacy.css: global selectors → scoped page classes",
+      body: "Realized mid-session that writing CSS as if each legal page were a standalone HTML document (bare `:root`, `body`, `header`, `a` selectors) breaks the moment Next.js's client-side routing is involved, since stylesheets aren't torn down between page transitions the way a full reload would clear them:",
+      bullets: [
+        "Moved all custom properties from `:root` onto page-specific classes (`.privacy-page`, `.terms-page`)",
+        "Prefixed every bare-tag selector with the page class",
+        "Added matching outer `<div>` wrappers in each page's JSX so the scoping class actually has a DOM node to attach to"
+      ],
+      tags: "refactor"
+    }, 
+    {
+      id: 17,
+      month: "August 2026",
+      date: "August 18, 2026",
+      title: "auth.css: panel sizing, full-bleed vs. floating card",
+      body: [
+        "Initially built `.auth-panel-body` as a small centered card with `max-width` and rounded corners. Matched a generic 'form card' instinct rather than the actual mockup, which shows a full-height panel filling the space between nav and footer.",
+        "Corrected mid-session after screenshot comparison:"
+      ],
+      bullets: [
+        "Removed `max-width`, `border-radius`, and `border` from `.auth-panel-body`",
+        "Added `flex: 1` to both `.auth-content` and `.auth-panel-body` so the panel stretches to fill all available vertical space",
+        "Introduced a new `.auth-form-inner` wrapper specifically to cap the *form content's* width (settled at 32rem) independently from the full-bleed panel background. It solves 'panel should be full height' and 'form shouldn't stretch edge-to-edge' as two separate concerns instead of conflating them into one element's sizing"
+      ],
+      tags: "refactor"
+    },   
+    {
       id: 16,
       month: "August 2026",
       date: "August 07, 2026",
@@ -1457,6 +1545,12 @@ optimize: [
     { id: 64, topic: "auth.users and public.users are never automatically linked", body: "Supabase creates a row in auth.users on signup but has no built-in assumption about your own public schema. It won't guess whether you want a mirrored users table, three tables, or none. Bridging them requires an explicit SECURITY DEFINER trigger, every time, on every Supabase project." },
     { id: 65, topic: "OAuth Client ID vs Client Secret is an identification vs. proof distinctio", body: "The Client ID is public and travels in the browser redirect URL, it just says who's asking. The Client Secret is exchanged server-to-server and proves the request genuinely comes from Roam's backend. A leaked Secret enables impersonation/phishing of the login flow, not direct data exposure but it's still gitignore-critical." },
     { id: 66, topic: "Shared components should reflect genuinely shared structure, not be forced to", body: "When two UI pieces look similar but one is a strict subset of the other's markup (auth nav has zero buttons, main nav has two), collapsing them into one component with conditional hiding creates a hidden coupling. Every future change to the shared component has to remember the special case exists. Two small separate components can be simpler than one component with a mode flag." },
+    { id: 67, topic: "Client-side navigation doesn't reset global CSS state", body: "Unlike a full page reload, `<Link>`-driven navigation in Next.js doesn't unload previously-loaded stylesheets or reset `:root`-scoped custom properties. Any CSS written with unscoped selectors (`body`, bare `:root`, generic tag selectors) can leak from one page onto another after a client-side route change. The fix is always the same: scope every selector under a page-specific wrapper class." },
+    { id: 68, topic: "Route group parentheses never affect the URL or indicate 'the root'", body: "`(main)` and `(auth)` are purely filesystem-level organization for applying different layouts, neither name appears in the URL. Which folder serves `/` is determined only by which one has a `page.js` sitting directly inside it, independent of naming or grouping." },
+    { id: 69, topic: "`<Link>` vs `<button>` is a semantic choice, not a styling one", body: "`<button>` triggers in-page JavaScript actions and does not navigate on its own. `<Link>` performs client-side routing to a different URL. Any element whose job is 'take the user to another page' should be a `<Link>`, regardless of how it's visually styled (pill, ghost, solid, etc.)." },
+    { id: 70, topic: "`usePathname()` lets a shared component vary its output per-route without prop drilling", body: "When a component that lives in a shared layout (like `AuthNav`) needs to know which specific page it's currently rendering under, `usePathname()` reads the live URL path directly. This avoids the need for every page to explicitly pass that information down as a prop." },
+    { id: 71, topic: "Never state a file's contents without having actually read them via a tool call", body: "A real process failure this session: file imports and JSX structure were stated as confirmed fact twice without having opened the file first. Corrected by strictly reading files via the `view` tool before making any claim about their contents going forward, inference or memory is not a substitute for verification." },
+    { id: 72, topic: "A conversation-length rule and an idle-time rule are not the same trigger", body: "'Re-check the date if the conversation runs long' and 're-check the date if there's been no activity for X hours' sound similar but produce very different behavior. The first fires based on message count/duration, the second based on elapsed real time with no activity. Worth being precise about which one is actually meant when writing a standing rule." },
 
     //{ id: 10, topic: "", body: "" },
   ],
@@ -1478,6 +1572,28 @@ optimize: [
     },
   */
   bugs: [
+    { 
+      id: 35, 
+      title: "One-time hydration mismatch error on /signup (div vs. Link on auth-nav-logo)", 
+      status: "fixed", 
+      date: "August 18, 2026", 
+      body: [
+        "**Symptom:** browser console threw a React hydration error citing a mismatch between server-rendered `<div className='auth-nav-logo'>` and client-rendered `<a>` (from `Link`) inside `AuthNav.jsx`.",
+        "**Root cause:** diagnosed as stale dev-server SSR output momentarily out of sync with a recent edit to `AuthNav.jsx` (converting the logo to a `Link`), not a logic bug.",
+        "**Fix:** no code change needed, confirmed not recurring after the dev server caught up to the saved file."
+      ] 
+    },
+    { 
+      id: 34, 
+      title: "Pages visually 'bleeding' into each other after client-side navigation", 
+      status: "fixed", 
+      date: "August 18, 2026", 
+      body: [
+        "**Symptom:** clicking between `/`, `/privacy`, and `/terms` via `<Link>` caused stale colors and layout from a previously visited page to persist or override the current page's styling, most visibly the landing page's hero background shifting from violet to an incorrect shade after a round trip through `/terms`.",
+        "**Root cause:** `terms.css` and `privacy.css` both declared global `:root` custom properties and bare-tag selectors (`body`, `header`, `a`, `section`), none of which get cleared on client-side route transitions the way a full page reload would clear them.",
+        "**Fix:** rewrote both stylesheets to scope every rule under `.terms-page`/`.privacy-page` wrapper classes, added matching outer `<div>` wrappers in each page's JSX, and added a `<main id='page-root'>` wrapper around `{children}` in root `layout.js` to ensure every route has a stable DOM anchor. Verified fixed via repeated manual round-trip navigation testing between all three pages."
+      ] 
+    },
     { 
       id: 33, 
       title: "middleware.js placed inside app/, never executes", 
