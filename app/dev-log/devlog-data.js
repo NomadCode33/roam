@@ -381,7 +381,7 @@ const PINNED = {
 /* 
     {
       id: ,
-      date: "Jly, 2026",
+      date: "Jl0y, 2026",
       title: "",
       body: "",
       tag: ""
@@ -438,6 +438,90 @@ const DATA = {
     // ROA-007
 
 
+    {
+      id: 105,
+      date: "August 25, 2026",
+      title: "Google OAuth Verified Working End-to-End",
+      body: "Confirmed via terminal log (`Exchange result — error: null session exists: true`) and a real `sb-*` session cookie present in DevTools. First fully working authenticated login flow in the project.",
+      tag: "deployment"
+    },
+    {
+      id: 104,
+      date: "August 25, 2026",
+      title: "Vercel Build Failure — 'supabaseUrl is required'",
+      body: "Root-caused through a three-layer chain: (1) `handleEmailLogin` was calling `signInWithOAuth` instead of `signInWithPassword`; (2) `lib/supabase.js` had no explicit PKCE flow config; (3) the PKCE code verifier was written to localStorage client-side but read from cookies server-side. Fixed by switching to `createBrowserClient`/`createServerClient` from `@supabase/ssr` on both sides, and creating the missing `app/auth/callback/route.js` to handle the code exchange.",
+      tag: "fixed"
+    },
+    {
+      id: 103,
+      date: "August 25, 2026",
+      title: "Sign In Button Fake-Bolding Instead of Rendering Real Weight",
+      body: "DM Sans's 600 weight was never declared in `layout.js`'s `next/font/google` config, so the browser synthesized a fake bold instead of loading the real typeface cut. Added `'600'` to the weight array.",
+      tag: "fixed"
+    },
+    {
+      id: 102,
+      date: "August 25, 2026",
+      title: "Font-Family Bleed on Nav Tagline and Footer",
+      body: "`.auth-nav-tagline`, `.footer-links a`, and `.footer-copy` were inheriting `globals.css`'s Arial fallback instead of the project's DM Sans. Fixed via explicit `font-family` declarations on each rule; root cause in `globals.css` still open.",
+      tag: "fixed"
+    },
+    {
+      id: 101,
+      date: "August 25, 2026",
+      title: "Age-Gate Checkbox Layout Broken by Invalid CSS",
+      body: "`.age-row` used `display: row` which is not a valid CSS value. The browser silently ignored it and fell back to default block stacking, breaking the side-by-side checkbox/text layout. Corrected to `display: flex`.",
+      tag: "fixed"
+    },
+    {
+      id: 100,
+      date: "August 25, 2026",
+      title: "Auth Panel Not Stretching Full Height",
+      body: "`.auth-content` had `align-items: center`, silently overriding flexbox's default `stretch` behavior and leaving lavender gaps above/below the white auth panel. Removed the property; panel now correctly fills the space between nav and footer.",
+      tag: "fixed"
+    },
+    {
+      id: 99,
+      date: "August 25, 2026",
+      title: "Submit Button and Auth Switch-Link Styling",
+      body: "Styled `.submit-btn` (gold CTA, matching the `.mission-cta` pattern from landing.css) and `.auth-switch` (the 'Don't have an account?' / 'Already have an account?' links), with hover color settled on `#c9971f`, an existing darker-gold token from `privacy.css`.",
+      tag: "feature"
+    },
+    {
+      id: 98,
+      date: "August 25, 2026",
+      title: "Forgot Password Link and Age-Gate Row Styling",
+      body: "Styled `.forgot` (login) and `.age-row`/`.age-text` (signup's 13+ age confirmation checkbox with embedded Terms/Privacy links), including checkbox `accent-color` theming.",
+      tag: "feature"
+    },
+    {
+      id: 97,
+      date: "August 25, 2026",
+      title: "Auth Form Field Styling",
+      body: "Styled `.field-wrap`, `.field-label`, and the actual email/password `<input>` elements, including a lavender-tinted background matching brand tokens and a `:focus` border-color swap for accessibility.",
+      tag: "feature"
+    },
+    {
+      id: 96,
+      date: "August 25, 2026",
+      title: "Auth Divider Styling (.divider, .div-line, .div-text)",
+      body: "Built the 'or' separator between the OAuth button and the email/password form using a flex row with two `flex: 1` line elements, a self-balancing layout that doesn't require manual width math.",
+      tag: "feature"
+    },
+    {
+      id: 95,
+      date: "August 18, 2026",
+      title: "ROA-008 Walkthrough Regenerated Against Real State",
+      body: "Rebuilt the ROA-008 auth ticket walkthrough using the visualize/show_widget tool, replacing a stale static draft. Reflected actual current state: Phases A and B done (Google OAuth fully configured, Apple deferred), Phase C mid-build, Phases D–F outstanding.",
+      tag: "documentation"
+    },
+    {
+      id: 94,
+      date: "August 18, 2026",
+      title: "Session Conversation Tracker Reset",
+      body: "Reset the standing conversation tracker to a 40-conversation cycle for the Roam project. Display 'X/40' at the top of every response, remind at 40 without forcing a stop, and continue counting if explicitly told to keep going.",
+      tag: "decision"
+    },
     {
       id: 93,
       date: "August 18, 2026",
@@ -1232,6 +1316,20 @@ const DATA = {
     */
 optimize: [
     {
+      id: 19,
+      month: "August 2026",
+      date: "August 25, 2026",
+      title: "Auth Panel Layout: Card → Full-Bleed Panel",
+      body: "",
+      bullets: [
+        "",
+        "",
+        "",
+        ""
+      ],
+      tags: "refactor"
+    },
+    {
       id: 18,
       month: "August 2026",
       date: "August 18, 2026",
@@ -1992,6 +2090,20 @@ optimize: [
       body: "Place directly in the App Router under `app/api/health/`. Must export a `GET` function and return a 2xx status with no external calls, so Uptime Robot's checks reflect server availability only.",
       code: `export async function GET() {\n  return Response.json({ status: 'ok' }, { status: 200 });\n}`,
     },
+    {
+      id: 6,
+      title: "Scoping a legal/document page's stylesheet to prevent client-nav bleed",
+      lang: "css",
+      body: "Apply this pattern to any page-specific stylesheet written as if it were a standalone document. Move `:root` variables onto a page class, prefix every bare-tag selector.",
+      code: `.terms-page {\n  --roam-deep-base: #0D0A1A;\n  /* ...all other custom properties... */\n}\n.terms-page header { /* ... */ }\n.terms-page a { /* ... */ }`,
+    },
+    {
+      id: 7,
+      title: "Width-capped inner form column inside a full-bleed panel",
+      lang: "css",
+      body: "Use when a container needs to stretch full-height/full-width for background purposes, but its actual content should stay narrower and centered.",
+      code: `.auth-panel-body {\n  flex: 1;\n  width: 100%;\n  background: #fff;\n  padding: 2.5rem 3rem;\n  display: flex;\n  flex-direction: column;\n  justify-content: center;\n}\n\n.auth-form-inner {\n  width: 100%;\n  max-width: 32rem;\n  margin: 0 auto;\n}`,
+    },
     /*{
       id: 2,
       title: "Express Static Serve (Vite build)",
@@ -2043,7 +2155,9 @@ optimize: [
     { id: 7, title: "Supabase JavaScript Client Reference", url: "https://supabase.com/docs/reference/javascript/introduction", category: "backend",    note: "Complete API reference for the Supabase JS client. Every Supabase query written in Next.js uses this reference for syntax." },
     { id: 8, title: "Supabase CLI — `db dump` Reference", url: "https://supabase.com/docs/reference/cli/introduction", category: "deployment",    note: "Covers the full flag set for `supabase db dump`, including `--data-only`, `--schema-only` (the current default behavior), and connection string requirements." },
     { id: 9, title: "Cloudflare R2 — S3 Compatibility API", url: "https://developers.cloudflare.com/r2/api/s3/api/", category: "database",    note: "Documents R2's S3-compatible endpoint structure and authentication, needed for pointing the AWS CLI at R2 instead of actual AWS S3 (`--endpoint-url` usage)." },
-
+    { id: 10, title: "React hydration mismatch guide", url: "https://react.dev/link/hydration-mismatch", category: "routing",    note: "Referenced directly from the console error this session when diagnosing the transient div/Link SSR mismatch on `AuthNav.jsx`" },
+    
+    
     // { id: 4, title: "Tailwind CSS v4 Docs", url: "https://tailwindcss.com/docs", category: "styling",    note: "v4 uses @theme in CSS instead of tailwind.config.js." },
   ],
 };
