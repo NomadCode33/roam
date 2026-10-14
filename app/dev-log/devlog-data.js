@@ -2561,11 +2561,11 @@ const CardMedia = ({ mediaItems }) => {
         <div className="dn-card-media-item" key={index}>
 
           {media.type === "image" && (
-            <img src={media.src} alt={media.caption || ""} loading="lazy" />
+            <img src={media.src} alt={media.alt ?? (media.caption ? "" : "Dev log screenshot")} loading="lazy" />
           )}
 
           {media.type === "video" && (
-            <video controls preload="metadata">
+            <video controls muted preload="metadata">
               <source src={media.src} />
               Your browser does not support the video tag.
             </video>
