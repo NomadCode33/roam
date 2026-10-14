@@ -26,8 +26,10 @@ export async function GET(request) {
         .eq('id', session.user.id)
         .single()
 
-      const missingAgeGateInfo =
-        !userRow?.date_of_birth || !userRow?.signup_country || !userRow?.tos_accepted_at
+      const missingAgeGateInfo = !userRow?.date_of_birth || !userRow?.tos_accepted_at
+      
+        /*const missingAgeGateInfo =
+        !userRow?.date_of_birth || !userRow?.signup_country || !userRow?.tos_accepted_at*/
 
       if (missingAgeGateInfo) {
         return NextResponse.redirect(`${origin}/age-gate`)
