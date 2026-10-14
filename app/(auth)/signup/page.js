@@ -19,6 +19,7 @@ export default function Signup() {
   const [tosAccepted, setTosAccepted] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [notice, setNotice] = useState('');
 
   const handleGoogleSignup = async () => {
     const { error } = await supabase.auth.signInWithOAuth({
@@ -31,6 +32,7 @@ export default function Signup() {
   const handleEmailSignup = async (e) => {
     e.preventDefault();
     setError('');
+    setNotice('');
 
     // client-side plausibility gate only — real 13/16 threshold enforced server-side
     if (!dobMonth || !dobDay || !dobYear) {
@@ -67,7 +69,8 @@ export default function Signup() {
         return;
       }
 
-      window.location.href = '/auth/callback';
+      setNotice('Check your email to confirm your account, then log in.');
+      setLoading(false);
     } catch (err) {
       setError('Network error. Please try again.');
       setLoading(false);
@@ -168,6 +171,7 @@ export default function Signup() {
             </label>
           </div>
 
+          {notice && <p className="auth-notice" role="status">{notice}</p>}
           {error && <p className="auth-error">{error}</p>}
 
           <button type="submit" className="submit-btn" disabled={loading}>
