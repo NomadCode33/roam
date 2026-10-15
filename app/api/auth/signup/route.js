@@ -5,6 +5,8 @@ import { lookupCountryFromIp } from '@/lib/geo';
 import { meetsMinimumAge } from '@/lib/age';
 import { withLogging } from '@/lib/withLogging';
 import * as Sentry from "@sentry/nextjs";
+import { createServerClient } from '@supabase/ssr';
+import { cookies } from 'next/headers';
 
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -43,19 +45,41 @@ async function handler(req) {
 
   const tosAcceptedAt = new Date().toISOString();
 
-  const { data, error } = await supabaseAdmin.auth.admin.createUser({
+  const cookieStore = await cookies();
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    {
+      cookies: {
+        getAll: () => cookieStore.getAll(),
+        setAll: (cookiesToSet) => {
+          cookiesToSet.forEach(({ name, value, options }) => cookieStore.set(name, value, options));
+        },
+      },
+    }
+  );
+
+  const origin = req.headers.get('origin') ?? new URL(req.url).origin;
+
+  const { data, error } = await supabase.auth.signUp({
     email,
     password,
-    email_confirm: false,
-    user_metadata: {
-      date_of_birth: dateOfBirth,
-      signup_country: countryCode,
-      tos_accepted_at: tosAcceptedAt,
+    options: {
+      data: {
+        date_of_birth: dateOfBirth,
+        signup_country: countryCode,
+        tos_accepted_at: tosAcceptedAt,
+      },
+      emailRedirectTo: `${origin}/auth/callback`,
     },
   });
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 400 });
+  }
+
+  if (!data.user || data.user.identities?.length === 0) {
+    return NextResponse.json({ error: 'That email is already registered.' }, { status: 400 });
   }
 
   Sentry.setUser({ id: data.user.id });
