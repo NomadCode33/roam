@@ -144,7 +144,10 @@ const ScrollDock = ({ scrollRef, activeTab }) => {
       </div>
 
       {/* Toast — "Position saved" / "Position restored" confirmation */}
-      <div className={`dn-dock-toast${toast ? " dn-dock-toast-show" : ""}`}>
+      <div
+        role="status"
+        className={`dn-dock-toast${toast ? " dn-dock-toast-show" : ""}`}
+      >
         {toast}
       </div>
     </>
@@ -244,8 +247,9 @@ const TabNav = ({ activeTabId, activePane }) => {
                   key={tab.id}
                   className={`dn-tab${activeTab === tab.id ? " active" : ""}`}
                   onClick={() => setActiveTab(tab.id)}
+                  aria-current={activeTab === tab.id ? "true" : undefined}
                 >
-                  <span className="dn-tab-icon">{tab.icon}</span>
+                  <span className="dn-tab-icon" aria-hidden="true">{tab.icon}</span>
                   <span className="dn-tab-text">
                     <span className="dn-tab-label">{tab.label}</span>
                     <span className="dn-tab-sub">{tab.sublabel}</span>
@@ -270,11 +274,11 @@ const TabNav = ({ activeTabId, activePane }) => {
             fadeSlideIn animation on .dn-pane.active would never replay. Keying
             on the tab id forces a remount per switch, which restarts the
             animation exactly like the old eight-div version did. */}
-        <main className="dn-main" ref={mainScrollRef}>
+        <div className="dn-main" ref={mainScrollRef}>
           <div className="dn-pane active" key={activeTab}>
             {activePane}
           </div>
-        </main>
+        </div>
       </div>
 
       {/* Persistent scroll dock — lives outside .dn-main/.dn-pane so it never
