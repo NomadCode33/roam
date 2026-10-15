@@ -28,7 +28,7 @@ export async function GET(request) {
 
       const missingAgeGateInfo = !userRow?.date_of_birth || !userRow?.tos_accepted_at
       
-        /*const missingAgeGateInfo =
+      /*const missingAgeGateInfo =
         !userRow?.date_of_birth || !userRow?.signup_country || !userRow?.tos_accepted_at*/
 
       if (missingAgeGateInfo) {
