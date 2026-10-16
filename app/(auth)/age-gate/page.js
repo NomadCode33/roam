@@ -98,7 +98,7 @@ export default function AgeGate() {
             </label>
           </div>
 
-          {error && <p className="auth-error">{error}</p>}
+          {error && <p className="auth-error" role="alert">{error}</p>}
 
           <button type="submit" className="submit-btn" disabled={loading}>
             {loading ? 'Saving...' : 'Continue'}

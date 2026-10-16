@@ -176,7 +176,7 @@ export default function Signup() {
           </div>
 
           {notice && <p className="auth-notice" role="status">{notice}</p>}
-          {error && <p className="auth-error">{error}</p>}
+          {error && <p className="auth-error" role="alert">{error}</p>}
 
           <button type="submit" className="submit-btn" disabled={loading}>
             {loading ? 'Creating account...' : 'Create account'}

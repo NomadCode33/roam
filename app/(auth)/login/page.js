@@ -77,7 +77,7 @@ export default function Login() {
             />
           </div>
 
-          {error && <p className="auth-error">{error}</p>}
+          {error && <p className="auth-error" role="alert">{error}</p>}
 
           <Link href="#" className="forgot">Forgot password?</Link>
           <button type="submit" className="submit-btn">Sign in</button>
