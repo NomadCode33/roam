@@ -10,6 +10,9 @@ Due to tailwind we have to do this math:
 - if the logo's font-size changes (bigger on a hero page, smaller in a compact nav), the letter-spacing scales proportionally with it automatically, no separate adjustment needed.
 */
 
+html { scroll-padding-bottom: var(--cookie-banner-h, 0px); }
+body { padding-bottom: var(--cookie-banner-h, 0px); }
+
 .roam-cookie-banner {
   position: fixed;
   bottom: 0;

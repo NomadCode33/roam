@@ -1320,12 +1320,10 @@ optimize: [
       month: "August 2026",
       date: "August 25, 2026",
       title: "Auth Panel Layout: Card → Full-Bleed Panel",
-      body: "",
+      body: "Realized the auth panel needed to visually fill the space between nav and footer rather than float as a small centered card in order to match with the mockup's actual full-height proportions.",
       bullets: [
-        "",
-        "",
-        "",
-        ""
+        "Removed `align-items: center` from `.auth-content`, restoring flexbox's default `stretch` so `.auth-panel-body`'s `flex: 1` could actually take effect",
+        "Confirmed the fix visually — lavender gaps above/below the white panel disappeared entirely"
       ],
       tags: "refactor"
     },
