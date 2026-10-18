@@ -27,7 +27,7 @@ Due to tailwind we have to do this math:
 
 .site-footer-links {
   font-family: var(--font-dm-sans), sans-serif;
-  color: rgba(237, 232, 255, 0.4);
+  color: rgba(237, 232, 255, 0.6);
   font-size: 0.75rem;
   text-decoration: none;
   display: flex;
@@ -46,6 +46,6 @@ Due to tailwind we have to do this math:
 
 .site-footer-copy {
   font-family: var(--font-dm-sans), sans-serif;
-  color: rgba(237, 232, 255, 0.25);
+  color: rgba(237, 232, 255, 0.55);
   font-size: 0.75rem;
 }

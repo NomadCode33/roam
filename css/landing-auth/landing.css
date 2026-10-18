@@ -25,7 +25,7 @@ Due to tailwind we have to do this math:
   font-weight: 500;
   letter-spacing: .12em;
   text-transform: uppercase;
-  color: #E8C547;
+  color: #f1db8d;
   margin-bottom: 1.125rem;        /* 18px */
 }
 
@@ -41,7 +41,7 @@ Due to tailwind we have to do this math:
 .hero-sub {
   font-family: var(--font-dm-sans), sans-serif;
   font-size: 0.9375rem;           /* 15px */
-  color: rgba(237,232,255,.65);
+  color: rgba(237,232,255,.9);
   line-height: 1.75;
   margin-bottom: 2rem;            /* 32px */
   max-width: 26.25rem;            /* 420px */

@@ -881,7 +881,6 @@ html {
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--dn-text-dim);
-  opacity: 0.6;
   margin-bottom: 0.6rem;
 }
  
@@ -945,7 +944,7 @@ html {
  
 .dn-resource-category {
   font-size: var(--dn-cat-font);
-  color: var(--dn-blue);
+  color: #3a83ff;
   background: rgba(26,111,255,0.1);
   border: 1px solid rgba(26,111,255,0.2);
   padding: var(--dn-tag-pad);

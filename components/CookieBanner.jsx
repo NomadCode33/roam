@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import Link from 'next/link';
 import { CONSENT_COOKIE, parseConsent, hasConsentDecision } from "../lib/consent";
 import "../css/cookieBanner.css";
 
@@ -58,9 +59,9 @@ export default function CookieBanner() {
     <section ref={bannerRef} className="roam-cookie-banner" aria-label="Cookie consent">
       <p className="roam-cookie-banner__text">
         We use cookies to understand how people use Roam. Read our{" "}
-        <a href="/privacy" className="roam-cookie-banner__link">
+        <Link href="/privacy" className="roam-cookie-banner__link">
           Privacy Policy
-        </a>{" "}
+        </Link>{" "}
         to learn more.
       </p>
       <div className="roam-cookie-banner__actions">

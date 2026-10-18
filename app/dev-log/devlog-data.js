@@ -2164,7 +2164,7 @@ optimize: [
 const TAG_STYLES = {
   // ── deployment: pushed off cyan toward a deeper, more saturated blue so it
   // reads distinctly from feature's cyan while still popping against the bg.
-  deployment:  { bg: "rgba(47,111,255,0.12)", color: "#2f6fff", border: "rgba(47,111,255,0.3)" },
+  deployment:  { bg: "rgba(47,111,255,0.12)", color: "#4c83ff", border: "rgba(47,111,255,0.3)" },
   feature:     { bg: "rgba(34,211,238,0.1)",  color: "#22d3ee", border: "rgba(34,211,238,0.25)" },
   fix:         { bg: "rgba(255,201,60,0.1)",  color: "#ffc93c", border: "rgba(255,201,60,0.25)" },
   // ── fixed: explicit entry so it stops silently falling back to
