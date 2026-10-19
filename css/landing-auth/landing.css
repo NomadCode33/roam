@@ -47,6 +47,10 @@ Due to tailwind we have to do this math:
   max-width: 26.25rem;            /* 420px */
 }
 
+.hero :focus-visible {
+  outline-color: #ffffff;
+}
+
 .hero-actions {
   display: flex;
   gap: 0.75rem;                   /* 12px */
