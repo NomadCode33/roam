@@ -352,6 +352,10 @@ html {
   overflow-y: auto; /* ← scrolls only this column */
   height: calc(100vh - var(--dn-topbar-h)); /* ← constrains height so scroll triggers */
 }
+
+.dn-main:focus-visible {
+  outline-offset: -2px;
+}
  
 /* ─── Pane ───────────────────────────────────────────────── */
 /* overflow-y:auto on .dn-pane.active makes only the active

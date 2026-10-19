@@ -118,6 +118,14 @@ Due to tailwind we have to do this math:
   color: #6a6f77;
 }
 
+.auth-error {
+  color: #b91c1c;
+}
+
+.auth-notice {
+  color: #111827;
+}
+
 .field-wrap {
   margin-bottom: 0.875rem; /* 14px */
 }

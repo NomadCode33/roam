@@ -274,7 +274,8 @@ const TabNav = ({ activeTabId, activePane }) => {
             fadeSlideIn animation on .dn-pane.active would never replay. Keying
             on the tab id forces a remount per switch, which restarts the
             animation exactly like the old eight-div version did. */}
-        <div className="dn-main" ref={mainScrollRef}>
+        {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- scroll container needs keyboard access (axe scrollable-region-focusable) */}
+        <div className="dn-main" ref={mainScrollRef} tabIndex={0} role="region" aria-label="Dev log content">
           <div className="dn-pane active" key={activeTab}>
             {activePane}
           </div>
