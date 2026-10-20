@@ -275,11 +275,11 @@ const TabNav = ({ activeTabId, activePane }) => {
             on the tab id forces a remount per switch, which restarts the
             animation exactly like the old eight-div version did. */}
         {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- scroll container needs keyboard access (axe scrollable-region-focusable) */}
-        <div className="dn-main" ref={mainScrollRef} tabIndex={0} role="region" aria-label="Dev log content">
+        <main id="main-content" className="dn-main" ref={mainScrollRef} tabIndex={0} aria-label="Dev log content">
           <div className="dn-pane active" key={activeTab}>
             {activePane}
           </div>
-        </div>
+        </main>
       </div>
 
       {/* Persistent scroll dock — lives outside .dn-main/.dn-pane so it never

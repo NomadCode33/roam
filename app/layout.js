@@ -45,14 +45,14 @@ export default function RootLayout({ children }) {
     >
       <body className="min-h-full flex flex-col">
         <a
-        href="#page-root"
-          className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:rounded focus:bg-white focus:px-4 focus:py-2 focus:text-black"
+          href="#main-content"
+          className="skip-link sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:rounded focus:bg-white focus:px-4 focus:py-2 focus:text-black"
         >
           Skip to main content
         </a>
-        <main id="page-root" className="flex-1 flex flex-col">
+        <div id="page-root" className="flex-1 flex flex-col">
           {children}
-        </main>
+        </div>
       </body>
     </html>
   );
