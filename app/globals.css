@@ -80,12 +80,6 @@ main#main-content[tabindex="-1"]:focus {
   outline: none;
 }
 
-a.skip-link:focus {
-  z-index: 10000;
-  background-color: #ffffff;
-  color: #000000;
-}
-
 :root {
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0 0);
