@@ -41,16 +41,22 @@ export default function CookieBanner() {
     document.cookie = `${CONSENT_COOKIE}=${value}; path=/; max-age=${oneYear}; SameSite=Lax`;
   }
 
+  function moveFocusToMain() {
+    document.getElementById("main-content")?.focus({ preventScroll: true });
+  }
+
   function handleAccept() {
     setConsentCookie("accepted");
     // PostHog init call goes here once ROA-0XX installs the package.
     // Intentionally left as a marker, not a silent no-op — see note below.
     setVisible(false);
+    moveFocusToMain();
   }
 
   function handleDecline() {
     setConsentCookie("declined");
     setVisible(false);
+    moveFocusToMain();
   }
 
   if (!visible) return null;
