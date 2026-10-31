@@ -392,52 +392,50 @@ const DATA = {
   // ── progression: flat list, rendered by ProgressionPane ──────────────────
   // Fields per entry: id, date, title, body (string/array), tag/tags (optional)
   progression: [
-    /*
     // ROA-007
     {
-      id: ,
+      id: 172,
       date: "September 09, 2026",
       title: "Clarified Redis Fix 'Applied' vs. 'Verified' Status",
       body: "User corrected an assumption that the Upstash Redis production fix being *applied* to `main` meant `/api/health` was confirmed working. These are being tracked as two separate claims going forward. The fix is applied, but the endpoint's live response has not been checked this session.",
       tag: "fixed"
     },
     {
-      id: ,
+      id: 171,
       date: "September 09, 2026",
       title: "Internal Privacy Link Changed to Same-Tab",
       body: "Changed the banner's Privacy Policy link from `target='_blank'` to same-tab navigation. `target='_blank'` exists to protect a user's place in the app when linking *away* for an internal link there's no 'elsewhere' to protect against, so it was only adding friction (two open tabs, one unresolved banner).",
       tag: "refactor"
     },
     {
-      id: ,
+      id: 170,
       date: "September 09, 2026",
       title: "Scoped CSS for Banner (`css/CookieBanner.css`)",
       body: "Added component-scoped stylesheet, every rule nested under a single `.roam-cookie-banner` wrapper class. A direct, deliberate application of the CSS-bleed lesson from ROA-005 (unscoped bare-tag selectors leak across client-side route transitions in the App Router).",
       tag: "feature"
     },
     {
-      id: ,
+      id: 169,
       date: "September 09, 2026",
       title: "Cookie Consent Banner Component (`CookieBanner.jsx`)",
       body: "Built the client-side banner component. Reads `document.cookie` on mount, renders nothing if a decision already exists, and writes a 1-year `SameSite=Lax` cookie on Accept or Decline. The PostHog init call inside `handleAccept` was left as an explicit comment/marker rather than a stub call, since the package isn't installed yet.",
       tag: "feature"
     },
     {
-      id: ,
+      id: 168,
       date: "September 09, 2026",
       title: "Cookie Consent Utility (`lib/consent.js`)",
       body: "Built the consent-state utility: `parseConsent`, `hasConsentDecision`, and the `CONSENT_COOKIE` export. Returns exactly one of `'accepted'`, `'declined'`, or `null`. Never guesses a default state from a missing or malformed cookie.",
       tag: "feature"
     },
     {
-      id: ,
+      id: 167,
       date: "September 09, 2026",
       title: "Scoped ROA-007 to Binary Consent, Not Categorized",
       body: "Initially proposed a categorized (Necessary/Analytics/Marketing) consent model with per-category toggles. Cross-checked against the actual kanban ticket spec and found ROA-007 is written as strictly binary (Accept/Decline only). Reversed course and built to the real written scope instead of the richer assumed version.",
       tag: "decision"
     },
     // ROA-007
-    */
 
     /*{
       id: ,
@@ -449,7 +447,7 @@ const DATA = {
     {
       id: 118,
       date: "August 28, 2026",
-      title: "Silent Login Success With No User Feedbac",
+      title: "Silent Login Success With No User Feedback",
       body: "`login/page.js` had no success-path logic at all. A correct login produced zero visible change, leaving the user on `/login` with no indication anything happened. Fixed by adding `useRouter`, `router.push('/')`, and `router.refresh()` on successful `signInWithPassword()`.",
       tag: "fixed"
     },
