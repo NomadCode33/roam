@@ -1316,6 +1316,31 @@ const DATA = {
     */
 optimize: [
     {
+      id: 21,
+      month: "August 2026",
+      date: "August 26, 2026",
+      title: "Supabase Client: Plain createClient → createBrowserClient",
+      body: "Realized that using two different storage mechanisms (localStorage on the client, cookies on the server) for the same PKCE verifier was architecturally incompatible, not just a config oversight.",
+      bullets: [
+        "Replaced `createClient` from `@supabase/supabase-js` with `createBrowserClient` from `@supabase/ssr` in `lib/supabase.js`",
+        "Removed the now-redundant manual `flowType: 'pkce'` option, since `createBrowserClient` defaults to PKCE and cookie storage already",
+        "Verified via terminal log that the session exchange succeeded post-fix, not just that the code compiled"
+      ],
+      tags: "refactor"
+    },
+    {
+      id: 20,
+      month: "August 2026",
+      date: "August 25, 2026",
+      title: "Font Loading: Implicit Fallback → Explicit Weight Declarations",
+      body: "Realized that `next/font/google` only generates usable CSS for weights explicitly listed and not for 'whatever the design needs', an assumption that had been silently wrong for the 600-weight submit button.",
+      bullets: [
+        "Added `'600'` to DM Sans's `weight` array in `layout.js`",
+        "Confirmed `.submit-btn`'s existing `font-weight: 600` CSS was already correct and needed no further changes once the real weight loaded"
+      ],
+      tags: "refactor"
+    },    
+    {
       id: 19,
       month: "August 2026",
       date: "August 25, 2026",
@@ -1647,6 +1672,16 @@ optimize: [
     { id: 70, topic: "`usePathname()` lets a shared component vary its output per-route without prop drilling", body: "When a component that lives in a shared layout (like `AuthNav`) needs to know which specific page it's currently rendering under, `usePathname()` reads the live URL path directly. This avoids the need for every page to explicitly pass that information down as a prop." },
     { id: 71, topic: "Never state a file's contents without having actually read them via a tool call", body: "A real process failure this session: file imports and JSX structure were stated as confirmed fact twice without having opened the file first. Corrected by strictly reading files via the `view` tool before making any claim about their contents going forward, inference or memory is not a substitute for verification." },
     { id: 72, topic: "A conversation-length rule and an idle-time rule are not the same trigger", body: "'Re-check the date if the conversation runs long' and 're-check the date if there's been no activity for X hours' sound similar but produce very different behavior. The first fires based on message count/duration, the second based on elapsed real time with no activity. Worth being precise about which one is actually meant when writing a standing rule." },
+    { id: 73, topic: "Flexbox `align-items` Overrides Default Stretch Behavior", body: "Flex containers stretch children to fill the cross-axis by default. Setting `align-items: center` (or any value other than `stretch`) silently overrides this — a common, hard-to-spot cause of 'why isn't this filling the space' bugs." },
+    { id: 74, topic: "Invalid CSS Values Fail Silently", body: "`display: row` is not valid CSS. There's no error, no console warning, the browser just ignores the declaration and falls back to the element's default display type. This can look like a completely unrelated layout bug (checkbox/text stacking instead of sitting side-by-side)." },
+    { id: 75, topic: "next/font/google Only Loads Explicitly Declared Weights", body: "Google Fonts via `next/font` won't generate CSS for a weight unless it's explicitly listed in the config array. If a rule elsewhere declares that weight, the browser fake-bolds using the nearest loaded weight instead of throwing an error." },
+    { id: 76, topic: "PKCE Flow vs. Implicit Flow", body: "PKCE issues a short-lived code that gets exchanged for a session via a server-side call, it's required for any SSR architecture. Implicit flow returns tokens directly in the URL fragment, which is never sent to the server, making it fundamentally incompatible with server-side session handling." },
+    { id: 77, topic: "PKCE Verifier Storage Must Match Between Client and Server", body: "The code verifier generated during login must be readable by whatever exchanges the code afterward. Cookies work for both client and server; localStorage is browser-only and invisible to a server-side route. This mismatch was the actual root cause of the `AuthPKCECodeVerifierMissingError`." },
+    { id: 78, topic: "route.js vs. page.js in the App Router", body: "`page.js` renders a UI meant to be seen. `route.js` is a server endpoint returning a `Response` object with no visual output. An OAuth callback is a server handoff, not a page a user looks at. It belongs in `route.js`." },
+    //{ id: 10, topic: "", body: "" },
+    //{ id: 10, topic: "", body: "" },
+    //{ id: 10, topic: "", body: "" },
+    //{ id: 10, topic: "", body: "" },
 
     //{ id: 10, topic: "", body: "" },
   ],
@@ -1668,6 +1703,83 @@ optimize: [
     },
   */
   bugs: [
+    { 
+      id: 42, 
+      title: "PKCE Code Verifier Missing During Session Exchange", 
+      status: "fixed", 
+      date: "August 26, 2026", 
+      body: [
+        "**Symptom:** after fixing the 404, the callback route logged `AuthPKCECodeVerifierMissingError` instead of completing the session exchange.",
+        "**Root cause:** the client (`@supabase/supabase-js`) stored the PKCE verifier in localStorage, while the server-side route (`@supabase/ssr`) could only read from cookies — a storage location mismatch.",
+        "**Fix:** switched the client to `createBrowserClient` from `@supabase/ssr`, aligning both sides on cookie-based storage. Verified via terminal log confirming `session exists: true`."
+      ] 
+    },
+    { 
+      id: 41, 
+      title: "Google OAuth Redirect Landing on a 404", 
+      status: "fixed", 
+      date: "August 26, 2026", 
+      body: [
+        "**Symptom:** after completing Google's consent screen, the app redirected to `/auth/callback`, which returned a 404 page.",
+        "**Root cause:** `app/auth/callback/route.js` did not exist anywhere in the project, the OAuth handler was pointing at a route that had never been built.",
+        "**Fix:** created the route file using `createServerClient` to exchange the auth code for a session."
+      ] 
+    },
+    { 
+      id: 40, 
+      title: "Vercel Production Build Crashing with 'supabaseUrl is required'", 
+      status: "fixed", 
+      date: "August 26, 2026", 
+      body: [
+        "**Symptom:** build failed during prerendering of `/login`, throwing `Error: supabaseUrl is required`.",
+        "**Root cause** investigation revealed two separate issues layered together: `handleEmailLogin` was calling the wrong Supabase auth method (`signInWithOAuth` instead of `signInWithPassword`), and the Supabase client wasn't configured for PKCE flow, which is required for the intended SSR architecture.",
+        "**Fix:** corrected the method call, and migrated `lib/supabase.js` to `createBrowserClient` from `@supabase/ssr`."
+      ] 
+    },
+    { 
+      id: 39, 
+      title: "Sign In/Create Account Button Text Looking Slightly Off vs. Mockup", 
+      status: "fixed", 
+      date: "August 25, 2026", 
+      body: [
+        "**Symptom:** subtle visual mismatch in the submit button's boldness compared to the mockup.",
+        "**Root cause:** DM Sans's 600 weight was never declared in `layout.js`'s font config, so the browser synthesized a fake bold instead of loading the real 600-weight file, even though `auth.css`'s `font-weight: 600` was already correct.",
+        "**Fix:** added `'600'` to the `weight` array in `layout.js`."
+      ] 
+    },
+    { 
+      id: 38, 
+      title: "Nav Tagline and Footer Text Rendering in Wrong Font", 
+      status: "fixed", 
+      date: "August 25, 2026", 
+      body: [
+        "**Symptom:** 'Welcome back'/'Join the map' tagline and footer links/copyright text visually didn't match the mockup's DM Sans typography.",
+        "**Root cause:** these elements were outside `.auth-form-inner`'s DOM subtree (which had the DM Sans fix applied), so they fell through to `globals.css`'s Arial fallback.",
+        "**Fix:** added explicit `font-family` declarations directly to `.auth-nav-tagline`, `.footer-links a`, and `.footer-copy`."
+      ] 
+    },
+    { 
+      id: 37, 
+      title: "Signup Age-Gate Checkbox and Text Stacking Instead of Sitting Side-by-Side", 
+      status: "fixed", 
+      date: "August 25, 2026", 
+      body: [
+        "**Symptom:** the age-confirmation checkbox appeared above its label text instead of beside it, with no spacing control taking effect.",
+        "**Root cause:** `.age-row` used the invalid value `display: row` instead of `display: flex`, so `gap` and `align-items` had no container to apply within.",
+        "**Fix:** corrected to `display: flex`."
+      ] 
+    },
+    { 
+      id: 36, 
+      title: "Auth Panel Lavender Gaps Above/Below White Content", 
+      status: "fixed", 
+      date: "August 25, 2026", 
+      body: [
+        "**Symptom:** visible lavender-colored bands between the nav bar and the white auth panel, and between the panel and the footer, on both `/login` and `/signup`.",
+        "**Root cause:** `align-items: center` on `.auth-content` overrode flexbox's default `stretch`, preventing `.auth-panel-body` from filling available height despite `flex: 1`.",
+        "**Fix:** removed the `align-items: center` declaration entirely."
+      ] 
+    },
     { 
       id: 35, 
       title: "One-time hydration mismatch error on /signup (div vs. Link on auth-nav-logo)", 
@@ -1715,7 +1827,7 @@ optimize: [
       date: "August 07, 2026", 
       body: [
         "**Root cause:** the CDN `<link>` for the Tabler webfont, present in the original standalone HTML mockup, was never added to the Next.js root layout. No console error, just empty rounded squares where icons should be.",
-        "Fixed by migrating to `@tabler/icons-react` (see Optimizations).",
+        "**Fixed** by migrating to `@tabler/icons-react` (see Optimizations).",
         ""
       ] 
     },
@@ -2046,6 +2158,9 @@ optimize: [
     { id: 16, name: "Vercel",           icon: "☁️", version: "Hosting",           role: "Deployment platform" },
     { id: 17, name: "Uptime Robot",     icon: "🤖", version: "v3 API",             role: "External synthetics & monitoring" },
     { id: 18, name: "Google Cloud Console / Google Auth Platform",      icon: "☁️🛡️", version: "Google OAuth 2.0 API",    role: "External / OAuth provider" },
+    // { id: 6, name: "MongoDB",      icon: "🍃", version: "Atlas",    role: "NoSQL database" },
+    // { id: 6, name: "MongoDB",      icon: "🍃", version: "Atlas",    role: "NoSQL database" },
+    // { id: 6, name: "MongoDB",      icon: "🍃", version: "Atlas",    role: "NoSQL database" },
 
     // { id: 6, name: "MongoDB",      icon: "🍃", version: "Atlas",    role: "NoSQL database" },
   ],
@@ -2154,6 +2269,10 @@ optimize: [
     { id: 8, title: "Supabase CLI — `db dump` Reference", url: "https://supabase.com/docs/reference/cli/introduction", category: "deployment",    note: "Covers the full flag set for `supabase db dump`, including `--data-only`, `--schema-only` (the current default behavior), and connection string requirements." },
     { id: 9, title: "Cloudflare R2 — S3 Compatibility API", url: "https://developers.cloudflare.com/r2/api/s3/api/", category: "database",    note: "Documents R2's S3-compatible endpoint structure and authentication, needed for pointing the AWS CLI at R2 instead of actual AWS S3 (`--endpoint-url` usage)." },
     { id: 10, title: "React hydration mismatch guide", url: "https://react.dev/link/hydration-mismatch", category: "routing",    note: "Referenced directly from the console error this session when diagnosing the transient div/Link SSR mismatch on `AuthNav.jsx`" },
+    { id: 11, title: "Next.js: Middleware to Proxy Migration", url: "https://nextjs.org/docs/messages/middleware-to-proxy", category: "routing",    note: "Referenced directly from the dev server's deprecation warning; covers migrating from `middleware.js` to the newer `proxy.js` convention required by Next.js 16.2.12." },
+    { id: 12, title: "Next.js: Prerender Error", url: "https://nextjs.org/docs/messages/prerender-error", category: "build",    note: "Referenced directly from the Vercel build log during the initial `supabaseUrl is required` crash investigation; covers common causes of prerendering failures." },
+    // { id: 4, title: "Tailwind CSS v4 Docs", url: "https://tailwindcss.com/docs", category: "styling",    note: "v4 uses @theme in CSS instead of tailwind.config.js." },
+    // { id: 4, title: "Tailwind CSS v4 Docs", url: "https://tailwindcss.com/docs", category: "styling",    note: "v4 uses @theme in CSS instead of tailwind.config.js." },
     
     
     // { id: 4, title: "Tailwind CSS v4 Docs", url: "https://tailwindcss.com/docs", category: "styling",    note: "v4 uses @theme in CSS instead of tailwind.config.js." },
