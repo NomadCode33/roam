@@ -392,6 +392,30 @@ const DATA = {
   // ── progression: flat list, rendered by ProgressionPane ──────────────────
   // Fields per entry: id, date, title, body (string/array), tag/tags (optional)
   progression: [
+    // ROA-016: Session 18.4-18.5
+    {
+      id: 530,
+      date: "October 30, 2026",
+      title: "Supabase Site URL Still http://localhost:3000",
+      body: "Auth reached production while Site URL is still localhost, so an auth redirect on production falls back to localhost with no session. Tracked in ROA-008C item 8. Signups are OFF.",
+      tag: "open"
+    },
+    {
+      id: 529,
+      date: "October 30, 2026",
+      title: "Vercel Authentication Stays on Standard Protection",
+      body: "Previews require a Vercel login and production stays public. 'All Deployments' was rejected because it would lock production and break the UptimeRobot monitor. The cross-device confirmation-link test must run on production or with protection off.",
+      tag: "decision"
+    },
+    {
+      id: 528,
+      date: "October 30, 2026",
+      title: "Production Health Verified",
+      body: "/api/health returns {'status':'ok'}. UptimeRobot on roam-dusky-alpha.vercel.app/api/health shows 100% up for 1 month 15 days. The Aug 8 500 incident was resolved Sep 14.",
+      tag: "deployment"
+    },
+    
+    
     // ROA-007
     {
       id: 172,
