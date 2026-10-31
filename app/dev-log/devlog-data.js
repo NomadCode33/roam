@@ -1297,36 +1297,13 @@ const DATA = {
 
   // ── future: grouped by priority ("high" | "medium" | "low") in FuturePane ─
   // Fields per entry: id, title, priority, body (string/array), mediaItems (optional)
-  future: [
-    /* high */
-    { id: 3, 
-      title: "Verify `redact()` against a real sensitive payload",
-      priority: "high",  
-      body: "The redaction logic in `lib/logger.js` was explained and understood via code walkthrough but never exercised with a live call passing a real `password`/`token`-shaped key through `logRequest`. Needed before trusting the 'no sensitive data leaks' Done-When item in a real production scenario rather than on code-reading alone."
-    },
-    { id: 2, 
-      title: "ROA-017 — Sentry error tracking",
-      priority: "high",  
-      body: "Confirmed as the next ticket to start. No dependency blockers; equally unblocked alongside ROA-016 per Wave 2 sequencing, but explicitly chosen as next. Needed so real errors in production (currently only visible via the ROA-015 logger's stdout) get proper alerting and aggregation instead of requiring a manual log search."
-    },
-    { id: 1, 
-      title: "ROA-018 — Install and Initialize PostHog",
-      priority: "high",  
-      body: "Now fully unblocked (`deps: ['ROA-002','ROA-007'], both closed`). The consent gate point already exists inside `CookieBanner.jsx`'s `handleAccept`. This ticket just needs to install `posthog-js`, wire the init call into that exact gate, and add the seven listed manual tracking events (post created, upvoted, map pin clicked, place viewed, user followed, translate clicked, profile viewed)."
-    },
-    
-    /* medium */
 
-
-    /* low */
-
-
-    /*
+   /*
     { id: , 
       title: "",
       priority: "",  
       body: ""
-    }
+    },
     
     { id: 2, 
       title: "Skeleton Loading & Tile Routes",
@@ -1341,6 +1318,88 @@ const DATA = {
     },
     
     */
+  future: [
+    // ROA-016: SESSION 18.4 - 18.5
+    /* high */
+    { id: 1, 
+      title: "ROA-039: Patch npm Vulnerabilities and Sentry Import",
+      priority: "high",  
+      body: "Fix 1 critical Next.js advisory (RCE on Windows and the AVIF Image Optimization path) and 4 high ones (postcss, sharp, js-yaml, nanoid, mostly transitive via next). Also change the withSentryConfig import to @sentry/nextjs/config in its own commit. Own branch, full regression pass. Overlaps ROA-043, so decide which ticket carries it."
+    },
+    { id: 2, 
+      title: "ROA-044: Protect the users Table and Age Gate",
+      priority: "high",  
+      body: "Other signed-in users can probably read date_of_birth, signup_country, tos_accepted_at, and email, and any user can write them directly. Needs column-level REVOKEs, a write-once age-gate route, and cleanup of test users. Required before signups reopen."
+    },
+    { id: 3, 
+      title: "ROA-045: Resend as Supabase SMTP Provider",
+      priority: "high",  
+      body: "The built-in Supabase email sender is rate limited across the whole project. Set up a verified sending domain, custom SMTP, rate limits, and branded templates. Required before signups reopen."
+    },
+    { id: 4, 
+      title: "ROA-008C: Auth UX Gaps and Redirect Configuration",
+      priority: "high",  
+      body: "Toast notifications, a check-your-email page, forgot password, show-password checkboxes, a hash and query error reader, and the Supabase Site URL and Redirect URL fixes. Also carries the VoiceOver and missing-h1 findings."
+    },
+    { id: 5, 
+      title: "Verify `redact()` against a real sensitive payload",
+      priority: "high",  
+      body: "The redaction logic in `lib/logger.js` was explained and understood via code walkthrough but never exercised with a live call passing a real `password`/`token`-shaped key through `logRequest`. Needed before trusting the 'no sensitive data leaks' Done-When item in a real production scenario rather than on code-reading alone."
+    },
+    { id: 6, 
+      title: "ROA-017 — Sentry error tracking",
+      priority: "high",  
+      body: "Confirmed as the next ticket to start. No dependency blockers; equally unblocked alongside ROA-016 per Wave 2 sequencing, but explicitly chosen as next. Needed so real errors in production (currently only visible via the ROA-015 logger's stdout) get proper alerting and aggregation instead of requiring a manual log search."
+    },
+    { id: 7, 
+      title: "ROA-018 — Install and Initialize PostHog",
+      priority: "high",  
+      body: "Now fully unblocked (`deps: ['ROA-002','ROA-007'], both closed`). The consent gate point already exists inside `CookieBanner.jsx`'s `handleAccept`. This ticket just needs to install `posthog-js`, wire the init call into that exact gate, and add the seven listed manual tracking events (post created, upvoted, map pin clicked, place viewed, user followed, translate clicked, profile viewed)."
+    },
+    
+    /* medium */
+    { id: 8, 
+      title: "ROA-041: Fix setState Inside Effects",
+      priority: "medium",  
+      body: "Two react-hooks/set-state-in-effect errors, in TabNav.jsx (line 193) and CookieBanner.jsx (line 20, pre-existing). The ticket text still names old lines. Keep the cookie banner focus handlers working."
+    },
+    { id: 9, 
+      title: "ROA-040: Escape Unescaped JSX Entities",
+      priority: "medium",  
+      body: "Recount before starting: they are errors, not warnings, and the old ~95 count is stale."
+    },
+
+    /* low */
+    { id: 10, 
+      title: "ROA-042: Logo Home Link and Scroll to Top",
+      priority: "low",  
+      body: "Make the logo a real Link that resets scroll even on the same route."
+    },
+    { id: 11, 
+      title: "ROA-046: Reset Dev-Log Scroll on Tab Switch",
+      priority: "low",  
+      body: "Tabs share one scroll container, so scroll position carries over. Three decisions are open: dock save scope, back and forward behavior, and direct ?tab= loads."
+    },
+    { id: 12, 
+      title: "ROA-047: Build the About Page",
+      priority: "low",  
+      body: "The footer About link points to # on every page. Needs owner copy before build, one h1, and the shared page shell."
+    },
+    { id: 13, 
+      title: "ROA-048: Dev-Log Input Delay (Conditional)",
+      priority: "low",  
+      body: "Open only if slowness is reported on a real device or field INP on /dev-log exceeds 200ms. Start with a Chrome Performance trace."
+    },
+    { id: 14, 
+      title: "Windows NVDA Skip Link Retest",
+      priority: "low",  
+      body: "The skip link was not announced on a fresh load on Windows. Retest in a fresh Guest window with no click before claiming Windows screen reader support."
+    },
+    { id: 15, 
+      title: "Verify Map Popup and Dialog Accessibility",
+      priority: "low",  
+      body: "Neither exists yet. Run docs/a11y-checklist.md when the map tickets and the first real modal are built, including focus return on close."
+    },
   ],
 
   // ── Optimizations data ────────────────────────────────────────────────────
@@ -1832,7 +1891,7 @@ optimize: [
     { id: 85, topic: "'Success. No rows returned' Doesn't Mean What It Sounds Like", body: "For `CREATE FUNCTION`/`CREATE TRIGGER` statements, this message is expected and correct. However, these statements don't return data rows by nature. It's not evidence the function's logic is right; only a direct `SELECT prosrc FROM pg_proc` confirms the actual stored behavior." },
     { id: 86, topic: "Middleware Should Never Be the Sole Security Boundary", body: "Per CVE-2025-29927, treating Next.js middleware as the only gate protecting a route is a known anti-pattern, a crafted request can bypass it. The correct pattern is a lightweight presence-check in middleware (fast, cheap, catches the common case) plus real session validation again inside the protected page itself." },
     //{ id: 10, topic: "", body: "" },
-    
+
     //{ id: 10, topic: "", body: "" },
   ],
 
