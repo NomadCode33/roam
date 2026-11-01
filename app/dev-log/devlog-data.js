@@ -392,44 +392,68 @@ const DATA = {
   // ── progression: flat list, rendered by ProgressionPane ──────────────────
   // Fields per entry: id, date, title, body (string/array), tag/tags (optional)
   progression: [
+    // ROA-016: Session 18.4-18.5
+    {
+      id: 530,
+      date: "October 30, 2026",
+      title: "Supabase Site URL Still http://localhost:3000",
+      body: "Auth reached production while Site URL is still localhost, so an auth redirect on production falls back to localhost with no session. Tracked in ROA-008C item 8. Signups are OFF.",
+      tag: "open"
+    },
+    {
+      id: 529,
+      date: "October 30, 2026",
+      title: "Vercel Authentication Stays on Standard Protection",
+      body: "Previews require a Vercel login and production stays public. 'All Deployments' was rejected because it would lock production and break the UptimeRobot monitor. The cross-device confirmation-link test must run on production or with protection off.",
+      tag: "decision"
+    },
+    {
+      id: 528,
+      date: "October 30, 2026",
+      title: "Production Health Verified",
+      body: "/api/health returns {'status':'ok'}. UptimeRobot on roam-dusky-alpha.vercel.app/api/health shows 100% up for 1 month 15 days. The Aug 8 500 incident was resolved Sep 14.",
+      tag: "deployment"
+    },
+    
+    
     // ROA-007
     {
-      id: 120,
+      id: 172,
       date: "September 09, 2026",
       title: "Clarified Redis Fix 'Applied' vs. 'Verified' Status",
       body: "User corrected an assumption that the Upstash Redis production fix being *applied* to `main` meant `/api/health` was confirmed working. These are being tracked as two separate claims going forward. The fix is applied, but the endpoint's live response has not been checked this session.",
       tag: "fixed"
     },
     {
-      id: 119,
+      id: 171,
       date: "September 09, 2026",
       title: "Internal Privacy Link Changed to Same-Tab",
       body: "Changed the banner's Privacy Policy link from `target='_blank'` to same-tab navigation. `target='_blank'` exists to protect a user's place in the app when linking *away* for an internal link there's no 'elsewhere' to protect against, so it was only adding friction (two open tabs, one unresolved banner).",
       tag: "refactor"
     },
     {
-      id: 118,
+      id: 170,
       date: "September 09, 2026",
       title: "Scoped CSS for Banner (`css/CookieBanner.css`)",
       body: "Added component-scoped stylesheet, every rule nested under a single `.roam-cookie-banner` wrapper class. A direct, deliberate application of the CSS-bleed lesson from ROA-005 (unscoped bare-tag selectors leak across client-side route transitions in the App Router).",
       tag: "feature"
     },
     {
-      id: 117,
+      id: 169,
       date: "September 09, 2026",
       title: "Cookie Consent Banner Component (`CookieBanner.jsx`)",
       body: "Built the client-side banner component. Reads `document.cookie` on mount, renders nothing if a decision already exists, and writes a 1-year `SameSite=Lax` cookie on Accept or Decline. The PostHog init call inside `handleAccept` was left as an explicit comment/marker rather than a stub call, since the package isn't installed yet.",
       tag: "feature"
     },
     {
-      id: 116,
+      id: 168,
       date: "September 09, 2026",
       title: "Cookie Consent Utility (`lib/consent.js`)",
       body: "Built the consent-state utility: `parseConsent`, `hasConsentDecision`, and the `CONSENT_COOKIE` export. Returns exactly one of `'accepted'`, `'declined'`, or `null`. Never guesses a default state from a missing or malformed cookie.",
       tag: "feature"
     },
     {
-      id: 115,
+      id: 167,
       date: "September 09, 2026",
       title: "Scoped ROA-007 to Binary Consent, Not Categorized",
       body: "Initially proposed a categorized (Necessary/Analytics/Marketing) consent model with per-category toggles. Cross-checked against the actual kanban ticket spec and found ROA-007 is written as strictly binary (Accept/Decline only). Reversed course and built to the real written scope instead of the richer assumed version.",
@@ -437,7 +461,112 @@ const DATA = {
     },
     // ROA-007
 
-
+    /*{
+      id: ,
+      date: "Jl0y, 2026",
+      title: "",
+      body: "",
+      tag: ""
+    },*/
+    {
+      id: 118,
+      date: "August 28, 2026",
+      title: "Silent Login Success With No User Feedback",
+      body: "`login/page.js` had no success-path logic at all. A correct login produced zero visible change, leaving the user on `/login` with no indication anything happened. Fixed by adding `useRouter`, `router.push('/')`, and `router.refresh()` on successful `signInWithPassword()`.",
+      tag: "fixed"
+    },
+    {
+      id: 117,
+      date: "August 28, 2026",
+      title: "Production `/api/health` Returning 500 for 20+ Days",
+      body: [
+        "Discovered by coincidence in Vercel logs while testing ROA-008: `roam-dusky-alpha.vercel.app` (production) has returned `500 MIDDLEWARE_INVOCATION_FAILED` on every `/api/*` route since Aug 8, confirmed via a 20-day-old ongoing Uptime Robot incident.",
+        "**Root cause** identified as `Redis.fromEnv()` in `lib/ratelimit.js`, a documented flaky-lookup issue in Next.js/serverless contexts.",
+        "**Fix** written, **not yet applied** to `main`."
+      ],
+      tag: "open"
+    },
+    {
+      id: 116,
+      date: "August 28, 2026",
+      title: "Email/Password Flow Verified on Preview URL",
+      body: "Confirmed full signup → confirmation email → `/auth/callback` exchange → login loop works correctly on the Vercel preview deployment, verified directly via that deployment's own Runtime Logs (a `307` through `/auth/callback`, not local terminal output).",
+      tag: "feature"
+    },
+    {
+      id: 115,
+      date: "August 28, 2026",
+      title: "Google OAuth Verified on Preview URL",
+      body: "Confirmed Google OAuth login works correctly on the Vercel preview deployment (`roam-git-feature-roa-008-nomadcode33-2829s-projects.vercel.app`), not just localhost.",
+      tag: "feature"
+    },
+    {
+      id: 114,
+      date: "August 28, 2026",
+      title: "Feature Branch Preview Build Succeeded",
+      body: "Following the env var fix, `feature/roa-008` built and deployed cleanly on Vercel — all 11 routes compiled, `/login` and `/signup` no longer erroring.",
+      tag: "deployment"
+    },
+    {
+      id: 113,
+      date: "August 28, 2026",
+      title: "Vercel Build Failure — Missing Supabase Env Vars",
+      body: "Production build failed on `/login` with `@supabase/ssr: Your project's URL and API key are required`. Root cause: Vercel's Environment Variables page had zero variables configured for this project, despite ROA-002 being marked complete locally. Added all six required variables (`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `NEXT_PUBLIC_MAPBOX_TOKEN`, `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`) across all environments.",
+      tag: "fixed"
+    },
+    {
+      id: 112,
+      date: "August 28, 2026",
+      title: "Middleware Crash — `pathname is not defined`",
+      body: "New dashboard-protection block was pasted outside the `middleware()` function entirely (as free-floating module-level code), referencing `req`-derived variables with no access to `req`. Crashed every route site-wide. Fixed by moving the block inside the function and restructuring the early-return logic so non-rate-limited requests fall through correctly.",
+      tag: "fixed"
+    },
+    {
+      id: 111,
+      date: "August 26, 2026",
+      title: "Middleware-Based Route Protection (ROA-008 Phase E)",
+      body: "Extended the existing ROA-003 rate-limiter `middleware.js` with a presence-check auth gate: any request to `/dashboard/:path*` without a cookie matching `sb-*-auth-token` redirects to `/login`. Deliberately a presence-check only, not full validation, per current guidance that middleware shouldn't be the sole security boundary.",
+      tag: "feature"
+    },
+    {
+      id: 110,
+      date: "August 26, 2026",
+      title: "auth.users → public.users Trigger (ROA-008 Phase D)",
+      body: "Built `handle_new_auth_user()` (SECURITY DEFINER, `AFTER INSERT ON auth.users`) to auto-create a corresponding `public.users` row on every signup, with `display_name` falling back to 'New user' for email/password signups lacking a `full_name` in metadata. Verified via `prosrc` and a real signup test.",
+      tag: "feature"
+    },
+    {
+      id: 109,
+      date: "August 26, 2026",
+      title: "Email Confirmation Redirect Landing on Wrong URL",
+      body: [
+        "Confirmation link redirected to `/?code=...` instead of `/auth/callback?code=...`, leaving the auth code unexchanged.",
+        "**Root cause:** `signUp()` had no `emailRedirectTo` option, and Supabase's Redirect URLs allowlist was completely empty.",
+        "**Fixed** by adding `emailRedirectTo` to `signup/page.js` and adding `http://localhost:3000/auth/callback` to Supabase's allowlist."
+      ],
+      tag: "fixed"
+    },
+    {
+      id: 108,
+      date: "August 26, 2026",
+      title: "Password Complexity Policy Clarified",
+      body: "Confirmed Supabase's default is 6-character minimum only, no complexity rules. Researched current best practice (NIST SP 800-63B): favors raising minimum length over forced symbol/capital requirements. Decision: apply 'raise the minimum, skip complexity theater' when the future auth UX ticket is tackled.",
+      tag: "decision"
+    },
+    {
+      id: 107,
+      date: "August 26, 2026",
+      title: "Signup Error Message Renders But Is Unstyled",
+      body: "Confirmed Supabase's password-length validation error reaches the UI correctly via the existing error block. No `.auth-error` class exists in `auth.css`, so the message displays as unstyled plain text. Flagged for later styling pass, not blocking.",
+      tag: "fixed"
+    },
+    {
+      id: 106,
+      date: "August 26, 2026",
+      title: "ROA-008 Walkthrough Rebuilt to Reflect Verified State",
+      body: "Regenerated the ROA-008 auth ticket walkthrough using the ROA-001 visual widget format (lettered phases, numbered steps, why/trade-off/quiz blocks, Done-When checklist), replacing an outdated draft with one reflecting actual current progress: Google OAuth fully verified, Apple deferred, auth UI substantially built.",
+      tag: "decision"
+    },
     {
       id: 105,
       date: "August 25, 2026",
@@ -777,7 +906,7 @@ const DATA = {
       id: 58,
       date: "August 04, 2026",
       title: "Local Postgres CLI Tools Not on PATH",
-      body: "`createdb: command not found` in Terminal despite Postgres.app running. Root cause: Postgres.app's CLI binaries live inside the app bundle, not the shell's default PATH. Fixed by writing `/Applications/Postgres.app/Contents/Versions/14/bin` into `/etc/paths.d/postgresapp` and restarting the terminal session.",
+      body: "`createdb: command not found` in Terminal despite Postgres.app running. **Root cause:** Postgres.app's CLI binaries live inside the app bundle, not the shell's default PATH. Fixed by writing `/Applications/Postgres.app/Contents/Versions/14/bin` into `/etc/paths.d/postgresapp` and restarting the terminal session.",
       tag: "fixed"
     },
     {
@@ -798,7 +927,11 @@ const DATA = {
       id: 55,
       date: "August 04, 2026",
       title: "Backup Job Failing — IPv6 Unreachable",
-      body: "`pg_dump` failed with `Network is unreachable` against the direct Supabase connection string. Root cause: GitHub Actions runners don't support IPv6 egress, and the direct connection host resolves IPv6-only. Fixed by swapping `SUPABASE_DB_URL` to the Transaction Pooler connection string (IPv4).",
+      body: [
+        "`pg_dump` failed with `Network is unreachable` against the direct Supabase connection string.",
+        "**Root cause:** GitHub Actions runners don't support IPv6 egress, and the direct connection host resolves IPv6-only.",
+        "**Fixed** by swapping `SUPABASE_DB_URL` to the Transaction Pooler connection string (IPv4)."
+      ],
       tag: "fixed"
     },
     {
@@ -1186,36 +1319,13 @@ const DATA = {
 
   // ── future: grouped by priority ("high" | "medium" | "low") in FuturePane ─
   // Fields per entry: id, title, priority, body (string/array), mediaItems (optional)
-  future: [
-    /* high */
-    { id: 3, 
-      title: "Verify `redact()` against a real sensitive payload",
-      priority: "high",  
-      body: "The redaction logic in `lib/logger.js` was explained and understood via code walkthrough but never exercised with a live call passing a real `password`/`token`-shaped key through `logRequest`. Needed before trusting the 'no sensitive data leaks' Done-When item in a real production scenario rather than on code-reading alone."
-    },
-    { id: 2, 
-      title: "ROA-017 — Sentry error tracking",
-      priority: "high",  
-      body: "Confirmed as the next ticket to start. No dependency blockers; equally unblocked alongside ROA-016 per Wave 2 sequencing, but explicitly chosen as next. Needed so real errors in production (currently only visible via the ROA-015 logger's stdout) get proper alerting and aggregation instead of requiring a manual log search."
-    },
-    { id: 1, 
-      title: "ROA-018 — Install and Initialize PostHog",
-      priority: "high",  
-      body: "Now fully unblocked (`deps: ['ROA-002','ROA-007'], both closed`). The consent gate point already exists inside `CookieBanner.jsx`'s `handleAccept`. This ticket just needs to install `posthog-js`, wire the init call into that exact gate, and add the seven listed manual tracking events (post created, upvoted, map pin clicked, place viewed, user followed, translate clicked, profile viewed)."
-    },
-    
-    /* medium */
 
-
-    /* low */
-
-
-    /*
+   /*
     { id: , 
       title: "",
       priority: "",  
       body: ""
-    }
+    },
     
     { id: 2, 
       title: "Skeleton Loading & Tile Routes",
@@ -1230,6 +1340,88 @@ const DATA = {
     },
     
     */
+  future: [
+    // ROA-016: SESSION 18.4 - 18.5
+    /* high */
+    { id: 1, 
+      title: "ROA-039: Patch npm Vulnerabilities and Sentry Import",
+      priority: "high",  
+      body: "Fix 1 critical Next.js advisory (RCE on Windows and the AVIF Image Optimization path) and 4 high ones (postcss, sharp, js-yaml, nanoid, mostly transitive via next). Also change the withSentryConfig import to @sentry/nextjs/config in its own commit. Own branch, full regression pass. Overlaps ROA-043, so decide which ticket carries it."
+    },
+    { id: 2, 
+      title: "ROA-044: Protect the users Table and Age Gate",
+      priority: "high",  
+      body: "Other signed-in users can probably read date_of_birth, signup_country, tos_accepted_at, and email, and any user can write them directly. Needs column-level REVOKEs, a write-once age-gate route, and cleanup of test users. Required before signups reopen."
+    },
+    { id: 3, 
+      title: "ROA-045: Resend as Supabase SMTP Provider",
+      priority: "high",  
+      body: "The built-in Supabase email sender is rate limited across the whole project. Set up a verified sending domain, custom SMTP, rate limits, and branded templates. Required before signups reopen."
+    },
+    { id: 4, 
+      title: "ROA-008C: Auth UX Gaps and Redirect Configuration",
+      priority: "high",  
+      body: "Toast notifications, a check-your-email page, forgot password, show-password checkboxes, a hash and query error reader, and the Supabase Site URL and Redirect URL fixes. Also carries the VoiceOver and missing-h1 findings."
+    },
+    { id: 5, 
+      title: "Verify `redact()` against a real sensitive payload",
+      priority: "high",  
+      body: "The redaction logic in `lib/logger.js` was explained and understood via code walkthrough but never exercised with a live call passing a real `password`/`token`-shaped key through `logRequest`. Needed before trusting the 'no sensitive data leaks' Done-When item in a real production scenario rather than on code-reading alone."
+    },
+    { id: 6, 
+      title: "ROA-017 — Sentry error tracking",
+      priority: "high",  
+      body: "Confirmed as the next ticket to start. No dependency blockers; equally unblocked alongside ROA-016 per Wave 2 sequencing, but explicitly chosen as next. Needed so real errors in production (currently only visible via the ROA-015 logger's stdout) get proper alerting and aggregation instead of requiring a manual log search."
+    },
+    { id: 7, 
+      title: "ROA-018 — Install and Initialize PostHog",
+      priority: "high",  
+      body: "Now fully unblocked (`deps: ['ROA-002','ROA-007'], both closed`). The consent gate point already exists inside `CookieBanner.jsx`'s `handleAccept`. This ticket just needs to install `posthog-js`, wire the init call into that exact gate, and add the seven listed manual tracking events (post created, upvoted, map pin clicked, place viewed, user followed, translate clicked, profile viewed)."
+    },
+    
+    /* medium */
+    { id: 8, 
+      title: "ROA-041: Fix setState Inside Effects",
+      priority: "medium",  
+      body: "Two react-hooks/set-state-in-effect errors, in TabNav.jsx (line 193) and CookieBanner.jsx (line 20, pre-existing). The ticket text still names old lines. Keep the cookie banner focus handlers working."
+    },
+    { id: 9, 
+      title: "ROA-040: Escape Unescaped JSX Entities",
+      priority: "medium",  
+      body: "Recount before starting: they are errors, not warnings, and the old ~95 count is stale."
+    },
+
+    /* low */
+    { id: 10, 
+      title: "ROA-042: Logo Home Link and Scroll to Top",
+      priority: "low",  
+      body: "Make the logo a real Link that resets scroll even on the same route."
+    },
+    { id: 11, 
+      title: "ROA-046: Reset Dev-Log Scroll on Tab Switch",
+      priority: "low",  
+      body: "Tabs share one scroll container, so scroll position carries over. Three decisions are open: dock save scope, back and forward behavior, and direct ?tab= loads."
+    },
+    { id: 12, 
+      title: "ROA-047: Build the About Page",
+      priority: "low",  
+      body: "The footer About link points to # on every page. Needs owner copy before build, one h1, and the shared page shell."
+    },
+    { id: 13, 
+      title: "ROA-048: Dev-Log Input Delay (Conditional)",
+      priority: "low",  
+      body: "Open only if slowness is reported on a real device or field INP on /dev-log exceeds 200ms. Start with a Chrome Performance trace."
+    },
+    { id: 14, 
+      title: "Windows NVDA Skip Link Retest",
+      priority: "low",  
+      body: "The skip link was not announced on a fresh load on Windows. Retest in a fresh Guest window with no click before claiming Windows screen reader support."
+    },
+    { id: 15, 
+      title: "Verify Map Popup and Dialog Accessibility",
+      priority: "low",  
+      body: "Neither exists yet. Run docs/a11y-checklist.md when the map tickets and the first real modal are built, including focus return on close."
+    },
   ],
 
   // ── Optimizations data ────────────────────────────────────────────────────
@@ -1315,6 +1507,65 @@ const DATA = {
     }, 
     */
 optimize: [
+    {
+      id: 24,
+      month: "August 2026",
+      date: "August 28, 2026",
+      title: "Vercel Secret vs Config Classification",
+      body: "Realized that Vercel's 'Secret'/'Config' toggle is a dashboard-visibility setting only, unrelated to actual browser exposure of `NEXT_PUBLIC_` variables (which was happening regardless). Reclassified `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, and `NEXT_PUBLIC_MAPBOX_TOKEN` from Secret to Config to accurately reflect that they're intentionally public, while leaving `SUPABASE_SERVICE_ROLE_KEY` and both Upstash variables correctly as Secret.",
+      tags: "refactor"
+    },   
+    {
+      id: 23,
+      month: "August 2026",
+      date: "August 28, 2026",
+      title: "`middleware.js`: Merging Two Responsibilities Into One File",
+      body: "Realized Next.js 16 only permits a single middleware/proxy file per project, meaning ROA-003's rate limiter and ROA-008's route protection had to coexist in the same function rather than as separate concerns.",
+      bullets: [
+        "Restructured the early-return pattern (`if (!limiter) return NextResponse.next();`) into an `if (limiter) { ... }` block so non-API requests correctly fall through to the auth check.",
+        "Kept all five rate limiters completely untouched to avoid regressing ROA-003 work.",
+        "Generalized the auth cookie check to a pattern match (`sb-` prefix, `-auth-token` suffix) instead of hardcoding the project-specific ref, so it survives a future Supabase project change."
+      ],
+      tags: "refactor"
+    },   
+    {
+      id: 22,
+      month: "August 2026",
+      date: "August 26, 2026",
+      title: "`lib/supabase.js`: Client/Server Cookie Alignment",
+      body: "Realized that using `createBrowserClient` from `@supabase/ssr` (rather than plain `createClient`) was the actual missing piece for reliable session handling across client and server. It's not an incremental tweak, but the correct foundational pattern for this SSR architecture.",
+      bullets: [
+        "Switched `lib/supabase.js` to `createBrowserClient`.",
+        "Ensured `app/auth/callback/route.js` reads/writes the same cookie-based session store via `createServerClient`.",
+        "Eliminated a PKCE code-verifier mismatch that had been silently breaking OAuth exchange."
+      ],
+      tags: "refactor"
+    },   
+    {
+      id: 21,
+      month: "August 2026",
+      date: "August 26, 2026",
+      title: "Supabase Client: Plain createClient → createBrowserClient",
+      body: "Realized that using two different storage mechanisms (localStorage on the client, cookies on the server) for the same PKCE verifier was architecturally incompatible, not just a config oversight.",
+      bullets: [
+        "Replaced `createClient` from `@supabase/supabase-js` with `createBrowserClient` from `@supabase/ssr` in `lib/supabase.js`",
+        "Removed the now-redundant manual `flowType: 'pkce'` option, since `createBrowserClient` defaults to PKCE and cookie storage already",
+        "Verified via terminal log that the session exchange succeeded post-fix, not just that the code compiled"
+      ],
+      tags: "refactor"
+    },
+    {
+      id: 20,
+      month: "August 2026",
+      date: "August 25, 2026",
+      title: "Font Loading: Implicit Fallback → Explicit Weight Declarations",
+      body: "Realized that `next/font/google` only generates usable CSS for weights explicitly listed and not for 'whatever the design needs', an assumption that had been silently wrong for the 600-weight submit button.",
+      bullets: [
+        "Added `'600'` to DM Sans's `weight` array in `layout.js`",
+        "Confirmed `.submit-btn`'s existing `font-weight: 600` CSS was already correct and needed no further changes once the real weight loaded"
+      ],
+      tags: "refactor"
+    },    
     {
       id: 19,
       month: "August 2026",
@@ -1647,6 +1898,21 @@ optimize: [
     { id: 70, topic: "`usePathname()` lets a shared component vary its output per-route without prop drilling", body: "When a component that lives in a shared layout (like `AuthNav`) needs to know which specific page it's currently rendering under, `usePathname()` reads the live URL path directly. This avoids the need for every page to explicitly pass that information down as a prop." },
     { id: 71, topic: "Never state a file's contents without having actually read them via a tool call", body: "A real process failure this session: file imports and JSX structure were stated as confirmed fact twice without having opened the file first. Corrected by strictly reading files via the `view` tool before making any claim about their contents going forward, inference or memory is not a substitute for verification." },
     { id: 72, topic: "A conversation-length rule and an idle-time rule are not the same trigger", body: "'Re-check the date if the conversation runs long' and 're-check the date if there's been no activity for X hours' sound similar but produce very different behavior. The first fires based on message count/duration, the second based on elapsed real time with no activity. Worth being precise about which one is actually meant when writing a standing rule." },
+    { id: 73, topic: "Flexbox `align-items` Overrides Default Stretch Behavior", body: "Flex containers stretch children to fill the cross-axis by default. Setting `align-items: center` (or any value other than `stretch`) silently overrides this — a common, hard-to-spot cause of 'why isn't this filling the space' bugs." },
+    { id: 74, topic: "Invalid CSS Values Fail Silently", body: "`display: row` is not valid CSS. There's no error, no console warning, the browser just ignores the declaration and falls back to the element's default display type. This can look like a completely unrelated layout bug (checkbox/text stacking instead of sitting side-by-side)." },
+    { id: 75, topic: "next/font/google Only Loads Explicitly Declared Weights", body: "Google Fonts via `next/font` won't generate CSS for a weight unless it's explicitly listed in the config array. If a rule elsewhere declares that weight, the browser fake-bolds using the nearest loaded weight instead of throwing an error." },
+    { id: 76, topic: "PKCE Flow vs. Implicit Flow", body: "PKCE issues a short-lived code that gets exchanged for a session via a server-side call, it's required for any SSR architecture. Implicit flow returns tokens directly in the URL fragment, which is never sent to the server, making it fundamentally incompatible with server-side session handling." },
+    { id: 77, topic: "PKCE Verifier Storage Must Match Between Client and Server", body: "The code verifier generated during login must be readable by whatever exchanges the code afterward. Cookies work for both client and server; localStorage is browser-only and invisible to a server-side route. This mismatch was the actual root cause of the `AuthPKCECodeVerifierMissingError`." },
+    { id: 78, topic: "route.js vs. page.js in the App Router", body: "`page.js` renders a UI meant to be seen. `route.js` is a server endpoint returning a `Response` object with no visual output. An OAuth callback is a server handoff, not a page a user looks at. It belongs in `route.js`." },
+    { id: 79, topic: "Google OAuth Needs Only One Registered Callback", body: "Google only ever needs to know about Supabase's own fixed callback URL (`https://<ref>.supabase.co/auth/v1/callback`). The app's own `/auth/callback` is a second hop entirely between Supabase and the app. Google is never involved in it and never needs to know it exists, regardless of environment (localhost, preview, production)." },
+    { id: 80, topic: "`emailRedirectTo` and `redirectTo` Are Separate, Not Inferred", body: "Supabase's `signUp()` (email flow) and `signInWithOAuth()` (OAuth flow) each need their own explicit redirect parameter. Setting one does not configure the other, both must independently point at the same `/auth/callback` route." },
+    { id: 81, topic: "Vercel's Preview vs Production Environment Scoping Is Real", body: "Environment variables set for one Vercel environment (e.g., Production) do not automatically apply to another (e.g., Preview). A ticket can be 'done' locally and on production while still being completely broken on preview deployments, if the scoping was never checked." },
+    { id: 82, topic: "`Redis.fromEnv()` Has a Documented Flaky-Lookup Issue", body: "Even when environment variables are genuinely present and correctly named, Upstash's `Redis.fromEnv()` convenience method can fail to read them reliably in Next.js/serverless contexts. Explicit construction (`new Redis({ url, token })`) using `process.env` directly is the more robust pattern." },
+    { id: 83, topic: "A Local Terminal Log Never Proves Anything About a Deployment", body: "`npm run dev`'s terminal output only reflects the local dev server. Verifying behavior on a Vercel preview or production deployment requires checking that deployment's own Runtime Logs. A clean local terminal log is not evidence of anything happening on Vercel's infrastructure." },
+    { id: 84, topic: "Branch-Level Preview URLs Outlive Per-Commit URLs", body: "Vercel generates both a unique per-commit URL and a stable per-branch alias. External allowlists (like Supabase's Redirect URLs) should register the branch-level alias. Since it persists across every future commit to that branch, the per-commit URL would require re-registration on every single push." },
+    { id: 85, topic: "'Success. No rows returned' Doesn't Mean What It Sounds Like", body: "For `CREATE FUNCTION`/`CREATE TRIGGER` statements, this message is expected and correct. However, these statements don't return data rows by nature. It's not evidence the function's logic is right; only a direct `SELECT prosrc FROM pg_proc` confirms the actual stored behavior." },
+    { id: 86, topic: "Middleware Should Never Be the Sole Security Boundary", body: "Per CVE-2025-29927, treating Next.js middleware as the only gate protecting a route is a known anti-pattern, a crafted request can bypass it. The correct pattern is a lightweight presence-check in middleware (fast, cheap, catches the common case) plus real session validation again inside the protected page itself." },
+    //{ id: 10, topic: "", body: "" },
 
     //{ id: 10, topic: "", body: "" },
   ],
@@ -1668,6 +1934,83 @@ optimize: [
     },
   */
   bugs: [
+    { 
+      id: 42, 
+      title: "PKCE Code Verifier Missing During Session Exchange", 
+      status: "fixed", 
+      date: "August 26, 2026", 
+      body: [
+        "**Symptom:** after fixing the 404, the callback route logged `AuthPKCECodeVerifierMissingError` instead of completing the session exchange.",
+        "**Root cause:** the client (`@supabase/supabase-js`) stored the PKCE verifier in localStorage, while the server-side route (`@supabase/ssr`) could only read from cookies — a storage location mismatch.",
+        "**Fix:** switched the client to `createBrowserClient` from `@supabase/ssr`, aligning both sides on cookie-based storage. Verified via terminal log confirming `session exists: true`."
+      ] 
+    },
+    { 
+      id: 41, 
+      title: "Google OAuth Redirect Landing on a 404", 
+      status: "fixed", 
+      date: "August 26, 2026", 
+      body: [
+        "**Symptom:** after completing Google's consent screen, the app redirected to `/auth/callback`, which returned a 404 page.",
+        "**Root cause:** `app/auth/callback/route.js` did not exist anywhere in the project, the OAuth handler was pointing at a route that had never been built.",
+        "**Fix:** created the route file using `createServerClient` to exchange the auth code for a session."
+      ] 
+    },
+    { 
+      id: 40, 
+      title: "Vercel Production Build Crashing with 'supabaseUrl is required'", 
+      status: "fixed", 
+      date: "August 26, 2026", 
+      body: [
+        "**Symptom:** build failed during prerendering of `/login`, throwing `Error: supabaseUrl is required`.",
+        "**Root cause** investigation revealed two separate issues layered together: `handleEmailLogin` was calling the wrong Supabase auth method (`signInWithOAuth` instead of `signInWithPassword`), and the Supabase client wasn't configured for PKCE flow, which is required for the intended SSR architecture.",
+        "**Fix:** corrected the method call, and migrated `lib/supabase.js` to `createBrowserClient` from `@supabase/ssr`."
+      ] 
+    },
+    { 
+      id: 39, 
+      title: "Sign In/Create Account Button Text Looking Slightly Off vs. Mockup", 
+      status: "fixed", 
+      date: "August 25, 2026", 
+      body: [
+        "**Symptom:** subtle visual mismatch in the submit button's boldness compared to the mockup.",
+        "**Root cause:** DM Sans's 600 weight was never declared in `layout.js`'s font config, so the browser synthesized a fake bold instead of loading the real 600-weight file, even though `auth.css`'s `font-weight: 600` was already correct.",
+        "**Fix:** added `'600'` to the `weight` array in `layout.js`."
+      ] 
+    },
+    { 
+      id: 38, 
+      title: "Nav Tagline and Footer Text Rendering in Wrong Font", 
+      status: "fixed", 
+      date: "August 25, 2026", 
+      body: [
+        "**Symptom:** 'Welcome back'/'Join the map' tagline and footer links/copyright text visually didn't match the mockup's DM Sans typography.",
+        "**Root cause:** these elements were outside `.auth-form-inner`'s DOM subtree (which had the DM Sans fix applied), so they fell through to `globals.css`'s Arial fallback.",
+        "**Fix:** added explicit `font-family` declarations directly to `.auth-nav-tagline`, `.footer-links a`, and `.footer-copy`."
+      ] 
+    },
+    { 
+      id: 37, 
+      title: "Signup Age-Gate Checkbox and Text Stacking Instead of Sitting Side-by-Side", 
+      status: "fixed", 
+      date: "August 25, 2026", 
+      body: [
+        "**Symptom:** the age-confirmation checkbox appeared above its label text instead of beside it, with no spacing control taking effect.",
+        "**Root cause:** `.age-row` used the invalid value `display: row` instead of `display: flex`, so `gap` and `align-items` had no container to apply within.",
+        "**Fix:** corrected to `display: flex`."
+      ] 
+    },
+    { 
+      id: 36, 
+      title: "Auth Panel Lavender Gaps Above/Below White Content", 
+      status: "fixed", 
+      date: "August 25, 2026", 
+      body: [
+        "**Symptom:** visible lavender-colored bands between the nav bar and the white auth panel, and between the panel and the footer, on both `/login` and `/signup`.",
+        "**Root cause:** `align-items: center` on `.auth-content` overrode flexbox's default `stretch`, preventing `.auth-panel-body` from filling available height despite `flex: 1`.",
+        "**Fix:** removed the `align-items: center` declaration entirely."
+      ] 
+    },
     { 
       id: 35, 
       title: "One-time hydration mismatch error on /signup (div vs. Link on auth-nav-logo)", 
@@ -1715,7 +2058,7 @@ optimize: [
       date: "August 07, 2026", 
       body: [
         "**Root cause:** the CDN `<link>` for the Tabler webfont, present in the original standalone HTML mockup, was never added to the Next.js root layout. No console error, just empty rounded squares where icons should be.",
-        "Fixed by migrating to `@tabler/icons-react` (see Optimizations).",
+        "**Fixed** by migrating to `@tabler/icons-react` (see Optimizations).",
         ""
       ] 
     },
@@ -2046,6 +2389,9 @@ optimize: [
     { id: 16, name: "Vercel",           icon: "☁️", version: "Hosting",           role: "Deployment platform" },
     { id: 17, name: "Uptime Robot",     icon: "🤖", version: "v3 API",             role: "External synthetics & monitoring" },
     { id: 18, name: "Google Cloud Console / Google Auth Platform",      icon: "☁️🛡️", version: "Google OAuth 2.0 API",    role: "External / OAuth provider" },
+    // { id: 6, name: "MongoDB",      icon: "🍃", version: "Atlas",    role: "NoSQL database" },
+    // { id: 6, name: "MongoDB",      icon: "🍃", version: "Atlas",    role: "NoSQL database" },
+    // { id: 6, name: "MongoDB",      icon: "🍃", version: "Atlas",    role: "NoSQL database" },
 
     // { id: 6, name: "MongoDB",      icon: "🍃", version: "Atlas",    role: "NoSQL database" },
   ],
@@ -2154,6 +2500,10 @@ optimize: [
     { id: 8, title: "Supabase CLI — `db dump` Reference", url: "https://supabase.com/docs/reference/cli/introduction", category: "deployment",    note: "Covers the full flag set for `supabase db dump`, including `--data-only`, `--schema-only` (the current default behavior), and connection string requirements." },
     { id: 9, title: "Cloudflare R2 — S3 Compatibility API", url: "https://developers.cloudflare.com/r2/api/s3/api/", category: "database",    note: "Documents R2's S3-compatible endpoint structure and authentication, needed for pointing the AWS CLI at R2 instead of actual AWS S3 (`--endpoint-url` usage)." },
     { id: 10, title: "React hydration mismatch guide", url: "https://react.dev/link/hydration-mismatch", category: "routing",    note: "Referenced directly from the console error this session when diagnosing the transient div/Link SSR mismatch on `AuthNav.jsx`" },
+    { id: 11, title: "Next.js: Middleware to Proxy Migration", url: "https://nextjs.org/docs/messages/middleware-to-proxy", category: "routing",    note: "Referenced directly from the dev server's deprecation warning; covers migrating from `middleware.js` to the newer `proxy.js` convention required by Next.js 16.2.12." },
+    { id: 12, title: "Next.js: Prerender Error", url: "https://nextjs.org/docs/messages/prerender-error", category: "build",    note: "Referenced directly from the Vercel build log during the initial `supabaseUrl is required` crash investigation; covers common causes of prerendering failures." },
+    // { id: 4, title: "Tailwind CSS v4 Docs", url: "https://tailwindcss.com/docs", category: "styling",    note: "v4 uses @theme in CSS instead of tailwind.config.js." },
+    // { id: 4, title: "Tailwind CSS v4 Docs", url: "https://tailwindcss.com/docs", category: "styling",    note: "v4 uses @theme in CSS instead of tailwind.config.js." },
     
     
     // { id: 4, title: "Tailwind CSS v4 Docs", url: "https://tailwindcss.com/docs", category: "styling",    note: "v4 uses @theme in CSS instead of tailwind.config.js." },
