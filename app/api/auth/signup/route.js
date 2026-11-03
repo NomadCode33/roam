@@ -90,6 +90,7 @@ async function handler(req) {
       date_of_birth: dateOfBirth,
       signup_country: countryCode,
       tos_accepted_at: tosAcceptedAt,
+      confirmed_age: true,
     })
     .eq('id', data.user.id);
 

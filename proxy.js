@@ -46,23 +46,10 @@ export async function proxy(req) {
     return NextResponse.next();
   }
 
-  // Route protection — ROA-008 Phase E, presence-check only
-  if (req.nextUrl.pathname.startsWith("/dashboard")) {
-    const hasSession = req.cookies.getAll().some(
-      (cookie) => cookie.name.startsWith("sb-") && cookie.name.includes("-auth-token")
-    );
-    if (!hasSession) {
-      return NextResponse.redirect(new URL("/login", req.url));
-    }
-  }
+  const { pathname } = req.nextUrl;
 
-  // Age-gate redirect-guard — ROA-004 Phase F, step 17
-  // Skip this check on /age-gate itself to avoid an infinite redirect loop
-  if (
-    req.nextUrl.pathname.startsWith("/dashboard") &&
-    req.nextUrl.pathname !== "/age-gate"
-  ) {
-    let response = NextResponse.next();
+  if (pathname.startsWith("/dashboard") || pathname === "/age-gate") {
+    const response = NextResponse.next();
 
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -79,41 +66,34 @@ export async function proxy(req) {
       }
     );
 
-    const { data: { session } } = await supabase.auth.getSession();
+    const { data: { user } } = await supabase.auth.getUser();
 
-    if (session?.user) {
-      Sentry.setUser({ id: session.user.id });
-      //throw new Error("Sentry user-context test");  // TEMP
-      
-      const { data: userRow } = await supabase
-        .from("users")
-        .select("date_of_birth, signup_country, tos_accepted_at")
-        .eq("id", session.user.id)
-        .single();
+    if (!user) {
+      return NextResponse.redirect(new URL("/login", req.url));
+    }
 
-      const missingAgeGateInfo =
-        !userRow?.date_of_birth || !userRow?.signup_country || !userRow?.tos_accepted_at;
+    Sentry.setUser({ id: user.id });
 
-      if (missingAgeGateInfo) {
-        return NextResponse.redirect(new URL("/age-gate", req.url));
-      }
+    const { data: userRow } = await supabase
+      .from("users")
+      .select("confirmed_age")
+      .eq("id", user.id)
+      .single();
+
+    const completed = Boolean(userRow?.confirmed_age);
+
+    if (pathname.startsWith("/dashboard") && !completed) {
+      return NextResponse.redirect(new URL("/age-gate", req.url));
+    }
+
+    if (pathname === "/age-gate" && completed) {
+      return NextResponse.redirect(new URL("/", req.url));
     }
 
     return response;
-  }
-
-  // No-session guard for /age-gate itself — logged-out visitors shouldn't see this form
-  if (req.nextUrl.pathname === "/age-gate") {
-    const hasSession = req.cookies.getAll().some(
-      (cookie) => cookie.name.startsWith("sb-") && cookie.name.includes("-auth-token")
-    );
-    if (!hasSession) {
-      return NextResponse.redirect(new URL("/login", req.url));
-    }
   }
 
   return NextResponse.next();
 }
 
 export const config = { matcher: ["/api/:path*", "/dashboard/:path*", "/age-gate"] };
-//export const config = { matcher: "/api/:path*" };

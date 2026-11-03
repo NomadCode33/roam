@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 const currentYear = new Date().getFullYear();
 const months = Array.from({ length: 12 }, (_, i) => i + 1);
@@ -9,6 +10,7 @@ const days = Array.from({ length: 31 }, (_, i) => i + 1);
 const years = Array.from({ length: 100 }, (_, i) => currentYear - i);
 
 export default function AgeGate() {
+  const router = useRouter();
   const [dobMonth, setDobMonth] = useState('');
   const [dobDay, setDobDay] = useState('');
   const [dobYear, setDobYear] = useState('');
@@ -49,7 +51,8 @@ export default function AgeGate() {
         return;
       }
 
-      window.location.href = '/';
+      router.replace('/');
+      router.refresh();
     } catch (err) {
       setError('Network error. Please try again.');
       setLoading(false);

@@ -22,14 +22,11 @@ export async function GET(request) {
     if (session?.user) {
       const { data: userRow } = await supabase
         .from('users')
-        .select('date_of_birth, signup_country, tos_accepted_at')
+        .select('confirmed_age')
         .eq('id', session.user.id)
         .single()
 
-      const missingAgeGateInfo = !userRow?.date_of_birth || !userRow?.tos_accepted_at
-      
-      /*const missingAgeGateInfo =
-        !userRow?.date_of_birth || !userRow?.signup_country || !userRow?.tos_accepted_at*/
+      const missingAgeGateInfo = !userRow?.confirmed_age
 
       if (missingAgeGateInfo) {
         return NextResponse.redirect(`${origin}/age-gate`)
