@@ -393,6 +393,13 @@ const DATA = {
   // Fields per entry: id, date, title, body (string/array), tag/tags (optional)
   progression: [
     // ROA-016: Session 18.4-18.5
+    /*{
+      id: ,
+      date: "Jl0y, 2026",
+      title: "",
+      body: "",
+      tag: ""
+    },*/
     {
       id: 530,
       date: "October 30, 2026",
@@ -416,51 +423,6 @@ const DATA = {
     },
     
     
-    // ROA-007
-    {
-      id: 172,
-      date: "September 09, 2026",
-      title: "Clarified Redis Fix 'Applied' vs. 'Verified' Status",
-      body: "User corrected an assumption that the Upstash Redis production fix being *applied* to `main` meant `/api/health` was confirmed working. These are being tracked as two separate claims going forward. The fix is applied, but the endpoint's live response has not been checked this session.",
-      tag: "fixed"
-    },
-    {
-      id: 171,
-      date: "September 09, 2026",
-      title: "Internal Privacy Link Changed to Same-Tab",
-      body: "Changed the banner's Privacy Policy link from `target='_blank'` to same-tab navigation. `target='_blank'` exists to protect a user's place in the app when linking *away* for an internal link there's no 'elsewhere' to protect against, so it was only adding friction (two open tabs, one unresolved banner).",
-      tag: "refactor"
-    },
-    {
-      id: 170,
-      date: "September 09, 2026",
-      title: "Scoped CSS for Banner (`css/CookieBanner.css`)",
-      body: "Added component-scoped stylesheet, every rule nested under a single `.roam-cookie-banner` wrapper class. A direct, deliberate application of the CSS-bleed lesson from ROA-005 (unscoped bare-tag selectors leak across client-side route transitions in the App Router).",
-      tag: "feature"
-    },
-    {
-      id: 169,
-      date: "September 09, 2026",
-      title: "Cookie Consent Banner Component (`CookieBanner.jsx`)",
-      body: "Built the client-side banner component. Reads `document.cookie` on mount, renders nothing if a decision already exists, and writes a 1-year `SameSite=Lax` cookie on Accept or Decline. The PostHog init call inside `handleAccept` was left as an explicit comment/marker rather than a stub call, since the package isn't installed yet.",
-      tag: "feature"
-    },
-    {
-      id: 168,
-      date: "September 09, 2026",
-      title: "Cookie Consent Utility (`lib/consent.js`)",
-      body: "Built the consent-state utility: `parseConsent`, `hasConsentDecision`, and the `CONSENT_COOKIE` export. Returns exactly one of `'accepted'`, `'declined'`, or `null`. Never guesses a default state from a missing or malformed cookie.",
-      tag: "feature"
-    },
-    {
-      id: 167,
-      date: "September 09, 2026",
-      title: "Scoped ROA-007 to Binary Consent, Not Categorized",
-      body: "Initially proposed a categorized (Necessary/Analytics/Marketing) consent model with per-category toggles. Cross-checked against the actual kanban ticket spec and found ROA-007 is written as strictly binary (Accept/Decline only). Reversed course and built to the real written scope instead of the richer assumed version.",
-      tag: "decision"
-    },
-    // ROA-007
-
     /*{
       id: ,
       date: "Jl0y, 2026",
@@ -468,6 +430,160 @@ const DATA = {
       body: "",
       tag: ""
     },*/
+    {
+      id: 160,
+      date: "September 23, 2026",
+      title: "Defer `proxy.js` → Node Runtime Migration",
+      body: "Confirmed `Sentry.setUser()` doesn't reliably attach inside `proxy.js` due to Next.js middleware defaulting to Edge runtime. Decided not to force Node runtime for `proxy.js` right now. The real trade-off (slower cold starts, loss of Edge geographic distribution) wasn't worth it just to fix user-context tagging in one file, given `auth/signup` already proves the pattern works.",
+      tag: "decision"
+    },
+    {
+      id: 159,
+      date: "September 23, 2026",
+      title: "`signup_country` NULL Blocking Age-Gate",
+      body: "A real test signup showed `signup_country` as `NULL`, triggering a redirect loop to `/age-gate`. Root cause: Vercel's IP-geolocation headers only populate on Vercel's actual edge network, not on `localhost`. Manually patched the row via SQL to unblock local testing; confirmed as expected local-dev behavior, not a code defect.",
+      tag: "fixed"
+    },
+    {
+      id: 158,
+      date: "September 22, 2026",
+      title: "Skip Ad-Blocker Request Tunneling",
+      body: "Declined the Sentry wizard's option to route browser error reports through the Next.js server to bypass ad blockers. Reasoning: added server load/cost for a solo project isn't worth it just to catch the occasional ad-blocker-suppressed report.",
+      tag: "decision"
+    },
+    {
+      id: 157,
+      date: "September 23, 2026",
+      title: "Missing Source Maps on Preview Deploy",
+      body: "`SENTRY_AUTH_TOKEN` was scoped to Production only in Vercel, so the `feature/roa-017` Preview build had no access to it during `next build`, and no source maps were uploaded. Added Preview scope alongside Production, triggered a fresh deploy, confirmed a readable stack trace (`app/sentry-example-page/page.jsx:87:19`) instead of a minified chunk reference.",
+      tag: "fixed"
+    },
+    {
+      id: 156,
+      date: "September 22, 2026",
+      title: "`withLogging.js` Now Reports to Sentry",
+      body: "Added `Sentry.captureException(error)` inside the existing catch block of `lib/withLogging.js`. Previously, every error caught by this wrapper was logged only via the custom logger and silently never reached Sentry. This fix applies retroactively to all 8 routes wrapped by this higher-order function.",
+      tag: "refactor"
+    },
+    {
+      id: 155,
+      date: "September 22, 2026",
+      title: "User-Context Attachment Implemented",
+      body: "Added `Sentry.setUser({ id: ... })` to `proxy.js` and `app/api/auth/signup/route.js`. Confirmed working correctly only in the signup route (Node runtime), a real Supabase user UUID appeared correctly tagged on a captured error.",
+      tag: "feature"
+    },
+    {
+      id: 154,
+      date: "September 22, 2026",
+      title: "Production-Only Gate Added",
+      body: "Added `enabled: process.env.NODE_ENV === 'production'` to all three Sentry config files, preventing local dev noise from consuming the free-tier error quota.",
+      tag: "feature"
+    },
+    {
+      id: 153,
+      date: "September 22, 2026",
+      title: "Sentry SDK Installed via Wizard",
+      body: "Ran `npx @sentry/wizard@latest -i nextjs`. Selected SaaS, existing account, declined ad-blocker request tunneling, declined Tracing, declined Session Replay, accepted the example test page, declined the Sentry MCP server. Wizard installed `@sentry/nextjs`, created `instrumentation.js`, `instrumentation-client.js`, `sentry.server.config.js`, `sentry.edge.config.js`, patched `next.config.mjs`, and scaffolded the example test files.",
+      tag: "feature"
+    },
+    {
+      id: 152,
+      date: "September 22, 2026",
+      title: "Sentry Project Created",
+      body: "Created a new Sentry project (`roam`, org `nomadcode33`) via the Create Project flow, platform set to Next.js, alert frequency left on default 'High priority issues,' repository linking skipped.",
+      tag: "deployment"
+    },
+    {
+      id: 151,
+      date: "September 14, 2026",
+      title: "Corrected a stale project-memory record for ROA-003",
+      body: "Project memory incorrectly stated ROA-003 (rate limiting) was 'blocked, not complete.' A prior session's handoff document was provided proving it was fully closed. All 5 limiters verified, a real `pickLimiter` regression fixed, and the `middleware.js` → `proxy.js` migration completed. Memory corrected to match reality.",
+      tag: "fixed"
+    },
+    {
+      id: 150,
+      date: "September 14, 2026",
+      title: "`@/lib/...` alias adopted as the standing import convention",
+      body: "An earlier attempt at the `@/` alias reportedly failed, so relative paths (`../../../lib/...`) were used across all 8 wrapped files initially. Mid-session, `@/lib/withLogging` was retested and confirmed working and is adopted going forward. Several files still use the relative-path form; flagged as cleanup, not urgent.",
+      tag: "decision"
+    },
+    {
+      id: 149,
+      date: "September 14, 2026",
+      title: "Logging verified live on Vercel preview (`feature/roa-015`)",
+      body: "Pushed the branch, hit `/api/health` on the live preview URL, and confirmed the identical structured JSON log line appeared in Vercel's Runtime Logs panel. It proves that the logger works in the real serverless environment, not just `next dev`.",
+      tag: "deployment"
+    },
+    {
+      id: 148,
+      date: "September 14, 2026",
+      title: "All 8 live API routes wrapped in `withLogging`",
+      body: "`health`, `posts`, `posts/[id]`, `comments`, `translate`, `auth/login`, `auth/signup`, `auth/age-gate` all now export their real HTTP verb wrapped in `withLogging(handler)`. Real business logic in `auth/signup` and `auth/age-gate` (geo lookup, age check, Supabase writes) preserved exactly, only the export line changed.",
+      tag: "refactor"
+    },
+    {
+      id: 147,
+      date: "September 14, 2026",
+      title: "429 rate-limit rejections were invisible to logging",
+      body: "`proxy.js` returns its own response directly when a rate limiter rejects a request. That response never passes through a route handler, so `withLogging` alone couldn't see it. Fixed by calling `logRequest`/`createRequestId` directly inside the existing `if (!success)` branch in `proxy.js`, closing the visibility gap for the busiest failure mode under load.",
+      tag: "fixed"
+    },
+    {
+      id: 146,
+      date: "September 10, 2026",
+      title: "Route-wrapping middleware (`lib/withLogging.js`)",
+      body: "Higher-order function that wraps any route handler with automatic request-ID generation, execution timing, and try/catch error handling. Successful calls log method/path/status/duration and stamp an `x-request-id` response header; thrown errors log the real stack trace server-side while the client only ever sees a generic 500 + request ID.",
+      tag: "feature"
+    },
+    {
+      id: 145,
+      date: "September 10, 2026",
+      title: "Structured request logger (`lib/logger.js`)",
+      body: "Built a shared JSON logging utility exporting `createRequestId()` and `logRequest()`. Every log line carries `level`, `requestId`, `method`, `path`, `status`, `durationMs`, and `timestamp`, with a denylist-based `redact()` function scrubbing any key containing `password`, `token`, `authorization`, `cookie`, `jwt`, or `secret` before it reaches stdout.",
+      tag: "feature"
+    },
+    {
+      id: 144,
+      date: "September 09, 2026",
+      title: "Clarified Redis Fix 'Applied' vs. 'Verified' Status",
+      body: "User corrected an assumption that the Upstash Redis production fix being *applied* to `main` meant `/api/health` was confirmed working. These are being tracked as two separate claims going forward. The fix is applied, but the endpoint's live response has not been checked this session.",
+      tag: "fixed"
+    },
+    {
+      id: 143,
+      date: "September 09, 2026",
+      title: "Internal Privacy Link Changed to Same-Tab",
+      body: "Changed the banner's Privacy Policy link from `target='_blank'` to same-tab navigation. `target='_blank'` exists to protect a user's place in the app when linking *away* for an internal link there's no 'elsewhere' to protect against, so it was only adding friction (two open tabs, one unresolved banner).",
+      tag: "refactor"
+    },
+    {
+      id: 142,
+      date: "September 09, 2026",
+      title: "Scoped CSS for Banner (`css/CookieBanner.css`)",
+      body: "Added component-scoped stylesheet, every rule nested under a single `.roam-cookie-banner` wrapper class. A direct, deliberate application of the CSS-bleed lesson from ROA-005 (unscoped bare-tag selectors leak across client-side route transitions in the App Router).",
+      tag: "feature"
+    },
+    {
+      id: 141,
+      date: "September 09, 2026",
+      title: "Cookie Consent Banner Component (`CookieBanner.jsx`)",
+      body: "Built the client-side banner component. Reads `document.cookie` on mount, renders nothing if a decision already exists, and writes a 1-year `SameSite=Lax` cookie on Accept or Decline. The PostHog init call inside `handleAccept` was left as an explicit comment/marker rather than a stub call, since the package isn't installed yet.",
+      tag: "feature"
+    },
+    {
+      id: 140,
+      date: "September 09, 2026",
+      title: "Cookie Consent Utility (`lib/consent.js`)",
+      body: "Built the consent-state utility: `parseConsent`, `hasConsentDecision`, and the `CONSENT_COOKIE` export. Returns exactly one of `'accepted'`, `'declined'`, or `null`. Never guesses a default state from a missing or malformed cookie.",
+      tag: "feature"
+    },
+    {
+      id: 139,
+      date: "September 09, 2026",
+      title: "Scoped ROA-007 to Binary Consent, Not Categorized",
+      body: "Initially proposed a categorized (Necessary/Analytics/Marketing) consent model with per-category toggles. Cross-checked against the actual kanban ticket spec and found ROA-007 is written as strictly binary (Accept/Decline only). Reversed course and built to the real written scope instead of the richer assumed version.",
+      tag: "decision"
+    },
     {
       id: 138,
       date: "September 08, 2026",
@@ -1658,6 +1774,58 @@ const DATA = {
     */
 optimize: [
     {
+      id: 31,
+      month: "September 2026",
+      date: "September 22, 2026",
+      title: "`proxy.js` / `auth/signup`: User-Context Placement",
+      body: " I initially assumed `Sentry.setUser()` just needed to be called *somewhere* before an error happened, without realizing Sentry's scope is tied to the specific request it's running in, not a shared session-wide state.",
+      bullets: [
+        "Moved the *tested* implementation from `proxy.js` (Edge runtime, unreliable for this SDK behavior) to `app/api/auth/signup/route.js` (Node runtime, verified working)",
+        "Kept the `proxy.js` call in place as real code, but documented that it's currently a no-op there due to the runtime limitation",
+        "Established the standing pattern: call `Sentry.setUser()` fresh at the top of every authenticated request that could throw, not once per session"
+      ],
+      tags: "refactor"
+    },   
+    {
+      id: 30,
+      month: "September 2026",
+      date: "September 22, 2026",
+      title: "`lib/withLogging.js`: Error Visibility",
+      body: "I realized that a caught exception silently swallowed by a custom error handler doesn't mean the monitoring tool watching for errors ever sees it. Sentry's automatic instrumentation only fires on *uncaught* exceptions, so a well-behaved try/catch can accidentally hide every single error from Sentry.",
+      bullets: [
+        "Added one explicit `Sentry.captureException(error)` call inside the existing catch block",
+        "No change to the response shape or status code returned to the client",
+        "Fix applies uniformly across all 8 routes wrapped by `withLogging`, since they all share this one function"
+      ],
+      tags: "refactor"
+    },   
+    {
+      id: 29,
+      month: "September 2026",
+      date: "September 10, 2026",
+      title: "API routes: bare handlers → observable handlers",
+      body: "I realized that shipping eight working routes wasn't the same as shipping eight *debuggable* routes. Without a shared wrapper, any future production failure would be invisible unless I happened to be watching the terminal at the exact moment it happened.",
+      bullets: [
+        "Converted every route's direct verb export (`export async function POST()`) into a renamed internal `handler` wrapped by `withLogging(handler)`, so the public export signature stays identical to Next.js while gaining full observability underneath.",
+        "Centralized timing (`Date.now()` diff) and request-ID generation into one function instead of duplicating that logic across 8 files, a future 9th route inherits full logging just by using the same one-line wrap.",
+        "Verified the wrapper doesn't care whether the underlying handler takes a `req` parameter or not (JS allows unused declared parameters), so one wrapper correctly serves both 2-line stub routes and 40-line real routes without any per-route special-casing."
+      ],
+      tags: "refactor"
+    },  
+    {
+      id: 28,
+      month: "September 2026",
+      date: "September 09, 2026",
+      title: "CookieBanner.jsx: Link Target Behavior",
+      body: "Mindset shift mid-build: initially wrote the Privacy Policy link with `target='_blank'` reflexively, treating it like any outbound link. Realized that logic only holds for *external* destinations, not same-site navigation.",
+      bullets: [
+        "Removed `target='_blank'` and `rel='noopener noreferrer'` from the internal `/privacy` anchor",
+        "Kept the link's existing `className` and position inside the banner unchanged",
+        "No change needed to `CookieBanner.css`, the fix was JSX-attribute-only"
+      ],
+      tags: "refactor"
+    },   
+    {
       id: 27,
       month: "September 2026",
       date: "September 08, 2026",
@@ -2109,6 +2277,21 @@ optimize: [
     { id: 93, topic: "Geo-IP lookups can't resolve against localhost", body: "Testing IP-based geolocation from a local dev server will always fail or return null, because ip-api.com (and similar services) can't meaningfully geolocate 127.0.0.1/loopback traffic. This is expected behavior and not a bug because real verification requires a deployed preview." },
     { id: 94, topic: "Vercel preview URLs are per-branch, not global", body: "Each feature branch gets its own distinct preview URL/alias. An OAuth redirect allowlist entry added for one branch's preview (e.g. feature/roa-008) does not cover a different branch's preview (e.g. feature/roa-004), each has to be added separately." },
     { id: 95, topic: "Client-side checks are UX, not security", body: "A DOB/age check run in the browser before calling an API is trivially bypassable via devtools. It's useful for instant feedback, but the actual enforcement has to happen server-side, where the request can't be tampered with and the real client IP is available for geo-lookups." },
+    { id: 96, topic: "Ticket Scope Should Override Assumed 'Better' Design", body: "A categorized consent model is arguably more compliant for EU traffic than binary Accept/Decline, but the actual ticket spec called for binary only. Building the 'better' version the spec didn't ask for is scope creep, not improvement, even when the alternative has real merit." },
+    { id: 97, topic: "Dependency Direction Isn't Always Intuitive", body: "Assumed installing PostHog *inside* ROA-007 might be reasonable since the banner was already built. The kanban's actual `deps` field showed ROA-018 depends on ROA-007, not the reverse, meaning the consent gate is deliberately meant to exist *before* the analytics tool it's gating as its own separate, larger-scoped ticket." },
+    { id: 98, topic: "Never Fake a Call to Code That Doesn't Exist Yet", body: "Rather than stub a `posthog.init()` call against an uninstalled package (which would either throw or silently no-op), the gate point was left as a real comment. A fake success is worse than an honest gap, it hides exactly the kind of 'clean run isn't verification' trap this project explicitly guards against." },
+    { id: 99, topic: "'Applied' and 'Verified' Are Two Different Claims", body: "A fix being pushed to `main` doesn't mean its effect has been confirmed. This distinction came up directly this session (Redis fix vs. `/api/health` response) and is now a standing verification habit going forward, not a one-off correction." },
+    { id: 100, topic: "Middleware operates in a different lifecycle stage than route handlers", body: "`proxy.js` runs *before* a request reaches `app/api/*/route.js` and never sees what that handler returns. Anything middleware short-circuits (like a rejected rate-limit request) has to be logged inside middleware itself, a route-level wrapper can't retroactively catch what it never received." },
+    { id: 101, topic: "A near-zero timing result proves nothing on its own", body: "A fast operation (like a health check) can legitimately complete in under 1ms, so a logger reporting `durationMs: 0` is equally consistent with 'the timer works and this was just fast' and 'the timer is broken and always returns zero.' The only way to actually confirm a timer works is to run it against an operation slow enough to produce a real, non-trivial duration and compare it against an independent measurement." },
+    { id: 102, topic: "Two independent timing sources agreeing is strong evidence, not coincidence", body: "When a custom `Date.now()`-based timer and Next.js's own internal instrumentation landed within 11ms of each other on the same real request, that agreement — from two completely separate measurement systems — is meaningfully strong proof the custom timer is measuring real elapsed time correctly." },
+    { id: 103, topic: "OAuth callback URLs serve two distinct handoff stages, not one shared list", body: "Google Cloud Console only ever needs to know about Supabase's own fixed callback endpoint, Google never talks to the app directly. Supabase's Redirect URLs allowlist is the one that needs to track every actual app environment (localhost, each Vercel branch, production). Treating these as 'the same list, kept in sync' is a category error, not just an oversight." },
+    { id: 104, topic: "'Applied' and 'verified' are two different claims about the same fix", body: "A fix being written and deployed to a branch doesn't mean its actual effect has been observed. Several items this session (the Redis fix, the ROA-015 logger itself) required a real, separate verification step — hitting the endpoint, reading the actual log line — rather than trusting that a clean deploy implies correct behavior." },
+    { id: 105, topic: "Sentry's Scope Is Request-Scoped, Not Session-Scoped", body: "Calling `Sentry.setUser()` during one HTTP request does not carry that tag forward into a user's next, separate request. It has to be called fresh, every time, inside whichever request might actually throw the error you want tagged." },
+    { id: 106, topic: "Next.js Middleware Defaults to the Edge Runtime", body: "`proxy.js` (Next.js middleware) runs on Edge by default unless an explicit `runtime` export says otherwise. This matters because some SDKs, Sentry included, behave differently in Edge versus Node, particularly around scope propagation for things like `setUser()`." },
+    { id: 107, topic: "A Caught Error Is Invisible to Sentry Unless You Tell It", body: "Sentry's automatic instrumentation only captures *uncaught* exceptions. Any custom try/catch wrapper that handles an error gracefully has to explicitly call `Sentry.captureException(error)`, or that error simply never reaches Sentry." },
+    { id: 108, topic: "Vercel Environment Variables Are Scoped Per Environment, Independently", body: "A variable saved only under 'Production' in Vercel will not exist during a Preview build, even though the same underlying secret would work identically in both." },
+    { id: 109, topic: "Vercel's 'Development' Env Scope Is a Red Herring for Local Dev", body: "That environment checkbox only matters if you're running the `vercel dev` CLI tool. Plain `next dev` never touches it, it reads exclusively from `.env.local`." },
+    { id: 110, topic: "Two Independent Timing/Evidence Sources Agreeing Is Real Proof", body: "When two separately-generated measurements or confirmations point the same direction, that's meaningful evidence. When they *disagree*, like a green 'Error sent to Sentry' button next to an unchanged Issues list, that mismatch is the signal something's actually wrong and not something to explain away." },
     //{ id: 10, topic: "", body: "" },
     //{ id: 10, topic: "", body: "" },
     //{ id: 10, topic: "", body: "" },
@@ -2135,6 +2318,50 @@ optimize: [
     },
   */
   bugs: [
+    { 
+      id: 56, 
+      title: "Age-Gate Redirect Loop on Real Signup", 
+      status: "fixed", 
+      date: "September 23, 2026", 
+      body: [
+        "**Symptom:** a freshly signed-up user with a completed date-of-birth and accepted ToS was still redirected to `/age-gate` instead of `/dashboard`.",
+        "**Root cause:** `signup_country` was `NULL`. Vercel's IP-geolocation header used to populate it only works on Vercel's actual edge network, not on `localhost`.",
+        "**Fix:** manually patched the row via SQL for testing purposes; confirmed this is expected local-dev behavior, not a code defect."
+      ] 
+    },
+    { 
+      id: 55, 
+      title: "Stack Traces Showing Minified Code Instead of Source", 
+      status: "fixed", 
+      date: "September 23, 2026", 
+      body: [
+        "**Symptom:** Sentry's Stack Trace tab showed a minified chunk reference instead of readable file/line info, with an 'Unminify Code' prompt.",
+        "**Root cause:** `SENTRY_AUTH_TOKEN` was scoped to Production only in Vercel, so the Preview deployment's build process had no token available to authenticate the source map upload.",
+        "**Fix:** added Preview scope to the env var, triggered a new deployment, confirmed a real, readable stack trace on the next test."
+      ] 
+    },
+    { 
+      id: 54, 
+      title: "Errors Never Reaching Sentry Despite Correct Throws", 
+      status: "fixed", 
+      date: "September 22, 2026", 
+      body: [
+        "**Symptom:** terminal logs clearly showed errors being thrown and caught, but Sentry's Issues dashboard never updated to reflect them.",
+        "**Root cause:** `lib/withLogging.js`'s catch block logged errors via the custom logger and returned a 500, but never called `Sentry.captureException()`.",
+        "**Fix:** added `Sentry.captureException(error)` inside the catch block."
+      ] 
+    },
+    { 
+      id: 53, 
+      title: "Rate-limit rejections (429s) were completely invisible to the logging system", 
+      status: "fixed", 
+      date: "September 10, 2026", 
+      body: [
+        "**Symptom:** `proxy.js`'s rate limiter correctly returned 429 responses with rate-limit headers, but none of those rejections ever produced a log line or an `x-request-id`, since they never reached a route handler wrapped by `withLogging`.",
+        "**Root cause:** middleware short-circuits the request before it reaches any `app/api/*/route.js` file, `withLogging` literally never runs for a rejected request.",
+        "**Fix:** imported `createRequestId`/`logRequest` directly into `proxy.js` and called them inline inside the existing `if (!success)` block, then added `x-request-id` to that response's headers alongside the existing rate-limit headers. Verified via a real 7-request burst against `authLimiter` (capped at 5/60s), the 6th and 7th requests both produced real matching 429 log lines."
+      ] 
+    },
     { 
       id: 52, 
       title: "Valid sessions treated as logged out by middleware", 
@@ -2682,29 +2909,30 @@ optimize: [
   // ── stack: tile grid in StackPane, not card-based (no body/bullets/media) ─
   // Fields per entry: id, name, icon, version (optional), role (optional)
   stack: [
-    { id: 1, name: "React 19",          icon: "⚛️", version: "^19.2.4",           role: "Frontend UI library" },
-    { id: 2, name: "Next.js",           icon: "🔼", version: "^16.2.12",          role: "Full-stack React framework" },
-    { id: 3, name: "Tailwind v4",       icon: "🎨", version: "^4.2.4",            role: "Utility-first styling" },
-    { id: 4, name: "Mapbox GL JS",      icon: "📍", version: "^3.28.1",           role: "Interactive client-side maps" },
-    { id: 5, name: "react-map-gl",      icon: "🗺️", version: "^8.1.1",            role: "React wrapper for Mapbox GL" },
-    { id: 6, name: "Turf.js",           icon: "📐", version: "^7.3.5",            role: "Client-side geospatial analysis" },
-    { id: 7, name: "shadcn/ui",         icon: "🧩", version: "4.16.x",            role: "Accessible unstyled components" },
-    { id: 8, name: "TanStack Query",    icon: "🔄", version: "^5.100.6",          role: "Client-side state & caching" },
-    { id: 9, name: "@upstash/ratelimit", icon: "🛑", version: "^2.0.x",           role: "Sliding-window rate limiting framework" },
-    { id: 10, name: "@upstash/redis",    icon: "🔴", version: "^1.34.x",          role: "HTTP-based serverless state & session storage" },
-    { id: 11, name: "Supabase",          icon: "⚡", version: "^2.112.2",           role: "Backend-as-a-Service (BaaS)" },
-    { id: 12, name: "PostgreSQL",       icon: "🐘", version: "^18.4.0",           role: "Relational database engine" },
-    { id: 13, name: "PostGIS",          icon: "🗺️", version: "^3.3.7",            role: "Spatial database extension" },
-    { id: 14, name: "Cloudflare R2",    icon: "📦", version: "S3 API Compatible", role: "S3-compatible object storage for database backups" },
-    { id: 15, name: "AWS CLI",          icon: "💻", version: "^2 (Pre-installed)", role: "S3 client used for backup orchestration" },
-    { id: 16, name: "Vercel",           icon: "☁️", version: "Hosting",           role: "Deployment platform" },
-    { id: 17, name: "Uptime Robot",     icon: "🤖", version: "v3 API",             role: "External synthetics & monitoring" },
-    { id: 18, name: "Google Cloud Console / Google Auth Platform",      icon: "☁️🛡️", version: "Google OAuth 2.0 API",    role: "External / OAuth provider" },
-    // { id: 6, name: "MongoDB",      icon: "🍃", version: "Atlas",    role: "NoSQL database" },
-    // { id: 6, name: "MongoDB",      icon: "🍃", version: "Atlas",    role: "NoSQL database" },
-    // { id: 6, name: "MongoDB",      icon: "🍃", version: "Atlas",    role: "NoSQL database" },
+    { id: 1, name: "React 19", icon: "⚛️", version: "^19.2.4", role: "Frontend UI library" },
+    { id: 2, name: "Next.js", icon: "🔼", version: "^16.2.12", role: "Full-stack React framework" },
+    { id: 3, name: "Tailwind v4", icon: "🎨", version: "^4.2.4", role: "Utility-first styling" },
+    { id: 4, name: "Mapbox GL JS", icon: "📍", version: "^3.28.1", role: "Interactive client-side maps" },
+    { id: 5, name: "react-map-gl", icon: "🗺️", version: "^8.1.1", role: "React wrapper for Mapbox GL" },
+    { id: 6, name: "Turf.js", icon: "📐", version: "^7.3.5", role: "Client-side geospatial analysis" },
+    { id: 7, name: "shadcn/ui", icon: "🧩", version: "4.16.x", role: "Accessible unstyled components" },
+    { id: 8, name: "TanStack Query", icon: "🔄", version: "^5.100.6", role: "Client-side state & caching" },
+    { id: 9, name: "@upstash/ratelimit", icon: "🛑", version: "^2.0.x", role: "Sliding-window rate limiting framework" },
+    { id: 10, name: "@upstash/redis", icon: "🔴", version: "^1.34.x", role: "HTTP-based serverless state & session storage" },
+    { id: 11, name: "Supabase", icon: "⚡", version: "^2.112.2", role: "Backend-as-a-Service (BaaS)" },
+    { id: 12, name: "PostgreSQL", icon: "🐘", version: "^18.4.0", role: "Relational database engine" },
+    { id: 13, name: "PostGIS", icon: "🗺️", version: "^3.3.7", role: "Spatial database extension" },
+    { id: 14, name: "Cloudflare R2", icon: "📦", version: "S3 API Compatible", role: "S3-compatible object storage for database backups" },
+    { id: 15, name: "AWS CLI", icon: "💻", version: "^2 (Pre-installed)", role: "S3 client used for backup orchestration" },
+    { id: 16, name: "Vercel", icon: "☁️", version: "Hosting", role: "Deployment platform" },
+    { id: 17, name: "Uptime Robot", icon: "🤖", version: "v3 API", role: "External synthetics & monitoring" },
+    { id: 18, name: "Google Cloud Console / Google Auth Platform", icon: "☁️🛡️", version: "Google OAuth 2.0 API", role: "External / OAuth provider" },
+    { id: 19, name: "@sentry/nextjs", icon: "🚨🔍", version: "^11.10.0", role: "Error monitoring & performance tracking" },
+    //{ id: 6, name: "MongoDB", icon: "🍃", version: "Atlas", role: "NoSQL database" },
+    //{ id: 6, name: "MongoDB", icon: "🍃", version: "Atlas", role: "NoSQL database" },
+    //{ id: 6, name: "MongoDB", icon: "🍃", version: "Atlas", role: "NoSQL database" },
 
-    // { id: 6, name: "MongoDB",      icon: "🍃", version: "Atlas",    role: "NoSQL database" },
+    //{ id: 6, name: "MongoDB", icon: "🍃", version: "Atlas", role: "NoSQL database" },
   ],
 
   // ── snippets: flat list, lang shown once as a meta badge (see SnippetsPane) ─
