@@ -469,6 +469,146 @@ const DATA = {
       tag: ""
     },*/
     {
+      id: 138,
+      date: "September 08, 2026",
+      title: "Age-gate redirect-guard middleware + no-session guard",
+      body: "Extended app/proxy.js so missing DOB/country/ToS fields are re-checked on every /dashboard request (not just once at OAuth callback), redirecting to /age-gate. Added a second guard so /age-gate itself redirects unauthenticated visitors to /login instead of rendering a form that could never submit successfully.",
+      tag: "feature"
+    },
+    {
+      id: 137,
+      date: "September 08, 2026",
+      title: "Middleware session-cookie matching bug",
+      body: " app/proxy.js's dashboard presence-check used `.endsWith('-auth-token')`, but real Supabase session cookies are split across sb-<ref>-auth-token.0 and .1. The exact-suffix match never matched, so valid sessions were misread as logged out. Fixed to `.includes('-auth-token')`; confirmed via a live session correctly reaching the age-gate check instead of being bounced to /login.",
+      tag: "fixed"
+    },
+    {
+      id: 136,
+      date: "September 08, 2026",
+      title: "Missing preview-deployment redirect URI in Supabase",
+      body: "OAuth silently fell back to the Site URL (localhost:3000) on the ROA-004 preview because only ROA-008's preview URL was allow-listed in Supabase's Redirect URLs. Added ROA-004's actual preview URL; confirmed via a real OAuth round-trip landing on /age-gate instead of the public homepage.",
+      tag: "fixed"
+    },
+    {
+      id: 135,
+      date: "September 08, 2026",
+      title: "Wrong redirect path in OAuth callback",
+      body: "callback/route.js redirected to /auth/age-gate, which doesn't exist. (auth) is a route group and contributes nothing to the URL, so the real path is /age-gate. One-line fix, confirmed by successfully landing on the real interstitial post-OAuth.",
+      tag: "fixed"
+    },
+    {
+      id: 134,
+      date: "September 08, 2026",
+      title: "Google OAuth age-gate interstitial",
+      body: "Built app/(auth)/age-gate/page.js and app/api/auth/age-gate/route.js so OAuth signups (which bypass the signup form) are still required to submit DOB/ToS before continuing. Updated app/auth/callback/route.js to redirect there when any of the three fields are missing after OAuth completes.",
+      tag: "feature"
+    },
+    {
+      id: 133,
+      date: "September 03, 2026",
+      title: "Email/password signup enforcement",
+      body: "Rebuilt app/(auth)/signup/page.js with DOB dropdowns and a ToS checkbox; added app/api/auth/signup/route.js as a new server-side route that runs the real geo-lookup and age check before creating the user via the Supabase admin client, client-side signup calls were removed entirely.",
+      tag: "feature"
+    },
+    {
+      id: 132,
+      date: "September 03, 2026",
+      title: "Server-side geo-IP + age threshold logic",
+      body: "Built lib/geo.js (EU/non-EU lookup via ip-api.com, fails safe to isEU: true on any error or ambiguous response) and lib/age.js (calculateAge, meetsMinimumAge — 13 baseline, 16 for EU-identified signups).",
+      tag: "feature"
+    },
+    {
+      id: 131,
+      date: "September 03, 2026",
+      title: "ROA-004 age-gate database schema",
+      body: "Added `date_of_birth` (date), `signup_country` (text), and `tos_accepted_at` (timestamptz) to public.users. tos_accepted_at is a timestamp rather than a boolean so it doubles as a consent audit trail.",
+      tag: "feature"
+    },
+    {
+      id: 130,
+      date: "September 03, 2026",
+      title: "Missing GRANT on service_role for public.users",
+      body: "Signup route threw 'permission denied for table users' on every account creation attempt. Root cause was a missing table-level GRANT. RLS policies were correct, but Postgres checks GRANT before RLS ever runs, and service_role had never been explicitly given SELECT/INSERT/UPDATE on public.users. Fixed via `GRANT SELECT, INSERT, UPDATE ON public.users TO service_role;`, confirmed with a direct curl request returning real row data instead of the permission error.",
+      tag: "fixed"
+    },
+    {
+      id: 129,
+      date: "September 01, 2026",
+      title: "ROA-008C ticket authored",
+      body: "New ticket scoping auth-flow UX gaps: illegible error/validation styling on login/signup (confirmed via screenshot), missing check-your-email interstitial, missing forgot-password flow, missing cross-method sign-in/account linking, and the still-open OAuth signup Terms/Privacy disclosure gap. Rebuilt once mid-session to match the real kanban structure (header/User Story/Description/Done When) rather than an initial flat-format draft.",
+      tag: "documentation"
+    },
+    {
+      id: 128,
+      date: "September 01, 2026",
+      title: "`backup-main` branch created",
+      body: "A snapshot branch pointing at `main`'s current commit, created and pushed to origin as a safety net. It's not a live mirror, but rather a point-in-time backup.",
+      tag: "deployment"
+    },
+    {
+      id: 127,
+      date: "September 01, 2026",
+      title: "`feature/roa-008` merged into `staging`",
+      body: "Fast-forward merge (no diverging commits on `staging`, so no merge commit was created). Verified via `git log --oneline` showing all expected commits present, and a post-merge `/api/health` check on `staging` confirming `{'status':'ok'}`.",
+      tag: "deployment"
+    },
+    {
+      id: 126,
+      date: "September 01, 2026",
+      title: "Dashboard route protection re-verified post-migration",
+      body: "Confirmed via browser test that an unauthenticated request to `/dashboard` still redirects correctly to `/login` after the `proxy.js` migration. A stale, already-authenticated session initially produced a `404` instead (expected `dashboard/page.js` is still an empty folder); clearing the session cookie and repeating the test produced the correct `/login` redirect.",
+      tag: "fixed"
+    },
+    {
+      id: 125,
+      date: "September 01, 2026",
+      title: "`middleware.js` migrated to `proxy.js`",
+      body: "Renamed via `git mv` to preserve file history as a move rather than a delete+create (confirmed via `git diff --stat` showing 0 insertions/deletions on the rename itself). A second, unplanned fix was required: Next.js 16's `proxy.js` convention requires the exported function itself to be named `proxy`, not just the filename. The original `export async function middleware(req)` still referenced the old name and threw a build error until corrected.",
+      tag: "refactor"
+    },
+    {
+      id: 124,
+      date: "September 01, 2026",
+      title: "Window-reset behavior deliberately verified",
+      body: "After tripping `translateLimiter`'s block, waited the full 60-second window and confirmed a fresh request returns `200` again, proving the sliding window resets and normal usage isn't permanently penalized. Done as a deliberate test, not left as an earlier accidental observation.",
+      tag: "feature"
+    },
+    {
+      id: 123,
+      date: "September 01, 2026",
+      title: "`authLimiter`, `commentLimiter`, `translateLimiter` verified working",
+      body: "Same curl-loop pattern applied to all three remaining tiers — 5/60s, 20/60s, and 30/60s respectively — each confirmed blocking on the correct request count with a readable error body.",
+      tag: "fixed"
+    },
+    {
+      id: 122,
+      date: "September 01, 2026",
+      title: "`/api/posts/[id]` fallthrough regression closed",
+      body: "The fallthrough fix from 08/29 was formally regression-tested: 100 requests to `/api/posts/123` followed by a 101st, expecting a block. First attempt incorrectly returned `200` on request 101, it was traced to a stale dev server that hadn't picked up the middleware edit (Next.js middleware doesn't reliably hot-reload). After a full server restart, the same test correctly returned `429` on request 101.",
+      tag: "fixed"
+    },
+    {
+      id: 121,
+      date: "September 01, 2026",
+      title: "`postLimiter` verified working end-to-end",
+      body: "10 requests to `/api/posts` succeed, the 11th returns `429` with a readable error body (`'Too many requests. Please slow down and try again shortly.'`), confirmed via direct curl output, not just a status code check.",
+      tag: "fixed"
+    },
+    {
+      id: 120,
+      date: "September 01, 2026",
+      title: "Five stub API routes built for rate-limit testing",
+      body: "`app/api/posts/route.js`, `app/api/posts/[id]/route.js`, `app/api/auth/login/route.js`, `app/api/comments/route.js`, `app/api/translate/route.js` are each a minimal handler returning a stub JSON response, existing only to give Phase D's rate-limit tests something real to hit. Each file carries a comment flagging it as temporary, not production logic.",
+      tag: "feature"
+    },
+    {
+      id: 119,
+      date: "August 29, 2026",
+      title: "Rate limiter fallthrough gap in `pickLimiter`",
+      body: "Found during code review, not from a bug report: any path under `/api/posts/*` other than the exact `/api/posts` route hit a `return null` branch in `middleware.js`, silently skipping rate limiting entirely, unlimited requests possible against something like `/api/posts/123`. Fixed by removing the special-case block so those paths correctly fall through to `generalLimiter` (100 req/60s) like every other unspecified `/api/*` route.",
+      tag: "fixed"
+    },
+    {
       id: 118,
       date: "August 28, 2026",
       title: "Silent Login Success With No User Feedback",
@@ -1351,17 +1491,17 @@ const DATA = {
     { id: 2, 
       title: "ROA-044: Protect the users Table and Age Gate",
       priority: "high",  
-      body: "Other signed-in users can probably read date_of_birth, signup_country, tos_accepted_at, and email, and any user can write them directly. Needs column-level REVOKEs, a write-once age-gate route, and cleanup of test users. Required before signups reopen."
+      body: "Other signed-in users can probably read date_of_birth, signup_country, tos_accepted_at, and email, and any user can write them directly. Needs column-level REVOKEs, a service-role or SECURITY DEFINER write path for /api/auth/age-gate, a write-once age-gate route, a tighter proxy.js cookie check, the item 10 navigation warning, test-user cleanup, and decisions on getSession() vs getUser() and confirmed_age. Required before signups reopen."
     },
     { id: 3, 
       title: "ROA-045: Resend as Supabase SMTP Provider",
       priority: "high",  
-      body: "The built-in Supabase email sender is rate limited across the whole project. Set up a verified sending domain, custom SMTP, rate limits, and branded templates. Required before signups reopen."
+      body: "The built-in Supabase email sender is rate limited across the whole project. Needs a verified sending domain, custom SMTP, rate limits, and branded templates. Required before signups reopen."
     },
     { id: 4, 
       title: "ROA-008C: Auth UX Gaps and Redirect Configuration",
       priority: "high",  
-      body: "Toast notifications, a check-your-email page, forgot password, show-password checkboxes, a hash and query error reader, and the Supabase Site URL and Redirect URL fixes. Also carries the VoiceOver and missing-h1 findings."
+      body: "Toast feedback for errors, a check-your-email page, forgot password, show password, a hash-and-query error reader, and OAuth disclosure research. It also owns the Redirect URL cleanup and setting Site URL to the production domain. Required before signups reopen."
     },
     { id: 5, 
       title: "Verify `redact()` against a real sensitive payload",
@@ -1383,41 +1523,51 @@ const DATA = {
     { id: 8, 
       title: "ROA-041: Fix setState Inside Effects",
       priority: "medium",  
-      body: "Two react-hooks/set-state-in-effect errors, in TabNav.jsx (line 193) and CookieBanner.jsx (line 20, pre-existing). The ticket text still names old lines. Keep the cookie banner focus handlers working."
+      body: "Locations are TabNav.jsx line 193 and CookieBanner.jsx line 20, plus a third effect that calls setAnnounced(message ?? '') whose file wasn't shown (probably the LiveRegion component, unverified). Derive values during render where possible and keep the cookie banner focus handlers working."
     },
     { id: 9, 
       title: "ROA-040: Escape Unescaped JSX Entities",
       priority: "medium",  
-      body: "Recount before starting: they are errors, not warnings, and the old ~95 count is stale."
+      body: "The old ~95 count is stale. The 10/31 baseline is 104 problems (102 errors, 2 warnings) in total, which includes the ROA-041 errors, so recount by rule before editing."
+    },
+    { id: 10, 
+      title: "ROA-049: Clear the Remaining Non-Breaking Audit Findings",
+      priority: "medium",  
+      body: "Run `npm audit fix --dry-run` first, apply the six non-breaking fixes in their own commit, repeat the Sentry test error if @sentry/nextjs, the bundler plugin, or next changes, and decide on shadcn, zod, and moving shadcn to devDependencies. Keeps the audit clean enough that a new critical or high finding stands out. Any time after ROA-044."
+    },
+    { id: 11, 
+      title: "Sentry Coverage: global-error.jsx and Sentry.setUser()",
+      priority: "medium",  
+      body: "ROA-017's cleanup removed app/global-error.jsx, the file Sentry generates to report root-level React render errors (inference). Decide whether to add it back, and extend Sentry.setUser() beyond auth/signup/route.js."
     },
 
     /* low */
-    { id: 10, 
-      title: "ROA-042: Logo Home Link and Scroll to Top",
-      priority: "low",  
-      body: "Make the logo a real Link that resets scroll even on the same route."
-    },
-    { id: 11, 
-      title: "ROA-046: Reset Dev-Log Scroll on Tab Switch",
-      priority: "low",  
-      body: "Tabs share one scroll container, so scroll position carries over. Three decisions are open: dock save scope, back and forward behavior, and direct ?tab= loads."
-    },
     { id: 12, 
+      title: "ROA-042: Logo Navigation and Scroll Reset",
+      priority: "low",  
+      body: "The Roam logo doesn't navigate home when already on `/`, and page navigation doesn't reliably scroll to top. Wrap the logo in a real <Link href="/"> with forced scroll reset."
+    },
+    { id: 13, 
+      title: "ROA-046: Dev-Log Tabs Keep the Previous Scroll Position",
+      priority: "low",  
+      body: "Three decisions are open: dock save and restore behavior, back and forward behavior, and direct ?tab= loads."
+    },
+    { id: 14, 
       title: "ROA-047: Build the About Page",
       priority: "low",  
       body: "The footer About link points to # on every page. Needs owner copy before build, one h1, and the shared page shell."
     },
-    { id: 13, 
+    { id: 15, 
       title: "ROA-048: Dev-Log Input Delay (Conditional)",
       priority: "low",  
       body: "Open only if slowness is reported on a real device or field INP on /dev-log exceeds 200ms. Start with a Chrome Performance trace."
     },
-    { id: 14, 
+    { id: 16, 
       title: "Windows NVDA Skip Link Retest",
       priority: "low",  
       body: "The skip link was not announced on a fresh load on Windows. Retest in a fresh Guest window with no click before claiming Windows screen reader support."
     },
-    { id: 15, 
+    { id: 17, 
       title: "Verify Map Popup and Dialog Accessibility",
       priority: "low",  
       body: "Neither exists yet. Run docs/a11y-checklist.md when the map tickets and the first real modal are built, including focus return on close."
@@ -1491,7 +1641,7 @@ const DATA = {
 // ── optimize: grouped by `month` in OptimizePane (see full field docs above) ─
 // 1 total
    /*
-   {
+    {
       id: 2,
       month: "July 2026",
       date: "July 26, 2026",
@@ -1507,6 +1657,44 @@ const DATA = {
     }, 
     */
 optimize: [
+    {
+      id: 27,
+      month: "September 2026",
+      date: "September 08, 2026",
+      title: "app/proxy.js: single check → re-checked-on-every-request guard",
+      body: "Realized the original design only checked age-gate fields once. At the exact moment of OAuth callback, anything that nulled a field afterward (a bug, a manual edit) would go undetected forever since nothing else in the app re-checked those fields.",
+      bullets: [
+        "Added a second block to proxy.js that runs on every /dashboard request, not just the one-time OAuth redirect",
+        "Reused the same createServerClient pattern already proven in callback/route.js, adapted to middleware's req.cookies API instead of next/headers' cookies()",
+        "Guarded the new block against re-triggering on /age-gate itself, to avoid a redirect loop"
+      ],
+      tags: "refactor"
+    },   
+    {
+      id: 26,
+      month: "September 2026",
+      date: "September 01, 2026",
+      title: "`pickLimiter` simplified to remove a dead-code branch",
+      body: "The original function had a special-case early return for `/api/posts/*` that both introduced the rate-limiting gap and made the function harder to read than it needed to be. Removing that branch fixed the bug and shortened the function at the same time, a case where the correct fix and the cleaner code were the same change.",
+      bullets: [
+        "Reduced the function from 7 conditional lines to 5",
+        "Removed a `startsWith` + `!==` compound condition that was easy to misread at a glance"
+      ],
+      tags: "refactor"
+    },   
+    {
+      id: 25,
+      month: "September 2026",
+      date: "September 01, 2026",
+      title: "`middleware.js` → `proxy.js`: convention migration, not just a rename",
+      body: "Realized partway through that a filename change alone wasn't the actual fix Next.js required, the export name inside the file was the real contract being checked. This reframed the task from 'rename a file' to 'migrate to a new function-naming convention,' which matters for any future Next.js convention changes: assume the runtime checks *names*, not just *paths*, until proven otherwise.",
+      bullets: [
+        "Used `git mv` instead of a manual drag-and-drop rename, preserving clean `git blame`/history for the file going forward",
+        "Confirmed the diff was a pure rename (0 changes) before making the follow-up export-name fix, isolating the two changes from each other",
+        "Restarted the dev server deliberately after the change, rather than assuming hot-reload would pick it up. This habit was already learned earlier in the session and reapplied here correctly"
+      ],
+      tags: "refactor"
+    },   
     {
       id: 24,
       month: "August 2026",
@@ -1912,6 +2100,19 @@ optimize: [
     { id: 84, topic: "Branch-Level Preview URLs Outlive Per-Commit URLs", body: "Vercel generates both a unique per-commit URL and a stable per-branch alias. External allowlists (like Supabase's Redirect URLs) should register the branch-level alias. Since it persists across every future commit to that branch, the per-commit URL would require re-registration on every single push." },
     { id: 85, topic: "'Success. No rows returned' Doesn't Mean What It Sounds Like", body: "For `CREATE FUNCTION`/`CREATE TRIGGER` statements, this message is expected and correct. However, these statements don't return data rows by nature. It's not evidence the function's logic is right; only a direct `SELECT prosrc FROM pg_proc` confirms the actual stored behavior." },
     { id: 86, topic: "Middleware Should Never Be the Sole Security Boundary", body: "Per CVE-2025-29927, treating Next.js middleware as the only gate protecting a route is a known anti-pattern, a crafted request can bypass it. The correct pattern is a lightweight presence-check in middleware (fast, cheap, catches the common case) plus real session validation again inside the protected page itself." },
+    { id: 87, topic: "Next.js middleware does not reliably hot-reload", body: "Editing `middleware.js` (or `proxy.js`) while the dev server is already running does not guarantee the new logic takes effect immediately. This produced a real false-negative test result this session. A fix was correctly written and saved, but the running server was still executing the old code until a full restart. Any middleware/proxy-layer change now gets a mandatory restart before re-testing, not treated as optional." },
+    { id: 88, topic: "Next.js 16's `proxy.js` convention checks the export name, not just the filename", body: "Renaming `middleware.js` to `proxy.js` is not sufficient on its own. Next.js specifically looks for a function named `proxy` (or a default export) inside that file. A file named correctly but still exporting a function called `middleware` throws an explicit build error rather than failing silently." },
+    { id: 89, topic: "A fast-forward merge means the target branch had zero new commits since branching", body: "When `git merge` reports 'Fast-forward,' it's not just a status message. It specifically means git didn't need to create a merge commit because `staging` hadn't diverged at all since `feature/roa-008` was branched off it. This is also why no conflicts were possible: there was nothing on `staging` to conflict with." },
+    { id: 90, topic: "GRANT and RLS are two separate permission layers", body: "A Postgres role can have perfectly correct RLS policies and still get 'permission denied' if it was never given a base GRANT on the table. GRANT is checked first; RLS only applies to rows the role already has table-level access to." },
+    { id: 91, topic: "Next.js route groups vs. plain folders", body: "A folder wrapped in parentheses, e.g. (auth), is a route group, it organizes files and shares layouts but contributes nothing to the actual URL. A plain folder, e.g. auth/callback, does show up in the URL. Mixing the two up is an easy, recurring source of wrong-redirect bugs." },
+    { id: 92, topic: "Supabase session cookies can split across multiple cookies", body: "Once a session JWT is long enough, Supabase stores it as sb-<ref>-auth-token.0, .1, etc., instead of one cookie. Any cookie-presence check needs to match on a substring, not an exact suffix, or it will silently treat valid sessions as logged out." },
+    { id: 93, topic: "Geo-IP lookups can't resolve against localhost", body: "Testing IP-based geolocation from a local dev server will always fail or return null, because ip-api.com (and similar services) can't meaningfully geolocate 127.0.0.1/loopback traffic. This is expected behavior and not a bug because real verification requires a deployed preview." },
+    { id: 94, topic: "Vercel preview URLs are per-branch, not global", body: "Each feature branch gets its own distinct preview URL/alias. An OAuth redirect allowlist entry added for one branch's preview (e.g. feature/roa-008) does not cover a different branch's preview (e.g. feature/roa-004), each has to be added separately." },
+    { id: 95, topic: "Client-side checks are UX, not security", body: "A DOB/age check run in the browser before calling an API is trivially bypassable via devtools. It's useful for instant feedback, but the actual enforcement has to happen server-side, where the request can't be tampered with and the real client IP is available for geo-lookups." },
+    //{ id: 10, topic: "", body: "" },
+    //{ id: 10, topic: "", body: "" },
+    //{ id: 10, topic: "", body: "" },
+    //{ id: 10, topic: "", body: "" },
     //{ id: 10, topic: "", body: "" },
 
     //{ id: 10, topic: "", body: "" },
@@ -1934,6 +2135,116 @@ optimize: [
     },
   */
   bugs: [
+    { 
+      id: 52, 
+      title: "Valid sessions treated as logged out by middleware", 
+      status: "fixed", 
+      date: "September 08, 2026", 
+      body: [
+        "**Symptom:** navigating to /dashboard with a confirmed, live session cookie still redirected to /login instead of running the age-gate check.",
+        "**Root cause:** the cookie-matching logic used .endsWith('-auth-token'), but real cookies are named …-auth-token.0/.1, which never matches an exact suffix check.",
+        "**Fix:** changed to .includes('-auth-token'); verified via a live session correctly reaching /age-gate with a deliberately nulled field."
+      ] 
+    },
+    { 
+      id: 51, 
+      title: "404 on /auth/age-gate after OAuth", 
+      status: "fixed", 
+      date: "September 08, 2026", 
+      body: [
+        "**Symptom:** OAuth login correctly detected missing age-gate fields but redirected to a 404 page instead of the interstitial.",
+        "**Root cause:** the redirect target included an extra /auth segment left over from confusing the (auth) route group (no URL impact) with the auth/callback plain folder (real URL impact).",
+        "**Fix:** changed the redirect to /age-gate; verified by landing on a real, blank interstitial form post-OAuth."
+      ] 
+    },
+    { 
+      id: 50, 
+      title: "'permission denied for table users' on signup", 
+      status: "fixed", 
+      date: "September 03, 2026", 
+      body: [
+        "**Symptom:** every signup attempt failed at the final database write step with a Postgres permission error, despite RLS policies looking correct.",
+        "**Root cause:** service_role had never been GRANTed base table access. GRANT and RLS are separate layers, and GRANT is checked first.",
+        "**Fix:** `GRANT SELECT, INSERT, UPDATE ON public.users TO service_role;`, verified via a direct curl request returning real row data afterward."
+      ] 
+    },
+    { 
+      id: 49, 
+      title: "`proxy.js` build error after the middleware rename", 
+      status: "fixed", 
+      date: "September 01, 2026", 
+      body: [
+        "**Symptom:** after renaming `middleware.js` to `proxy.js` and restarting the dev server, Next.js threw a startup error: `The file './proxy.js' must export a function, either as a default export or as a named 'proxy' export.`",
+        "**Root cause:** the file was renamed, but the exported function inside it was still named `middleware`, not `proxy`. Next.js 16 checks the export name itself, not just the filename.",
+        "**Fix:** changed `export async function middleware(req)` to `export async function proxy(req)`, confirmed via `git diff --stat` showing exactly one line changed."
+      ] 
+    },
+    { 
+      id: 48, 
+      title: "False-negative rate limit test after a legitimate fix", 
+      status: "fixed", 
+      date: "September 01, 2026", 
+      body: [
+        "**Symptom:** after applying the `pickLimiter` fix, a 101-request test against `/api/posts/123` still returned `200` on the 101st request, suggesting the fix hadn't worked.",
+        "**Root cause:** the dev server had been running since before the fix was saved and Next.js middleware doesn't reliably hot-reload, the server was still executing the old, buggy code.",
+        "**Fix:** restarted the dev server (`Ctrl+C`, then `npm run dev`), then re-ran the identical test, which correctly returned `429` on request 101."
+      ] 
+    },
+    { 
+      id: 47, 
+      title: "Rate limiting silently skipped for nested post routes", 
+      status: "fixed", 
+      date: "August 29, 2026", 
+      body: [
+        "**Symptom:** no visible error, but any request to a path like `/api/posts/123` bypassed rate limiting entirely, while the exact `/api/posts` path was correctly limited.",
+        "**Root cause:** `pickLimiter` had an early `return null` specifically for any `/api/posts/*` path that wasn't an exact match, and `null` was never caught by the later general-limiter fallback because the function had already returned.",
+        "**Fix:** removed the special-case block entirely, letting those paths fall through naturally to `generalLimiter`."
+      ] 
+    },
+    { 
+      id: 46, 
+      title: "Silent Login — No Redirect or Feedback on Success", 
+      status: "fixed", 
+      date: "August 28, 2026", 
+      body: [
+        "**Symptom:** a correct email/password login produced no visible change; user remained on `/login` with no error and no indication of success, confirmed only via Supabase's `last_sign_in_at` timestamp updating server-side.",
+        "**Root cause:** `handleEmailLogin` only had error-path logic (`setError`), no success-path logic at all.",
+        "**Fix:** added `useRouter` from `next/navigation`, calling `router.push('/')` and `router.refresh()` on successful `signInWithPassword()`."
+      ] 
+    },
+    { 
+      id: 45, 
+      title: "Vercel Build Failure: `supabaseUrl is required`", 
+      status: "fixed", 
+      date: "August 28, 2026", 
+      body: [
+        "**Symptom:** production build failed while prerendering `/login`.",
+        "**Root cause:** Vercel's Environment Variables page had zero variables configured for this project in any environment, a gap despite ROA-002 being marked locally complete.",
+        "**Fix:** added all six required variables across Production, Preview, and Development."
+      ] 
+    },
+    { 
+      id: 44, 
+      title: "`ReferenceError: pathname is not defined` — Site-Wide Middleware Crash", 
+      status: "fixed", 
+      date: "August 28, 2026", 
+      body: [
+        "**Symptom:** every route (including `/`) returned a runtime error after pasting in the dashboard-protection code.",
+        "**Root cause:** the new code block was placed outside the `middleware()` function entirely, at module scope, where `req` and its derived `pathname` don't exist. A second contributing bug: `config.matcher` had been commented back down to API-only, meaning even a correctly-placed block would never have run against `/dashboard`.",
+        "**Fix:** moved the block inside the function, restructured the rate-limiter's early-return into a conditional block so execution properly falls through, and re-enabled the full matcher array."
+      ] 
+    },
+    { 
+      id: 43, 
+      title: "Confirmation Email Redirects to Wrong URL", 
+      status: "fixed", 
+      date: "August 26, 2026", 
+      body: [
+        "**Symptom:** clicking the email confirmation link landed on `/?code=...` instead of exchanging the code for a session.",
+        "**Root cause:** `signUp()` had no `emailRedirectTo` set, and Supabase's Redirect URLs allowlist was completely empty, so Supabase silently fell back to the bare Site URL.",
+        "**Fix:** added `emailRedirectTo: \`${window.location.origin}/auth/callback\`` to the `signUp()` call, and added the real callback URL to Supabase's allowlist."
+      ] 
+    },
     { 
       id: 42, 
       title: "PKCE Code Verifier Missing During Session Exchange", 
@@ -2448,6 +2759,13 @@ optimize: [
       body: "Use when a container needs to stretch full-height/full-width for background purposes, but its actual content should stay narrower and centered.",
       code: `.auth-panel-body {\n  flex: 1;\n  width: 100%;\n  background: #fff;\n  padding: 2.5rem 3rem;\n  display: flex;\n  flex-direction: column;\n  justify-content: center;\n}\n\n.auth-form-inner {\n  width: 100%;\n  max-width: 32rem;\n  margin: 0 auto;\n}`,
     },
+    {
+      id: 8,
+      title: "Corrected `pickLimiter` routing logic",
+      lang: "js",
+      body: "Place inside `proxy.js` (formerly `middleware.js`). Determines which rate limiter applies to a given request path; falls through to `generalLimiter` for any `/api/*` path not explicitly matched, rather than silently skipping rate limiting.",
+      code: `function pickLimiter(pathname) {\n  if (pathname === "/api/posts") return postLimiter;\n  if (pathname.startsWith("/api/auth")) return authLimiter;\n  if (pathname.startsWith("/api/comments")) return commentLimiter;\n  if (pathname.startsWith("/api/translate")) return translateLimiter;\n  if (pathname.startsWith("/api/")) return generalLimiter;\n  return null;\n}`,
+    },
     /*{
       id: 2,
       title: "Express Static Serve (Vite build)",
@@ -2502,6 +2820,12 @@ optimize: [
     { id: 10, title: "React hydration mismatch guide", url: "https://react.dev/link/hydration-mismatch", category: "routing",    note: "Referenced directly from the console error this session when diagnosing the transient div/Link SSR mismatch on `AuthNav.jsx`" },
     { id: 11, title: "Next.js: Middleware to Proxy Migration", url: "https://nextjs.org/docs/messages/middleware-to-proxy", category: "routing",    note: "Referenced directly from the dev server's deprecation warning; covers migrating from `middleware.js` to the newer `proxy.js` convention required by Next.js 16.2.12." },
     { id: 12, title: "Next.js: Prerender Error", url: "https://nextjs.org/docs/messages/prerender-error", category: "build",    note: "Referenced directly from the Vercel build log during the initial `supabaseUrl is required` crash investigation; covers common causes of prerendering failures." },
+    { id: 13, title: "Vercel: MIDDLEWARE_INVOCATION_FAILED Error Reference", url: "https://vercel.com/docs/errors/middleware_invocation_failed", category: "build",    note: "Vercel's documentation page linked directly from the 500 error page itself, describing the error code encountered during the production `/api/health` outage investigation." },
+    // { id: 4, title: "Tailwind CSS v4 Docs", url: "https://tailwindcss.com/docs", category: "styling",    note: "v4 uses @theme in CSS instead of tailwind.config.js." },
+    // { id: 4, title: "Tailwind CSS v4 Docs", url: "https://tailwindcss.com/docs", category: "styling",    note: "v4 uses @theme in CSS instead of tailwind.config.js." },
+    // { id: 4, title: "Tailwind CSS v4 Docs", url: "https://tailwindcss.com/docs", category: "styling",    note: "v4 uses @theme in CSS instead of tailwind.config.js." },
+    // { id: 4, title: "Tailwind CSS v4 Docs", url: "https://tailwindcss.com/docs", category: "styling",    note: "v4 uses @theme in CSS instead of tailwind.config.js." },
+    // { id: 4, title: "Tailwind CSS v4 Docs", url: "https://tailwindcss.com/docs", category: "styling",    note: "v4 uses @theme in CSS instead of tailwind.config.js." },
     // { id: 4, title: "Tailwind CSS v4 Docs", url: "https://tailwindcss.com/docs", category: "styling",    note: "v4 uses @theme in CSS instead of tailwind.config.js." },
     // { id: 4, title: "Tailwind CSS v4 Docs", url: "https://tailwindcss.com/docs", category: "styling",    note: "v4 uses @theme in CSS instead of tailwind.config.js." },
     
