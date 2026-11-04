@@ -392,45 +392,258 @@ const DATA = {
   // ── progression: flat list, rendered by ProgressionPane ──────────────────
   // Fields per entry: id, date, title, body (string/array), tag/tags (optional)
   progression: [
-    // ROA-016: Session 18.4-18.5
-    /*{
-      id: ,
-      date: "Jl0y, 2026",
-      title: "",
-      body: "",
-      tag: ""
-    },*/
-    /*{
-      id: 530,
-      date: "October 30, 2026",
-      title: "Supabase Site URL Still http://localhost:3000",
-      body: "Auth reached production while Site URL is still localhost, so an auth redirect on production falls back to localhost with no session. Tracked in ROA-008C item 8. Signups are OFF.",
+    {
+      id: 250,
+      date: "November 03, 2026",
+      title: "ROA-044 design decisions recorded",
+      body: "`getUser()` over `getSession()`. `confirmed_age` is the completion flag (set in both routes, kept). Admin-client write instead of a SECURITY DEFINER function. The x-vercel-ip-country header was not adopted. location_preference, TRUNCATE/TRIGGER grants, and a grant audit of other tables were parked.",
+      tag: "decision"
+    },
+    {
+      id: 249,
+      date: "November 03, 2026",
+      title: "Under-minimum rejections verified",
+      body: "Production with a 2014 date of birth showed 'at least 13', and localhost showed 'at least 16' (lookup fails, strict fail-safe). The row stayed NULL/false after both.",
+      tag: "documentation"
+    },
+    {
+      id: 248,
+      date: "November 03, 2026",
+      title: "New-user flows on production after the lockdown",
+      body: "A dashboard-created user, an email signup, and a Google signup each ended with the date of birth stored, `signup_country` US, and `confirmed_age` true. Each also showed /age-gate → /, a 409 on a second POST, and the row unchanged. Existing email and Google logins stayed on /.",
+      tag: "deployment"
+    },
+    {
+      id: 247,
+      date: "November 03, 2026",
+      title: "Post-lockdown tests as an impersonated user",
+      body: "Reading B's secrets returned 42501, and B's profile read returned 1 row. A date of birth update returned 42501, own bio returned 1 row, and B's bio returned 0 rows. At 16:12 a DO-block harness printed DENIED 42501 for all six sensitive columns and ALLOWED for a bio control.",
+      tag: "documentation"
+    },
+    {
+      id: 246,
+      date: "November 03, 2026",
+      title: "Stored grants verified",
+      body: "`role_table_grants` and `column_privileges` matched the plan. The four sensitive columns show only REFERENCES, and anon is unchanged.",
+      tag: "documentation"
+    },
+    {
+      id: 245,
+      date: "November 03, 2026",
+      title: "Column lockdown ran on public.users",
+      body: "A single DO block revoked table-level SELECT and UPDATE from authenticated, then granted column-level access. The result was SELECT on 9 columns and UPDATE on 5 profile columns.",
+      tag: "feature"
+    },
+    {
+      id: 244,
+      date: "November 03, 2026",
+      title: "Age-gate page navigation: hard reload replaced with the router",
+      body: "`window.location.href` became `router.replace('/')` plus `router.refresh()`, which cleared the lint warning (ROA-044 item 10).",
+      tag: "refactor"
+    },
+    {
+      id: 243,
+      date: "November 03, 2026",
+      title: "proxy.js guard rewritten around getUser()",
+      body: "One block covers /dashboard and /age-gate: no valid user redirects to /login, an incomplete user on /dashboard goes to /age-gate, and a finished user on /age-gate goes to /. The leftover `-code-verifier` cookie no longer gets through.",
+      tag: "fixed"
+    },
+    {
+      id: 242,
+      date: "November 03, 2026",
+      title: "Completion check moved from three fields to one flag",
+      body: "proxy.js and the OAuth callback read `confirmed_age` instead of `date_of_birth`, `signup_country`, and `tos_accepted_at`. The signup route also sets `confirmed_age: true`.",
+      tag: "refactor"
+    },
+    {
+      id: 241,
+      date: "November 03, 2026",
+      title: "/api/auth/age-gate is now write-once and server-written",
+      body: "feature",
+      tag: "The route identifies the user with `getUser()` and writes through the service-role client, using `.eq('id', user.id).eq('confirmed_age', false)`, which sets `confirmed_age: true`. Zero rows returns 409, and the 500 path no longer leaks the raw database error."
+    },
+    {
+      id: 240,
+      date: "November 03, 2026",
+      title: "Backfilled confirmed_age for finished users",
+      body: "One UPDATE returned exactly 2 rows. A Step 6 re-run showed them true and the two incomplete users still false.",
+      tag: "feature"
+    },
+    {
+      id: 239,
+      date: "November 03, 2026",
+      title: "Baseline exposure proven (read and write)",
+      body: "User A read User B's date of birth, country, consent time, and email. User A also rewrote all six protected columns on their own row in one statement (rolled back, original values confirmed at 13:44).",
+      tag: "documentation"
+    },
+    {
+      id: 238,
+      date: "November 03, 2026",
+      title: "Ship the code first, run the lockdown second",
+      body: "The Supabase project is shared by preview and production (inferred), so permission changes hit production instantly. The age-gate and guard code went live before the column lockdown, so production never ran old code against locked columns.",
+      tag: "decision"
+    },
+    {
+      id: 237,
+      date: "November 01, 2026",
+      title: "Eight High Audit Findings Justified, Not Force-Fixed",
+      body: "The final audit shows 35 findings with 0 critical and 8 high. Six come through the shadcn CLI (shadcn, @modelcontextprotocol/sdk, body-parser, systeminformation, undici, zod), and two come through build tooling (brace-expansion, source-map-js). The app imports none of them (git grep found nothing in app/, components/, lib/, proxy.js, or the root config files). `npm audit fix --force` would install shadcn@1.0.0, so it was declined. The six non-breaking fixes go to ROA-049.",
+      tag: "decision"
+    },
+    {
+      id: 236,
+      date: "November 01, 2026",
+      title: "Dev-Log Sync Check Becomes a Standing Rule",
+      body: "I'm allowed to add dev-log entries on main. To keep `--ff-only` working, step 1 of every ROA and the step right before each production promotion now run `git fetch origin` and `git log --oneline staging..main`. If it prints anything, main is merged into staging first. This supersedes the 10/30 rule 'dev-log entries on staging only.'",
+      tag: "decision"
+    },
+    {
+      id: 235,
+      date: "October 31, 2026",
+      title: "Sentry Browser and Server Test Errors Verified After the Upgrade",
+      body: "The three deleted ROA-017 example files were restored on a throwaway branch (tmp/roa-039-sentry-test, commit b1b3365) and the branch was deleted afterward. Frontend event 0c34bb06 (ROAM-2, app/sentry-example-page/page.jsx line 87) and server event 3b107b29 (ROAM-6, app/api/sentry-example-api/route.js line 14) both reached Sentry with release b1b3365, readable stack traces, and the same trace ID.",
+      tag: "deployment"
+    },
+    {
+      id: 234,
+      date: "October 31, 2026",
+      title: "Route Guard Passes on Stale Handshake Cookies",
+      body: "proxy.js lines 52 and 108 count any cookie starting with `sb-` and containing `-auth-token` as a session. In a normal browser, leftover `...-code-verifier` cookies let a logged-out visitor see /age-gate and get a 404 on /dashboard. After clearing cookies, both redirected to login, and Incognito always did. proxy.js was unchanged by ROA-039. Added to ROA-044.",
       tag: "open"
     },
     {
-      id: 529,
+      id: 233,
+      date: "October 31, 2026",
+      title: "Age-Gate Lint Warning: no-location-assign-relative-destination",
+      body: "The post-upgrade lint run shows one new warning at app/(auth)/age-gate/page.js line 52 (window.location.href used for an internal page). It probably came with eslint-config-next 16.4.1. The full page reload may be deliberate, so it's recorded as ROA-044 item 10.",
+      tag: "open"
+    },
+    {
+      id: 232,
+      date: "October 31, 2026",
+      title: "js-yaml and nanoid Refreshed Inside Existing Ranges",
+      body: "The Next.js bump did not clear them, because they came through eslint, shadcn, and Tailwind's postcss. `npm update js-yaml nanoid` changed only package-lock.json (js-yaml 4.3.0 to 4.3.2, nanoid 3.3.16 to 3.3.20), commit 4d955cc. Audit: 37 to 35 findings.",
+      tag: "fixed"
+    },
+    {
+      id: 231,
+      date: "October 31, 2026",
+      title: "Sentry withSentryConfig Import Moved to @sentry/nextjs/config",
+      body: "The one import at next.config.mjs line 1 was changed in its own commit (8d56963). The local build log went from 4 matching lines to 0, and dev start-up, the preview, staging, and production builds show no warning.",
+      tag: "fixed"
+    },
+    {
+      id: 230,
+      date: "October 31, 2026",
+      title: "Next.js 16.2.12 to 16.4.1 Clears the Critical Advisories",
+      body: "Commit 7c63051 also moved eslint-config-next from 16.2.4 to 16.4.1, pinned exact. The audit went from 39 findings (1 critical, 12 high) to 37 (0 critical, 10 high). postcss under next moved to 8.5.23 and sharp to 0.35.5.",
+      tag: "fixed"
+    },
+    {
+      id: 229,
+      date: "October 31, 2026",
+      title: "Before-Audit Snapshot and Code Search Recorded",
+      body: "The before audit was saved to ~/audit-before-roa039.json (39 findings). Searches found no AVIF, no images.formats, remotePatterns, domains, or dangerouslyAllowSVG settings, no next/og or ImageResponse, and no use cache or cacheComponents. next/image is used only in app/(main)/page.js, and the landing page made no /_next/image request.",
+      tag: "documentation"
+    },
+    {
+      id: 228,
+      date: "October 31, 2026",
+      title: "Regression Scope Reduced to the Flows That Exist",
+      body: "app/api/posts/route.js and app/api/posts/[id]/route.js are stubs that return {'status':'stub ok'}. The map and image upload screens are not built, so ROA-039's regression covered login, signup refusal, route guards, health, and page loads instead of the original post, map, and upload list.",
+      tag: "decision"
+    },
+    {
+      id: 227,
       date: "October 30, 2026",
       title: "Vercel Authentication Stays on Standard Protection",
       body: "Previews require a Vercel login and production stays public. 'All Deployments' was rejected because it would lock production and break the UptimeRobot monitor. The cross-device confirmation-link test must run on production or with protection off.",
       tag: "decision"
     },
     {
-      id: 528,
+      id: 226,
       date: "October 30, 2026",
       title: "Production Health Verified",
       body: "/api/health returns {'status':'ok'}. UptimeRobot on roam-dusky-alpha.vercel.app/api/health shows 100% up for 1 month 15 days. The Aug 8 500 incident was resolved Sep 14.",
       tag: "deployment"
-    },*/
-    
-    
-    /*{
-      id: ,
-      date: "Jl0y, 2026",
-      title: "",
-      body: "",
-      tag: ""
-    },*/
-    
+    },
+    {
+      id: 225,
+      date: "October 30, 2026",
+      title: "Step 25 Review: Oct 3 Build Failure and fad98f5 Diff",
+      body: "Build 19410ba failed on 'Can't resolve @vercel/turbopack-next/internal/font/google/font' from the DM Sans import in app/layout.js. The commit never touched layout.js, and every later build is Ready. The fad98f5 diff (3 insertions, 5 deletions) only filled the empty Aug 25 'Auth Panel Layout' entry.",
+      tag: "documentation"
+    },
+    {
+      id: 224,
+      date: "October 30, 2026",
+      title: "Tickets Drafted and Updated",
+      body: "Drafted ROA-047 (About page, footer link currently goes nowhere) and ROA-048 (dev-log INP). Added the Sentry import deprecation to ROA-039, two bullets to ROA-044 (test users, never-run checks), and the item 8 redirect cleanup and a VoiceOver bullet to ROA-008C. A ROA-049 draft was deleted.",
+      tag: "documentation"
+    },
+    {
+      id: 223,
+      date: "October 30, 2026",
+      title: "No More Best Practices Scans, h1 Goes to the Flag List",
+      body: "The only Best Practices finding was page-has-heading-one (moderate) on /login, /signup, /age-gate, and the dev-log views. It is not a WCAG 2.1 AA failure. Fix when ROA-008C touches those pages.",
+      tag: "decision"
+    },
+    {
+      id: 222,
+      date: "October 30, 2026",
+      title: "Final Axe Scans on the Pushed Preview",
+      body: "Axe (WCAG 2.1 AA) returned 0 findings on /, / with the cookie banner showing, /login, /signup, /age-gate, /privacy, /terms, and all 8 dev-log views, in no emulation, OS light, and OS dark. Best Practices ON found only the missing-h1 rule.",
+      tag: "deployment"
+    },
+    {
+      id: 221,
+      date: "October 30, 2026",
+      title: "Cookie Banner Focus Fix Verified",
+      body: "After Decline and after Accept, document.activeElement.id returned 'main-content'. An untouched load returned BODY. With VoiceOver, Decline made it say 'main' and the next Tab landed on 'Sign up free'.",
+      tag: "fixed"
+    },
+    {
+      id: 220,
+      date: "October 30, 2026",
+      title: "Cookie Banner Dismiss Moves Focus to main-content",
+      body: "Chose option B: on Accept or Decline, send focus to main#main-content. The call sits in the click handlers, not in an effect, so it never fires on first load.",
+      tag: "decision"
+    },
+    {
+      id: 219,
+      date: "October 30, 2026",
+      title: "INP Measured From the Console, VoiceOver Off",
+      body: "A PerformanceObserver reading of about 10 dock presses gave 120ms as the baseline and 80ms with the dock pulse animation disabled by an injected style. Both are under the 200ms good line, and the 40ms gap is within noise. No ticket opened.",
+      tag: "performance"
+    },
+    {
+      id: 218,
+      date: "October 28, 2026",
+      title: "Dev-Log Input Delay With VoiceOver On",
+      body: "Speech lagged and Chrome briefly showed 'not responding' on /dev-log. The Vercel toolbar read INP of 520ms and 616ms, with worst rows on the dock pulse buttons, the active tab, and the skip link. Input delay dominated and render stayed small. Cause unknown. Drafted as ROA-048.",
+      tag: "open"
+    },
+    {
+      id: 217,
+      date: "October 28, 2026",
+      title: "Screen Reader Pass, Part 3: Dev-Log Tabs and Position Toasts",
+      body: "Sidebar tab names read 'Progression updates & milestones 99+, current item, button' and 'Future updates planned features 3, button' with the emoji ignored. 'Position restored' was spoken on 10/28/26, and 'Position saved' was confirmed on the 10/30/26 retest.",
+      tag: "feature"
+    },
+    {
+      id: 216,
+      date: "October 28, 2026",
+      title: "Screen Reader Pass, Part 2: Spoken Form Errors",
+      body: "Errors on /signup ('Signups not allowed for this instance', 'You must be at least 13 to sign up'), /login ('Invalid login credentials'), and /age-gate ('You must be at least 13 to use Roam') were all spoken by VoiceOver. Field labels read with name and role. Month, day, and year read only as 'button', and the login password name read with asterisks (both deferred to ROA-008C).",
+      tag: "feature"
+    },
+    {
+      id: 215,
+      date: "October 28, 2026",
+      title: "Screen Reader Pass, Part 1: Skip Link and Landmarks",
+      body: "On macOS VoiceOver the skip link was announced as a link, Enter moved focus into the hero, and the next Tab landed on 'Sign up free'. The landmark list showed navigation, main, footer, and Cookie consent region. NVDA on Windows listed the same four landmarks. The skip link was not announced on a fresh load on Windows (unverified, possibly focus moving first).",
+      tag: "feature"
+    },
     {
       id: 214,
       date: "October 20, 2026",
@@ -1977,6 +2190,7 @@ const DATA = {
     */
   future: [
     // ROA-016: SESSION 18.4 - 18.5
+    // ROA-044: SESSION 20
     /* high */
     { id: 1, 
       title: "ROA-045: Resend as Supabase SMTP Provider",
@@ -2177,6 +2391,161 @@ const DATA = {
     }, 
     */
 optimize: [
+    {
+      id: 59,
+      month: "November 2026",
+      date: "November 03, 2026",
+      title: "Write-lock test: six manual runs became one harness",
+      body: "A loop with an inner `EXCEPTION WHEN insufficient_privilege` block tests each column separately and ends in a rolled-back summary.",
+      bullets: [
+        "A bio control proves the harness can print ALLOWED",
+        "No test can be skipped by accident",
+        "Nothing is saved"
+      ],
+      tags: "refactor"
+    },
+    {
+      id: 58,
+      month: "November 2026",
+      date: "November 03, 2026",
+      title: "Age-gate page: hard reload replaced with the Next.js router",
+      body: "The reload wasn't needed because the age-gate route doesn't change a login cookie.",
+      bullets: [
+        "`router.replace('/')` leaves no Back-button trap",
+        "`router.refresh()` re-reads server data",
+        "Clears the `no-location-assign-relative-destination` warning"
+      ],
+      tags: "refactor"
+    },
+    {
+      id: 57,
+      month: "November 2026",
+      date: "November 03, 2026",
+      title: "Lockdown SQL builds its column lists from the live table",
+      body: "Hardcoding 9 and 5 column names could drift from the table, so the lists come from `information_schema.columns` minus two deny arrays.",
+      bullets: [
+        "Table-level grants are revoked, then columns are granted by name",
+        "Columns added later are inaccessible until granted (fails safe)",
+        "One DO block applies fully or not at all"
+      ],
+      tags: "refactor"
+    },
+    {
+      id: 56,
+      month: "November 2026",
+      date: "November 03, 2026",
+      title: "Completion check: three nullable fields became one boolean",
+      body: "A single `confirmed_age` stays readable after the sensitive columns are hidden.",
+      bullets: [
+        "Fewer columns read in proxy.js and the callback",
+        "A failed country lookup can no longer loop a user",
+        "It's one of the 9 user-readable columns"
+      ],
+      tags: "refactor"
+    },
+    {
+      id: 55,
+      month: "November 2026",
+      date: "November 03, 2026",
+      title: "proxy.js: three guard blocks became one",
+      body: "Two cookie-name checks and a separate age-gate block shared one idea, so I merged them.",
+      bullets: [
+        "One `createServerClient` and one `getUser()` per guarded request",
+        "Redirects by outcome (no user, incomplete, completed)",
+        "The commented TEMP test line is gone"
+      ],
+      tags: "refactor"
+    },
+    {
+      id: 54,
+      month: "November 2026",
+      date: "November 03, 2026",
+      title: "Age-gate route: check-then-write became one atomic update",
+      body: "I moved the 'already done?' check into the write itself, so two simultaneous submissions can't both succeed.",
+      bullets: [
+        "`.eq('id', user.id).eq('confirmed_age', false).select('id')` writes only an unfinished row and returns what changed",
+        "Zero rows returns 409",
+        "The user id comes from `getUser()`, so the admin client can't be pointed at another row"
+      ],
+      tags: "refactor"
+    },
+    {
+      id: 53,
+      month: "November 2026",
+      date: "November 01, 2026",
+      title: "Production Verification: One Pass in Incognito",
+      body: "The first test cycles mixed a normal browser with stale cookies and blockers. Moving checks to Incognito removed that noise.",
+      bullets: [
+        "Smoke test, health endpoint, email and Google login, cookie inspection, and Sentry browser events all run there",
+        "Production has no Vercel login in front of it, so Incognito needs no extra step"
+      ],
+      tags: "refactor"
+    },
+    {
+      id: 52,
+      month: "November 2026",
+      date: "November 01, 2026",
+      title: "Branch Flow: Sync Check Before Branching and Before Promotion",
+      body: "I felt dev-log entries belong on main, so the flow now handles that instead of forbidding it.",
+      bullets: [
+        "`git fetch origin` then `git log --oneline staging..main` at step 1 and again before the fast-forward",
+        "If it prints anything, main is merged into staging first and the preview is checked",
+        "Keeps `git merge --ff-only staging` working on main"
+      ],
+      tags: "refactor"
+    },
+    {
+      id: 51,
+      month: "October 2026",
+      date: "October 31, 2026",
+      title: "Test Workflow: Baseline Capture Before Every Change",
+      body: "I realized a 'zero' result only means something if the check could have found the problem first. Every ROA step now saves the before state.",
+      bullets: [
+        "Build log with the warning present before the change, lint summary (103 problems) before the upgrade",
+        "Before, middle, and final audit JSON files stored outside the repo",
+        "`git diff --stat A B` run on unchanged code before blaming the upgrade for the proxy.js behavior"
+      ],
+      tags: "refactor"
+    },
+    {
+      id: 50,
+      month: "October 2026",
+      date: "October 31, 2026",
+      title: "Sentry Config: Import Path Change in Its Own Commit",
+      body: "The deprecation warning was harmless today but would break on the Sentry v11 upgrade, so I moved it before it could.",
+      bullets: [
+        "One line changed at next.config.mjs line 1",
+        "Separate commit, so it can be reverted without undoing the Next.js bump",
+        "Verified by comparing a captured before log (4 matching lines) with an after log (0)"
+      ],
+      tags: "refactor"
+    },
+    {
+      id: 49,
+      month: "October 2026",
+      date: "October 31, 2026",
+      title: "Dependency Maintenance: Lockfile-Only Refresh Instead of a Broad Audit Fix",
+      body: "I wanted the audit to read clean, but `npm audit fix` can change dozens of transitive versions at once, and `--force` would cross majors. The fix was to refresh only the packages that matter.",
+      bullets: [
+        "`npm update js-yaml nanoid` re-resolved within the ranges the parents already allowed",
+        "Only package-lock.json changed (6 insertions, 6 deletions) in its own commit",
+        "Build and lint were rerun before committing, so a break never entered history"
+      ],
+      tags: "refactor"
+    },
+    {
+      id: 48,
+      month: "October 2026",
+      date: "October 30, 2026",
+      title: "CookieBanner: Focus Handling on Dismiss",
+      body: "I realized a focus call tied to a useEffect on the banner's visibility would also run on first load and steal focus on every visit, so I tied it to the click instead.",
+      bullets: [
+        "Added moveFocusToMain(), which focuses main#main-content with preventScroll",
+        "Called it after setVisible(false) in handleAccept and handleDecline",
+        "main-content already had tabIndex={-1}, so it takes script focus without becoming a Tab stop"
+      ],
+      tags: "refactor"
+    }, 
     {
       id: 47,
       month: "October 2026",
@@ -2943,6 +3312,36 @@ optimize: [
     { id: 152, topic: "Removing a focused element resets focus to the body", body: "After the cookie banner is dismissed, the next Tab starts from where it used to be. The banner is last in the DOM, so Tab then leaves the page." },
     { id: 153, topic: "A query with placeholder text still in it proves nothing", body: "`where email = '<the email you used>'` returned 0 because nothing matches that literal text. Only the rerun with the real address counted." },
     { id: 154, topic: "Automated scans miss structural bugs", body: "Axe scored 0 on pages where the skip link was broken. Only pressing Tab, Enter, and Tab again found it." },
+    { id: 155, topic: "Unlayered CSS Beats Layered CSS", body: "Tailwind v4 puts its utilities in cascade layers, and any unlayered rule beats a layered one regardless of specificity. The dev-log skip link padding lost to an unlayered * reset until the ! suffix was added." },
+    { id: 156, topic: "Scan the Pushed Preview, Not Localhost", body: "Localhost runs next dev, while a preview is a production build with minified CSS and no dev overlays. A clean dev scan does not prove the deployed build is clean, so the final axe scans ran on the pushed commit." },
+    { id: 157, topic: "Fast-Forward Versus a True Merge", body: "--ff-only refuses unless one branch's history sits inside the other's, which makes it a safe guard. When branches have diverged, a plain merge starts a real merge and can conflict. git merge -s ours keeps the current branch's files and records the other side as merged, while -X ours still merges both sides." },
+    { id: 158, topic: "Focus After an Element Unmounts", body: "When a focused element is removed, focus resets to body and the next Tab starts from where it was. Move focus explicitly, and use tabIndex={-1} on the target so it accepts script focus without joining the Tab order." },
+    { id: 159, topic: "Call Focus in the Handler, Not an Effect", body: "An effect keyed on state also runs on first load. A click handler runs only when the person acts." },
+    { id: 160, topic: "Axe Best Practices Versus WCAG Scope", body: "page-has-heading-one is an axe best practice, not a WCAG 2.1 AA failure. It was the only finding when Best Practices was ON, and it stays advisory." },
+    { id: 161, topic: "INP: Input Delay Versus Render", body: "A large input delay with a small render bar means the main thread was busy before the handler could start. A PerformanceObserver on event timing can measure it from the console, with no extra tooling." },
+    { id: 162, topic: "Prove a Lint Error Is Pre-Existing", body: "git show HEAD:<file> | npx eslint --stdin --stdin-filename <file> lints the committed version. The CookieBanner set-state-in-effect error appeared there too, so it predates the focus change." },
+    { id: 163, topic: "Vercel Standard Protection Versus All Deployment", body: "Standard Protection guards every domain except production custom domains. All Deployments would put a Vercel team login in front of production and block public visitors and the uptime monitor. Password Protection needs the Pro plan." },
+    { id: 164, topic: "Fixing a Parent Fixes Only Its Own Children", body: "Next 16.4.1 cleared postcss and sharp because they were next's children. js-yaml and nanoid came through eslint, shadcn, and Tailwind's postcss, so they stayed until the lockfile was refreshed." },
+    { id: 165, topic: "Advisory Databases Grow", body: "The ticket said 1 critical and 4 high. The audit on the clean branch said 39 findings, 12 high. Counts in a ticket are a snapshot, so rerun the audit before starting." },
+    { id: 166, topic: "`npm update <pkg>` Moves the Lockfile, Not package.json", body: "When a parent's `^` range already allows the fixed version, the update changes only package-lock.json. `npm audit fix --force` can cross major versions and install something like shadcn@1.0.0." },
+    { id: 167, topic: "`npm ls --omit=dev` Shows the Production Chain", body: "`npm explain` prints very long trees for packages that many dev tools depend on. `npm ls --omit=dev <pkg>` gives the production parents in a few lines." },
+    { id: 168, topic: "A Loose Cookie Name Check Is Not a Session Check", body: "proxy.js matches `sb-` plus `-auth-token`, which also matches `...-auth-token-code-verifier` handshake cookies. A logged-out browser holding one passes the guard." },
+    { id: 169, topic: "Blockers Swallow Sentry Browser Events", body: "In the normal Chrome profile, POSTs to ingest.us.sentry.io failed with ERR_BLOCKED_BY_CLIENT. Browser-side Sentry tests belong in Incognito." },
+    { id: 170, topic: "A Browser Event and a Server Event Are Separate Issues in Sentry", body: "The frontend error (ROAM-2) came from `onunhandledrejection`. The server error (ROAM-6) came from `auto.function.nextjs.on_request_error`. Opening one issue's page won't show the other." },
+    { id: 171, topic: "eslint-config-next Moves With next", body: "It's pinned exact, and it was two minor versions behind. Bump both together on every Next upgrade." },
+    { id: 172, topic: "Core ESLint No Longer Ships the unix Formatter", body: "`-f unix` failed. `-f json -o file`, then a short node script reading `severity === 1`, lists warnings without installing anything." },
+    { id: 173, topic: "`git grep` Searches Tracked Files Only", body: "That's why it skips node_modules and .next automatically, and why it misses a file that isn't added yet." },
+    { id: 174, topic: "`git checkout COMMIT^ -- path` Restores a File From the Parent", body: "It brought back the three files ROA-017 deleted, on a throwaway branch, without touching the ticket branch." },
+    { id: 175, topic: "A Baseline Gives a Zero Its Meaning", body: "The deprecation grep returned 0 after the change, and only the earlier run that printed the warning proved the check could detect it." },
+    { id: 176, topic: "Row policies hide rows; they can't hide columns", body: "RLS decides which rows a user can touch. A user who may see a row sees every column unless column privileges say otherwise. That's why `users_select_all` leaked birthdays and emails." },
+    { id: 177, topic: "A table-level grant covers every column", body: "`REVOKE SELECT (date_of_birth)` does nothing while table-level SELECT exists. Revoke at table level first, then grant the safe columns." },
+    { id: 178, topic: "A missing row and a missing privilege fail differently", body: "RLS filters silently (0 rows, 'Success. No rows returned'). A missing privilege raises `42501`. Reading which one happened tells you which layer blocked you." },
+    { id: 179, topic: "`select('*')` and `.update().select()` expand to every column", body: "After a column revoke they fail with 42501 even if you only wanted allowed ones. A grep for `from('users')` and `.select(` finds what breaks." },
+    { id: 180, topic: "The service-role client bypasses RLS and grants", body: "The route must take the user id from `getUser()`, never the request body. A client-callable SECURITY DEFINER function would skip the age check." },
+    { id: 181, topic: "getUser() validates, getSession() trusts the cookie", body: "A cookie name is not a login. A fake `sb-…-auth-token-code-verifier` cookie passed the old guard." },
+    { id: 182, topic: "A test needs a control", body: "A harness that can only print DENIED proves nothing. The bio control showed it could print ALLOWED. A combined test can't prove each column is locked on its own." },
+    { id: 183, topic: "The signup trigger copies almost nothing", body: "`handle_new_auth_user` inserts only id, email, display_name, and `confirmed_age = false`. Direct sign-up with fake metadata can't plant a date of birth." },
+    { id: 184, topic: "The landing header doesn't show login state", body: "'Log in' and 'Sign up' appear even when logged in. A redirect from /age-gate to / (not /login) is the evidence of a valid session." },
     //{ id: 10, topic: "", body: "" },
     //{ id: 10, topic: "", body: "" },
     //{ id: 10, topic: "", body: "" },
@@ -2984,6 +3383,132 @@ optimize: [
     },
   */
   bugs: [
+    { 
+      id: 56, 
+      title: "Age-gate navigation lint warning", 
+      status: "fixed", 
+      date: "November 03, 2026", 
+      body: [
+        "**Symptom:** `no-location-assign-relative-destination` at the page's line 52.",
+        "**Cause:** `window.location.href` for an internal page.",
+        "**Fix:** `router.replace('/')` plus `router.refresh()`.",
+        "**Verified:** the warning is gone and the total is 103 (102 errors, 1 warning)."
+      ] 
+    },
+    { 
+      id: 55, 
+      title: "confirmed_age stayed false after the age gate", 
+      status: "fixed", 
+      date: "November 03, 2026", 
+      body: [
+        "**Symptom:** finished rows showed false.",
+        "**Cause:** no route set it.",
+        "**Fix:** both routes set it and the 2 existing rows were backfilled.",
+        "**Verified:** all test users and all production flows end with true."
+      ] 
+    },
+    { 
+      id: 54, 
+      title: "Null signup_country looped users back to /age-gate", 
+      status: "fixed", 
+      date: "November 03, 2026", 
+      body: [
+        "**Symptom:** a failed lookup (localhost, VPN, outage) sent a finished user to the age gate on every login.",
+        "**Cause:** completion required a non-null country.",
+        "**Fix:** completion reads `confirmed_age`.",
+        "**Verified:** the localhost user finished with `signup_country` NULL and wasn't looped."
+      ] 
+    },
+    { 
+      id: 53, 
+      title: "proxy.js let a logged-out browser pass with a leftover cookie", 
+      status: "fixed", 
+      date: "November 03, 2026", 
+      body: [
+        "**Symptom:** /dashboard gave a 404 and /age-gate rendered after a failed login.",
+        "**Cause:** any cookie starting `sb-` and containing `-auth-token` counted as a session, including `…-code-verifier`.",
+        "**Fix:** `getUser()` guard, no user redirects to /login.",
+        "**Verified** with a fake cookie on all three environments."
+      ] 
+    },
+    { 
+      id: 52, 
+      title: "Age gate wasn't write-once and stayed reachable", 
+      status: "fixed", 
+      date: "November 03, 2026", 
+      body: [
+        "**Symptom:** a finished user could reopen /age-gate and overwrite their values.",
+        "**Cause:** an unconditional update and a guard that only checked a cookie.",
+        "**Fix:** the conditional update with 409, and a /age-gate → / redirect for completed users.",
+        "**Verified** on localhost, preview, and production."
+      ] 
+    },
+    { 
+      id: 51, 
+      title: "Users could overwrite their own age-gate and consent fields directly", 
+      status: "fixed", 
+      date: "November 03, 2026", 
+      body: [
+        "**Symptom:** one UPDATE changed date_of_birth, signup_country, tos_accepted_at, confirmed_age, created_at, and email, skipping the age check.",
+        "**Cause:** table-level UPDATE for authenticated.",
+        "**Fix:** revoked it, granted 5 profile columns, moved the write to the admin client.",
+        "**Verified:** six columns each DENIED 42501."
+      ] 
+    },
+    { 
+      id: 50, 
+      title: "Any signed-in user could read other users' date of birth, country, consent time, and email", 
+      status: "fixed", 
+      date: "November 03, 2026", 
+      body: [
+        "**Symptom:** the Step 7 query returned User B's private columns.",
+        "**Cause:** `users_select_all` (qual true) plus table-level SELECT for authenticated.",
+        "**Fix:** revoked table-level SELECT, granted 9 non-sensitive columns.",
+        "**Verified:** the same query returns 42501."
+      ] 
+    },
+    { 
+      id: 49, 
+      title: "`eslint -f unix` command failed", 
+      status: "fixed", 
+      date: "October 31, 2026", 
+      body: "The terminal printed that the unix formatter is no longer in core ESLint. Replaced it with `-f json -o ~/eslint-after-roa039.json` and a node script that prints entries with severity 1." 
+    },
+    { 
+      id: 48, 
+      title: "Server Sentry event looked missing", 
+      status: "fixed", 
+      date: "October 31, 2026", 
+      body: "Only the frontend issue (ROAM-2) appeared on the page I was looking at, so the server error seemed lost. The cause was that it's a separate issue (ROAM-6), visible in the Issues list. Confirmed by the Vercel runtime log and the matching trace ID." 
+    },
+    { 
+      id: 47, 
+      title: "js-yaml and nanoid still flagged after the Next.js upgrade", 
+      status: "fixed", 
+      date: "October 31, 2026", 
+      body: "Both remained in the audit. The cause was that their parents (eslint, shadcn, Tailwind's postcss) were untouched by the bump. `npm update js-yaml nanoid` refreshed them within existing ranges, lockfile only (4d955cc)." 
+    },
+    { 
+      id: 46, 
+      title: "withSentryConfig deprecation warning in dev and builds", 
+      status: "fixed", 
+      date: "October 31, 2026", 
+      body: "Dev start-up and every Vercel build printed that the root import will stop working in Sentry v11. The cause was importing from @sentry/nextjs. Changed the import at next.config.mjs line 1 to @sentry/nextjs/config (8d56963); the warning count went from 4 lines to 0." 
+    },
+    { 
+      id: 45, 
+      title: "Critical Next.js advisories in npm audit", 
+      status: "fixed", 
+      date: "October 31, 2026", 
+      body: "The audit reported 1 critical and 12 high findings on Next.js 16.2.12 (vulnerable range ended at 16.4.0). The cause was an outdated Next.js. Upgraded to 16.4.1 with eslint-config-next 16.4.1 (7c63051); the critical finding cleared and the audit dropped from 39 to 37." 
+    },
+    { 
+      id: 44, 
+      title: "Focus Lost After Dismissing the Cookie Banner", 
+      status: "fixed", 
+      date: "October 30, 2026", 
+      body: "After pressing Decline, focus reset to body and the next Tab left the page for the browser toolbar. The focused button unmounted with the banner. Added moveFocusToMain() to both click handlers. Verified by activeElement.id returning 'main-content' on both buttons, BODY on an untouched load, and VoiceOver saying 'main' followed by 'Sign up free' on the next Tab."
+    },
     { 
       id: 43, 
       title: "Skip link hidden under the dev-log top bar", 
@@ -3978,8 +4503,8 @@ optimize: [
     { id: 18, title: "WCAG 2.1", url: "https://www.w3.org/WAI/WCAG21/Understanding/non-text-contrast.html", category: "accessibility", note: "Globally recognized set of technical standards designed to make web content more accessible to people with disabilities" },
     { id: 19, title: "WAI-ARIA live regions (role='alert' and role='status')", url: "https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Guides/Live_regions", category: "accessibility", note: "Behind the toast and form-error changes: assertive versus polite announcements." },
     { id: 20, title: "Chrome DevTools: Rendering and element states", url: "https://developer.chrome.com/docs/devtools/rendering/apply-effects?st_source=ai_mode", category: "devtools", note: "Emulate a focused page, emulate `prefers-color-scheme`, and force `:focus` or `:focus-visible` from the `:hov` panel in Elements." },
-    //{ id: 4, title: "Tailwind CSS v4 Docs", url: "https://tailwindcss.com/docs", category: "styling", note: "v4 uses @theme in CSS instead of tailwind.config.js." },
-    //{ id: 4, title: "Tailwind CSS v4 Docs", url: "https://tailwindcss.com/docs", category: "styling", note: "v4 uses @theme in CSS instead of tailwind.config.js." },
+    { id: 21, title: "You Might Not Need an Effect", url: "https://react.dev/learn/you-might-not-need-an-effect", category: "react", note: "The page linked from the react-hooks/set-state-in-effect lint error in CookieBanner.jsx (ROA-041)." },
+    { id: 22, title: "React DevTools", url: "https://react.dev/link/react-devtools", category: "tooling", note: "The install prompt printed in the dev console during the INP checks." },
     //{ id: 4, title: "Tailwind CSS v4 Docs", url: "https://tailwindcss.com/docs", category: "styling", note: "v4 uses @theme in CSS instead of tailwind.config.js." },
     //{ id: 4, title: "Tailwind CSS v4 Docs", url: "https://tailwindcss.com/docs", category: "styling", note: "v4 uses @theme in CSS instead of tailwind.config.js." },
     //{ id: 4, title: "Tailwind CSS v4 Docs", url: "https://tailwindcss.com/docs", category: "styling", note: "v4 uses @theme in CSS instead of tailwind.config.js." },
