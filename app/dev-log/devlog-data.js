@@ -400,7 +400,7 @@ const DATA = {
       body: "",
       tag: ""
     },*/
-    {
+    /*{
       id: 530,
       date: "October 30, 2026",
       title: "Supabase Site URL Still http://localhost:3000",
@@ -420,7 +420,7 @@ const DATA = {
       title: "Production Health Verified",
       body: "/api/health returns {'status':'ok'}. UptimeRobot on roam-dusky-alpha.vercel.app/api/health shows 100% up for 1 month 15 days. The Aug 8 500 incident was resolved Sep 14.",
       tag: "deployment"
-    },
+    },*/
     
     
     /*{
@@ -2178,6 +2178,80 @@ const DATA = {
     */
 optimize: [
     {
+      id: 47,
+      month: "October 2026",
+      date: "October 20, 2026",
+      title: "Skip link and landmarks: one main per page, holding only content",
+      body: "I realized the skip link was only as good as its target. The root `<main id='page-root'>` wrapped the nav and footer, so pressing Enter on it moved focus to the top of a region that still contained the nav.",
+      bullets: [
+        "Root layout: `<main>` became `<div id='page-root' className='flex-1 flex flex-col'>`, and the link now points to `#main-content`.",
+        "(main) and (auth) layouts: the content wrapper became `<main id='main-content' tabIndex={-1}>`, with Nav and Footer outside it.",
+        "Privacy, terms, and dev-log: their own top wrappers became `<main>`.",
+        "`main#main-content[tabindex='-1']:focus { outline: none }` keeps the programmatic focus target from drawing a ring, without touching the dev-log column, which has `tabindex='0'`."
+      ],
+      tags: "refactor"
+    },  
+    {
+      id: 46,
+      month: "October 2026",
+      date: "October 20, 2026",
+      title: "Skip link stacking: focus:z-[10000]",
+      body: "I thought a color fix was needed until the computed background came back white. The problem was paint order, not color.",
+      bullets: [
+        "`focus:z-50` became `focus:z-[10000]`, above the dev-log top bar (100), sidebar (101), overlay (200), and the cookie banner (9999).",
+        "A custom CSS rule with the same z-index did not apply. The computed value stayed 50, so I removed it and fixed the utility class itself."
+      ],
+      tags: "refactor"
+    },
+    {
+      id: 45,
+      month: "October 2026",
+      date: "October 18, 2026",
+      title: "Hero focus ring as a scoped override, not a global change",
+      body: "I considered a two-tone global ring, but that touches every focus style, including shadcn's box-shadow rings.",
+      bullets: [
+        "`.hero :focus-visible { outline-color: #ffffff }` in landing.css only changes the color inside the hero.",
+        "The global ring stays `#2563eb` everywhere else, which measures 3.35:1 to 5.17:1 against the other backgrounds I checked."
+      ],
+      tags: "refactor"
+    },
+    {
+      id: 44,
+      month: "October 2026",
+      date: "October 17, 2026",
+      title: "Footer and hero text contrast through alpha, not new hex codes",
+      body: "I realized the failing text wasn't hex at all. It was `rgba(237, 232, 255, alpha)` over solid backgrounds.",
+      bullets: [
+        "Footer links .4 to .6 and footer copy .25 to .55 (footer.css and auth.css).",
+        "Hero subtitle .65 to .9, hero tag `#f1db8d`, auth 'or' divider `#6a6f77`.",
+        "My alpha model reproduced axe's own numbers (3.35, 2.09, 3.37, 3.46), so I trusted it for the new values."
+      ],
+      tags: "refactor"
+    },
+    {
+      id: 43,
+      month: "October 2026",
+      date: "October 17, 2026",
+      title: ".dn-code-lang: remove opacity, keep the token",
+      body: "The color token was fine at 6.76:1 on `#050508`. The `opacity: 0.6` was what dropped it to 3.01:1.",
+      bullets: [
+        "Deleted one line in css/devlog.css and left `--dn-text-dim` alone."
+      ],
+      tags: "refactor"
+    },
+    {
+      id: 42,
+      month: "October 2026",
+      date: "October 17, 2026",
+      title: "Footers and cookie banner: same-tab internal links",
+      body: "Internal links gain nothing from opening a new tab.",
+      bullets: [
+        "Footer.jsx and AuthFooter.jsx dropped `target='_blank'`.",
+        "The banner's Privacy Policy link became `<Link href='/privacy'>` with an `import Link from 'next/link'`."
+      ],
+      tags: "refactor"
+    },      
+    {
       id: 41,
       month: "October 2026",
       date: "October 16, 2026",
@@ -2853,6 +2927,29 @@ optimize: [
     { id: 136, topic: "Hooks must run before an early return", body: "A new useEffect has to sit above `if (!visible) return null;`, or React complains the hook order changed between renders." },
     { id: 137, topic: "Measure a fixed element, don't guess its height", body: "A banner wraps to different heights at different widths. A ResizeObserver feeding a CSS variable, with a `0px` fallback, adapts to any width." },
     { id: 138, topic: "A refusal is the evidence the fixed route is live", body: "The old admin.createUser route created users even with signups OFF. Seeing 'Signups not allowed' and 0 rows proves the signUp-based route is the one running." },
+    { id: 139, topic: "Unlayered CSS beats layered Tailwind utilities", body: "Tailwind v4 puts its utilities in a cascade layer. Any unlayered rule, such as devlog.css's `* { padding: 0 }`, wins over them regardless of specificity. That is why `focus:px-4` had no effect on /dev-log. The escape hatch is the important suffix (`focus:px-4!`), or scoping the unlayered rule." },
+    { id: 140, topic: "A color that depends on inheritance depends on the OS theme", body: "`.auth-error` had no rule, so it inherited `--foreground`, which flips to `#ededed` when the OS is dark. The same element was dark text in one session and near-white in another." },
+    { id: 141, topic: "Axe only sees the default state of the active theme", body: "It cannot see focus rings, error messages that aren't rendered yet, or the other OS theme. Those need forced states, triggered errors, and a second scan with emulated `prefers-color-scheme`." },
+    { id: 142, topic: "Text contrast with alpha is computed against the background", body: "`rgba` text blends with whatever is behind it. Checking the CSS and blending by hand gave the same numbers axe printed, so you can fix by calculation first and confirm second." },
+    { id: 143, topic: "Clicking into the DevTools Console steals page focus", body: "`:focus` and `:focus-visible` stop matching, so computed style reads back the base state. Use Rendering, then Emulate a focused page, or force the state in Elements, before reading focus styles." },
+    { id: 144, topic: "A #fragment in the URL changes where Tab starts", body: "After a skip link, the address ends in `#main-content`, and Chrome starts Tab from that target. Retest the first stop from a URL with no hash." },
+    { id: 145, topic: "A skip link target must start after the repeated block", body: "If the target contains the nav, the link skips nothing. A `<main>` should wrap only the primary content, so nav and footer keep their own landmarks." },
+    { id: 146, topic: "A translucent fixed bar can dim an element beneath it", body: "The link looked dark and its ring was faint because `.dn-topbar` (z-index 100, translucent, `backdrop-filter`) painted over it. A faint ring means something is dimming the whole element, not just its background." },
+    { id: 147, topic: "One focus ring color cannot fit every background", body: "`#2563eb` measured 5.17:1 on white but 1.34:1 on the hero purple. Scoped overrides for the failing surfaces are safer than changing the global rule." },
+    { id: 148, topic: "A scrollable region needs focusable content or its own tabindex", body: "Axe's scrollable-region-focusable rule passed on tabs with links in the Project Hub and failed on tabs without any. The linter then flags `tabIndex` on non-interactive elements, so the exception needs a written reason." },
+    { id: 149, topic: "tabIndex={-1} makes a programmatic focus target", body: "It can receive focus from a link or script without joining the Tab order, which Safari needs for skip links. Hide its outline with an attribute selector (`[tabindex='-1']`), so elements with `tabindex='0'` keep their ring." },
+    { id: 150, topic: "A real form gives you Enter-to-submit for free", body: "All three auth pages use `<form onSubmit>` with a `type='submit'` button, so Enter inside a text field works. Enter on a select or checkbox is browser-dependent, so it is a poor test." },
+    { id: 151, topic: "Browser extensions pollute accessibility tests", body: "A floating extension button took a Tab stop, and its content script caused the `removeChild` console errors. Run keyboard and screen reader tests in Incognito or a Guest window." },
+    { id: 152, topic: "Removing a focused element resets focus to the body", body: "After the cookie banner is dismissed, the next Tab starts from where it used to be. The banner is last in the DOM, so Tab then leaves the page." },
+    { id: 153, topic: "A query with placeholder text still in it proves nothing", body: "`where email = '<the email you used>'` returned 0 because nothing matches that literal text. Only the rerun with the real address counted." },
+    { id: 154, topic: "Automated scans miss structural bugs", body: "Axe scored 0 on pages where the skip link was broken. Only pressing Tab, Enter, and Tab again found it." },
+    //{ id: 10, topic: "", body: "" },
+    //{ id: 10, topic: "", body: "" },
+    //{ id: 10, topic: "", body: "" },
+    //{ id: 10, topic: "", body: "" },
+    //{ id: 10, topic: "", body: "" },
+    //{ id: 10, topic: "", body: "" },
+    //{ id: 10, topic: "", body: "" },
     //{ id: 10, topic: "", body: "" },
     //{ id: 10, topic: "", body: "" },
     //{ id: 10, topic: "", body: "" },
@@ -2887,6 +2984,72 @@ optimize: [
     },
   */
   bugs: [
+    { 
+      id: 43, 
+      title: "Skip link hidden under the dev-log top bar", 
+      status: "fixed", 
+      date: "October 20, 2026", 
+      body: [
+        "**Symptom:** on /dev-log the skip link showed as a dark, faint box with a dim ring, while other pages showed a white button.",
+        "**Root cause:** the link's `z-index` was 50 and `.dn-topbar` is 100 with a translucent background and `backdrop-filter`.",
+        "**Fix:** `focus:z-[10000]` on the link in app/layout.js. Verified: computed z-index 10000 and a white background."
+      ] 
+    },
+    { 
+      id: 42, 
+      title: "Skip link jumped to the nav, so it skipped nothing", 
+      status: "fixed", 
+      date: "October 19, 2026", 
+      body: [
+        "**Symptom:** after Enter on 'Skip to main content', the next Tab landed on 'Roam' in the nav.",
+        "**Root cause:** it targeted `<main id='page-root'>`, which wrapped the nav and footer (`main.contains(nav)` was `true`).",
+        "**Fix:** `<main id='main-content' tabIndex={-1}>` around each page's content only, with nav and footer outside, and the link pointing there. Verified: `false` on localhost and the preview; focus lands on the first content control on every page."
+      ] 
+    },
+    { 
+      id: 41, 
+      title: "Form error messages nearly invisible", 
+      status: "fixed", 
+      date: "October 18, 2026", 
+      body: [
+        "**Symptom:** 'Invalid login credentials' and the signup and age-gate errors were near-white on the white panel (axe 1.17:1).",
+        "**Root cause:** `.auth-error` and `.auth-notice` had no CSS rule, so they inherited `--foreground`, which is `#ededed` under OS dark mode.",
+        "**Fix:** explicit `#b91c1c` and `#111827` in auth.css. Verified: computed `rgb(185, 28, 28)` and axe 0 on all three pages with the error showing."
+      ] 
+    },
+    { 
+      id: 40, 
+      title: "Focus ring invisible on the landing hero", 
+      status: "fixed", 
+      date: "October 18, 2026", 
+      body: [
+        "**Symptom:** tabbing to the hero buttons showed an almost invisible ring.",
+        "**Root cause:** the global ring `#2563eb` on `#5c4e9e` is 1.34:1.",
+        "**Fix:** `.hero :focus-visible { outline-color: #ffffff }` in landing.css. Verified: `rgb(255, 255, 255)` in the hero and `rgb(37, 99, 235)` on a footer link."
+      ] 
+    },
+    { 
+      id: 39, 
+      title: "Dev-log scroll column not keyboard reachable", 
+      status: "fixed", 
+      date: "October 18, 2026", 
+      body: [
+        "**Symptom:** axe reported scrollable-region-focusable on Tech Stack and Code Snippets.",
+        "**Root cause:** `.dn-main` scrolls but those tabs hold nothing focusable.",
+        "**Fix:** `tabIndex={0}`, `role='region'`, and `aria-label` on the container, with a written eslint-disable. Verified: ring on Tab, scrolling with the arrow keys, axe 0."
+      ] 
+    },
+    { 
+      id: 38, 
+      title: "60 color-contrast failures across 11 color pairs", 
+      status: "fixed", 
+      date: "October 17, 2026", 
+      body: [
+        "**Symptom:** axe reported 6 on /, 5 on /login, 5 on /signup, 4 on /age-gate, 14 on dev-log Progression, 15 on /privacy, 10 on Resources, and 1 on What I Learned.",
+        "**Root cause:** muted `rgba` text and tag colors fell short of 4.5:1.",
+        "**Fix:** alpha and color edits in six files (footer.css, auth.css, landing.css, devlog.css, privacy.css, devlog-data.js). Verified: axe 0 on localhost in both OS themes."
+      ] 
+    },
     { 
       id: 37, 
       title: "Fixed cookie banner hid focused footer links", 
@@ -3814,7 +3977,20 @@ optimize: [
     { id: 17, title: "Tailwind CSS v4 Docs", url: "https://tailwindcss.com/docs", category: "styling", note: "v4 uses @theme in CSS instead of tailwind.config.js." },
     { id: 18, title: "WCAG 2.1", url: "https://www.w3.org/WAI/WCAG21/Understanding/non-text-contrast.html", category: "accessibility", note: "Globally recognized set of technical standards designed to make web content more accessible to people with disabilities" },
     { id: 19, title: "WAI-ARIA live regions (role='alert' and role='status')", url: "https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Guides/Live_regions", category: "accessibility", note: "Behind the toast and form-error changes: assertive versus polite announcements." },
-    // { id: 4, title: "Tailwind CSS v4 Docs", url: "https://tailwindcss.com/docs", category: "styling", note: "v4 uses @theme in CSS instead of tailwind.config.js." },
+    { id: 20, title: "Chrome DevTools: Rendering and element states", url: "https://developer.chrome.com/docs/devtools/rendering/apply-effects?st_source=ai_mode", category: "devtools", note: "Emulate a focused page, emulate `prefers-color-scheme`, and force `:focus` or `:focus-visible` from the `:hov` panel in Elements." },
+    //{ id: 4, title: "Tailwind CSS v4 Docs", url: "https://tailwindcss.com/docs", category: "styling", note: "v4 uses @theme in CSS instead of tailwind.config.js." },
+    //{ id: 4, title: "Tailwind CSS v4 Docs", url: "https://tailwindcss.com/docs", category: "styling", note: "v4 uses @theme in CSS instead of tailwind.config.js." },
+    //{ id: 4, title: "Tailwind CSS v4 Docs", url: "https://tailwindcss.com/docs", category: "styling", note: "v4 uses @theme in CSS instead of tailwind.config.js." },
+    //{ id: 4, title: "Tailwind CSS v4 Docs", url: "https://tailwindcss.com/docs", category: "styling", note: "v4 uses @theme in CSS instead of tailwind.config.js." },
+    //{ id: 4, title: "Tailwind CSS v4 Docs", url: "https://tailwindcss.com/docs", category: "styling", note: "v4 uses @theme in CSS instead of tailwind.config.js." },
+    //{ id: 4, title: "Tailwind CSS v4 Docs", url: "https://tailwindcss.com/docs", category: "styling", note: "v4 uses @theme in CSS instead of tailwind.config.js." },
+    //{ id: 4, title: "Tailwind CSS v4 Docs", url: "https://tailwindcss.com/docs", category: "styling", note: "v4 uses @theme in CSS instead of tailwind.config.js." },
+    //{ id: 4, title: "Tailwind CSS v4 Docs", url: "https://tailwindcss.com/docs", category: "styling", note: "v4 uses @theme in CSS instead of tailwind.config.js." },
+    //{ id: 4, title: "Tailwind CSS v4 Docs", url: "https://tailwindcss.com/docs", category: "styling", note: "v4 uses @theme in CSS instead of tailwind.config.js." },
+    //{ id: 4, title: "Tailwind CSS v4 Docs", url: "https://tailwindcss.com/docs", category: "styling", note: "v4 uses @theme in CSS instead of tailwind.config.js." },
+    //{ id: 4, title: "Tailwind CSS v4 Docs", url: "https://tailwindcss.com/docs", category: "styling", note: "v4 uses @theme in CSS instead of tailwind.config.js." },
+    //{ id: 4, title: "Tailwind CSS v4 Docs", url: "https://tailwindcss.com/docs", category: "styling", note: "v4 uses @theme in CSS instead of tailwind.config.js." },
+
     
     
     //{ id: 4, title: "Tailwind CSS v4 Docs", url: "https://tailwindcss.com/docs", category: "styling", note: "v4 uses @theme in CSS instead of tailwind.config.js." },
