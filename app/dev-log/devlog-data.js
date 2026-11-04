@@ -430,6 +430,210 @@ const DATA = {
       body: "",
       tag: ""
     },*/
+    
+    {
+      id: 214,
+      date: "October 20, 2026",
+      title: "One main landmark per page for /privacy, /terms, and /dev-log",
+      body: "These three routes sit outside both route-group layouts, so each got its own `<main id='main-content' tabIndex={-1}>` on its top wrapper (the dev-log reuses its `.dn-main` scroll container, with `role='region'` removed). Lint on the three edited files shows no jsx-a11y hits.",
+      tag: "refactor"
+    },
+    {
+      id: 213,
+      date: "October 20, 2026",
+      title: "Skip link hidden under the dev-log top bar",
+      body: "Computed values showed a white background and `z-index: 50`, while `.dn-topbar` is `z-index: 100` with a translucent background and `backdrop-filter`. The bar was painting over the link and dimming it. Changing `focus:z-50` to `focus:z-[10000]` fixed it (computed z-index 10000, white button confirmed on /dev-log).",
+      tag: "fixed"
+    },
+    {
+      id: 212,
+      date: "October 20, 2026",
+      title: "Dev-log skip link box is smaller than on other pages",
+      body: "The link is now white and sits above the top bar, but its padding is 0 on /dev-log while /privacy and /terms show 8px and 16px. Cause confirmed in the Styles pane: an unlayered `* { margin: 0; padding: 0 }` reset in devlog.css beats Tailwind's layered focus:px-4 and focus:py-2. Pending fix: the `!` important suffix on both classes, then verify computed padding on /dev-log.",
+      tag: "open"
+    },
+    {
+      id: 211,
+      date: "October 19, 2026",
+      title: "Skip link now skips the nav on the (main) and (auth) routes",
+      body: "After Enter on the skip link, the next Tab lands on the first content control: 'Sign up free' on /, 'Continue with Google' on /login and /signup, the Month select on /age-gate. Verified in Incognito on localhost.",
+      tag: "fixed"
+    },
+    {
+      id: 210,
+      date: "October 19, 2026",
+      title: "Move the main landmark instead of only adding an id",
+      body: "Giving each page's own content the `<main>` fixes the skip link and also restores the navigation and contentinfo landmarks outside it. A smaller option, adding an id to the existing wrappers, would have left nav and footer inside main.",
+      tag: "decision"
+    },
+    {
+      id: 209,
+      date: "October 19, 2026",
+      title: "Skip link skipped nothing: its target contained the nav",
+      body: "Found in the keyboard test. `main.contains(nav)` returned `true`, and after Enter on the skip link the next Tab landed on 'Roam' in the nav. Axe could not catch this, only a manual test did.",
+      tag: "open"
+    },
+    {
+      id: 208,
+      date: "October 19, 2026",
+      title: "Step 22 keyboard test on the preview, Parts A to E",
+      body: "Tab orders matched on /, /signup, and /login. The date selects work by keyboard and the checkbox by Space. Signup is refused with 'Signups not allowed for this instance' and no auth.users row exists for the test email. Dev-log tabs work by Enter and Space, the content column shows a ring, the scroll dock is operable, and there is no trap. The Next.js dev indicator is absent on the preview. All three auth pages use real `<form onSubmit>` forms.",
+      tag: "documentation"
+    },
+    {
+      id: 207,
+      date: "October 19, 2026",
+      title: "Step 21 lint re-run: 5 down to 0",
+      body: "Baseline 5 in a11y-baseline.txt. Both `npx eslint app/ components/` and `npx eslint .` print 0 jsx-a11y hits. `lang='en'` is visible on the rendered `<html>`. Commit 449fd7a confirmed Ready on the same screenshot.",
+      tag: "documentation"
+    },
+    {
+      id: 206,
+      date: "October 19, 2026",
+      title: "Step 20 seizure check: pass",
+      body: "Nothing exceeds 0.5 cycles per second: pulse-dot 2.5s, dn-dock-pulse 2.8s, dn-dock-pulse-alt 3.4s, landing pulse 2s, fadeSlideIn 0.22s run once. No `setInterval` in app/ or components/. The dock pulse looks like a slow breathing glow, and the global reduced-motion rule forces a single instant change.",
+      tag: "documentation"
+    },
+    {
+      id: 205,
+      date: "October 18, 2026",
+      title: "ROA-008C updated to v6",
+      body: "Item 1 now records the real root cause (an unstyled class inheriting `--foreground`), and two Done-When bullets were updated: the toast must set its own colors, and it must pass axe in both OS light and dark mode.",
+      tag: "documentation"
+    },
+    {
+      id: 204,
+      date: "October 18, 2026",
+      title: "Focus ring invisible on the landing hero",
+      body: "`#2563eb` on the hero background `#5c4e9e` computes to 1.34:1, against the 3:1 minimum. Added `.hero :focus-visible { outline-color: #ffffff }` (6.91:1). Forced-state readings: hero button `rgb(255, 255, 255)`, footer link `rgb(37, 99, 235)`, so the override is scoped.",
+      tag: "fixed"
+    },
+    {
+      id: 203,
+      date: "October 18, 2026",
+      title: "Dev-log scroll reset is its own ticket, ROA-046",
+      body: "Switching dev-log tabs keeps the previous scroll position, probably because `.dn-main` stays mounted (inference). It is not an accessibility issue and not ROA-042's route-level scroll reset. Drafted in the ROA-008C layout, with the number provisional and three decisions open (dock save and restore, back and forward, direct ?tab= load).",
+      tag: "decision"
+    },
+    {
+      id: 202,
+      date: "October 18, 2026",
+      title: "Light and dark mode axe scans: 0 on all seven pages",
+      body: "Every earlier scan ran at night in OS dark mode. Re-scanned in light mode with DevTools' prefers-color-scheme emulation: /, /login, /signup, /age-gate, /dev-log, /privacy, and /terms all scored 0.",
+      tag: "documentation"
+    },
+    {
+      id: 201,
+      date: "October 18, 2026",
+      title: ".auth-error and .auth-notice now have explicit colors",
+      body: "`.auth-error` is `#b91c1c` (6.47:1 on white by calculation) and `.auth-notice` is `#111827`. Verified: computed `rgb(185, 28, 28)` and axe 0 on /login, /signup, and /age-gate with the error showing. `.auth-notice` was verified by injecting a copy, because signups are OFF.",
+      tag: "fixed"
+    },
+    {
+      id: 200,
+      date: "October 18, 2026",
+      title: ".auth-error measured at 1.17:1 and the cause found",
+      body: "`#ededed` on `#ffffff`. Two readings were identical (no animation, opacity 1), so it was not a fade. The class had no CSS rule, so it inherited `--foreground`, which flips to `#ededed` under `prefers-color-scheme: dark`.",
+      tag: "documentation"
+    },
+    {
+      id: 199,
+      date: "October 18, 2026",
+      title: "Dev-log scroll column reachable by keyboard",
+      body: "Tech Stack and Code Snippets failed scrollable-region-focusable. Added `tabIndex={0}`, `role='region'`, and `aria-label` to `.dn-main`, plus one eslint-disable with its reason written in the comment. A blue ring now shows and the arrow keys scroll. Axe 0 on both tabs, and Position saved and Position restored still work.",
+      tag: "fixed"
+    },
+    {
+      id: 198,
+      date: "October 17, 2026",
+      title: "Footer and cookie banner links open in the same tab",
+      body: "Footer.jsx and AuthFooter.jsx dropped `target='_blank'`, and the banner's Privacy Policy anchor became `<Link href='/privacy'>`. Navigation works. The commit message names only contrast.",
+      tag: "refactor"
+    },
+    {
+      id: 197,
+      date: "October 17, 2026",
+      title: "Eleven failing color pairs fixed across the site",
+      body: "Footer link and copy alphas raised, hero tag and subtitle lightened, auth 'or' divider darkened, dev-log tag colors lightened, `.dn-code-lang` opacity removed, and `--ink-faint` darkened. Localhost axe scored 0 on /, /login, /signup, /age-gate, /privacy, and the dev-log Progression, What I Learned, and Resources tabs.",
+      tag: "fixed"
+    },
+    {
+      id: 196,
+      date: "October 17, 2026",
+      title: "Step 18 axe baseline on the preview: 62 serious findings",
+      body: "60 color-contrast (collapsing to 11 color pairs) and 2 scrollable-region-focusable. Page counts: / 6, /login 5, /signup 5, /age-gate 4, /dev-log Progression 14, /privacy 15, What I Learned 1, Tech Stack 1, Code Snippets 1, Resources 10. /terms and three dev-log tabs scored 0.",
+      tag: "documentation"
+    },
+    {
+      id: 195,
+      date: "October 16, 2026",
+      title: "Cookie banner region label and reserved space",
+      body: "The banner became `<section aria-label='Cookie consent'>` (Role: region). A ResizeObserver writes `--cookie-banner-h`, used for body padding-bottom and html scroll-padding-bottom. The value matched offsetHeight at 75, 130, and 130 across widths, and it cleared on Accept.",
+      tag: "feature"
+    },
+    {
+      id: 194,
+      date: "October 16, 2026",
+      title: "Cookie banner: no custom Tab order, kept global to (main)",
+      body: "Hand-tests showed keyboard reach and ring visibility pass. No tabindex values were added. Grep confirmed CookieBanner mounts only in app/(main)/layout.js, and you chose to keep it off /dev-log.",
+      tag: "decision"
+    },
+    {
+      id: 193,
+      date: "October 15, 2026",
+      title: "/age-gate reachable after completion routed to ROA-044",
+      body: "Opening /age-gate still worked for an apparently completed user (session state unconfirmed). The finding matches ROA-044 item 5 and its Step C, so no new ticket was created and no fix was made here.",
+      tag: "decision"
+    },
+    {
+      id: 192,
+      date: "October 15, 2026",
+      title: "role='alert' on auth form errors",
+      body: "Added to the existing `.auth-error` paragraph on /signup, /login, and /age-gate. Each showed Role: alert and live region assertive in the Accessibility pane. Per-field aria wiring was deliberately left to ROA-008C.",
+      tag: "feature"
+    },
+    {
+      id: 191,
+      date: "October 15, 2026",
+      title: "Dev-log image alt logic verified with a temporary test",
+      body: "Two Next.js logo entries showed `alt=''` on the captioned image (pane: 'Element has empty alt text') and `alt='Dev log screenshot'` on the uncaptioned one. The test entries were discarded with `git restore`, so the commit b1d3fbc kept the real edit.",
+      tag: "feature"
+    },
+    {
+      id: 190,
+      date: "October 15, 2026",
+      title: "Tab icon emoji hidden from assistive tech",
+      body: "`aria-hidden='true'` on `.dn-tab-icon`. The button's accessible name dropped from '🚀 Progression' to 'Progression'.",
+      tag: "feature"
+    },
+    {
+      id: 189,
+      date: "October 15, 2026",
+      title: "role='status' on the scroll dock toast",
+      body: "The toast stays mounted and only its text changes. The Accessibility pane shows a polite, atomic live region, and 'Position saved' and 'Position restored' both display as before.",
+      tag: "feature"
+    },
+    {
+      id: 188,
+      date: "October 15, 2026",
+      title: "aria-current on the active dev-log sidebar tab",
+      body: "`aria-current={activeTab === tab.id ? 'true' : undefined}`. Verified in Elements with 1 of 1' search results, and it moved to Future Updates on click.",
+      tag: "feature"
+    },
+    {
+      id: 187,
+      date: "October 15, 2026",
+      title: "Dev-log nested main landmark removed",
+      body: "`<main className='dn-main'>` became a `<div>` after a grep showed devlog.css has no element selector. `document.querySelectorAll('main').length` is 1 on localhost.",
+      tag: "fixed"
+    },
+    {
+      id: 186,
+      date: "October 15, 2026",
+      title: "Signup refusal verified on the ROA-016 preview",
+      body: "With signups OFF, email signup showed 'Signups not allowed for this instance' and left 0 rows in auth.users and public.users. Google signup was refused with the error in the URL hash and only handshake cookies. Existing email and Google logins still set auth-token.0 and .1. This closed the earlier gap where the preview ran the old admin route.",
+      tag: "deployment"
+    },
     {
       id: 185,
       date: "October 14, 2026",
@@ -1775,94 +1979,119 @@ const DATA = {
     // ROA-016: SESSION 18.4 - 18.5
     /* high */
     { id: 1, 
-      title: "ROA-039: Patch npm Vulnerabilities and Sentry Import",
-      priority: "high",  
-      body: "Fix 1 critical Next.js advisory (RCE on Windows and the AVIF Image Optimization path) and 4 high ones (postcss, sharp, js-yaml, nanoid, mostly transitive via next). Also change the withSentryConfig import to @sentry/nextjs/config in its own commit. Own branch, full regression pass. Overlaps ROA-043, so decide which ticket carries it."
-    },
-    { id: 2, 
-      title: "ROA-044: Protect the users Table and Age Gate",
-      priority: "high",  
-      body: "Other signed-in users can probably read date_of_birth, signup_country, tos_accepted_at, and email, and any user can write them directly. Needs column-level REVOKEs, a service-role or SECURITY DEFINER write path for /api/auth/age-gate, a write-once age-gate route, a tighter proxy.js cookie check, the item 10 navigation warning, test-user cleanup, and decisions on getSession() vs getUser() and confirmed_age. Required before signups reopen."
-    },
-    { id: 3, 
       title: "ROA-045: Resend as Supabase SMTP Provider",
       priority: "high",  
       body: "The built-in Supabase email sender is rate limited across the whole project. Needs a verified sending domain, custom SMTP, rate limits, and branded templates. Required before signups reopen."
     },
-    { id: 4, 
+    { id: 2, 
       title: "ROA-008C: Auth UX Gaps and Redirect Configuration",
       priority: "high",  
       body: "Toast feedback for errors, a check-your-email page, forgot password, show password, a hash-and-query error reader, and OAuth disclosure research. It also owns the Redirect URL cleanup and setting Site URL to the production domain. Required before signups reopen."
     },
-    { id: 5, 
+    { id: 3, 
       title: "Verify `redact()` against a real sensitive payload",
       priority: "high",  
       body: "The redaction logic in `lib/logger.js` was explained and understood via code walkthrough but never exercised with a live call passing a real `password`/`token`-shaped key through `logRequest`. Needed before trusting the 'no sensitive data leaks' Done-When item in a real production scenario rather than on code-reading alone."
     },
-    { id: 6, 
+    { id: 4, 
+      title: "Column-grant audit of every other table",
+      priority: "high",  
+      body: "The same default grants probably exist on posts, comments, and the rest (inferred). RLS does not hide columns, so the grant queries need running per table before signups reopen."
+    },
+    { id: 5, 
       title: "ROA-017 — Sentry error tracking",
       priority: "high",  
       body: "Confirmed as the next ticket to start. No dependency blockers; equally unblocked alongside ROA-016 per Wave 2 sequencing, but explicitly chosen as next. Needed so real errors in production (currently only visible via the ROA-015 logger's stdout) get proper alerting and aggregation instead of requiring a manual log search."
     },
-    { id: 7, 
+    { id: 6, 
       title: "ROA-018 — Install and Initialize PostHog",
       priority: "high",  
       body: "Now fully unblocked (`deps: ['ROA-002','ROA-007'], both closed`). The consent gate point already exists inside `CookieBanner.jsx`'s `handleAccept`. This ticket just needs to install `posthog-js`, wire the init call into that exact gate, and add the seven listed manual tracking events (post created, upvoted, map pin clicked, place viewed, user followed, translate clicked, profile viewed)."
     },
     
     /* medium */
-    { id: 8, 
+    { id: 7, 
       title: "ROA-041: Fix setState Inside Effects",
       priority: "medium",  
       body: "Locations are TabNav.jsx line 193 and CookieBanner.jsx line 20, plus a third effect that calls setAnnounced(message ?? '') whose file wasn't shown (probably the LiveRegion component, unverified). Derive values during render where possible and keep the cookie banner focus handlers working."
     },
-    { id: 9, 
+    { id: 8, 
       title: "ROA-040: Escape Unescaped JSX Entities",
       priority: "medium",  
       body: "The old ~95 count is stale. The 10/31 baseline is 104 problems (102 errors, 2 warnings) in total, which includes the ROA-041 errors, so recount by rule before editing."
     },
-    { id: 10, 
+    { id: 9, 
       title: "ROA-049: Clear the Remaining Non-Breaking Audit Findings",
       priority: "medium",  
       body: "Run `npm audit fix --dry-run` first, apply the six non-breaking fixes in their own commit, repeat the Sentry test error if @sentry/nextjs, the bundler plugin, or next changes, and decide on shadcn, zod, and moving shadcn to devDependencies. Keeps the audit clean enough that a new critical or high finding stands out. Any time after ROA-044."
     },
-    { id: 11, 
+    { id: 10, 
       title: "Sentry Coverage: global-error.jsx and Sentry.setUser()",
       priority: "medium",  
       body: "ROA-017's cleanup removed app/global-error.jsx, the file Sentry generates to report root-level React render errors (inference). Decide whether to add it back, and extend Sentry.setUser() beyond auth/signup/route.js."
     },
+    { id: 11, 
+      title: "Decide on revoking TRUNCATE and TRIGGER",
+      priority: "medium",  
+      body: "anon and authenticated hold both on public.users, likely on other tables too. The API probably doesn't expose TRUNCATE (inferred, untested), but the grants should be a conscious choice."
+    },
+    { id: 12, 
+      title: "Route guard coverage for new pages and APIs",
+      priority: "medium",  
+      body: "The age-gate guard covers only /dashboard. Add each new route to the guard or give it a `getUser()` plus `confirmed_age` check, and review /api/posts, /api/comments, and /api/translate."
+    },
+    { id: 13, 
+      title: "Profile columns after the lockdown",
+      priority: "medium",  
+      body: "location_preference is readable and editable by every signed-in user. Each new column needs an explicit GRANT, and a logged-out profile page needs a view or an API route."
+    },
+    { id: 14, 
+      title: "Country source for the age rule",
+      priority: "medium",  
+      body: "Decide between the Vercel header and the ip-api.com lookup. The lookup runs over plain HTTP (I believe the free tier has no HTTPS, unverified) and sends user IPs. The fail-safe to age 16 stays."
+    },
 
     /* low */
-    { id: 12, 
+    { id: 15, 
       title: "ROA-042: Logo Navigation and Scroll Reset",
       priority: "low",  
       body: "The Roam logo doesn't navigate home when already on `/`, and page navigation doesn't reliably scroll to top. Wrap the logo in a real <Link href="/"> with forced scroll reset."
     },
-    { id: 13, 
+    { id: 16, 
       title: "ROA-046: Dev-Log Tabs Keep the Previous Scroll Position",
       priority: "low",  
       body: "Three decisions are open: dock save and restore behavior, back and forward behavior, and direct ?tab= loads."
     },
-    { id: 14, 
+    { id: 17, 
       title: "ROA-047: Build the About Page",
       priority: "low",  
       body: "The footer About link points to # on every page. Needs owner copy before build, one h1, and the shared page shell."
     },
-    { id: 15, 
+    { id: 18, 
       title: "ROA-048: Dev-Log Input Delay (Conditional)",
       priority: "low",  
       body: "Open only if slowness is reported on a real device or field INP on /dev-log exceeds 200ms. Start with a Chrome Performance trace."
     },
-    { id: 16, 
+    { id: 19, 
       title: "Windows NVDA Skip Link Retest",
       priority: "low",  
       body: "The skip link was not announced on a fresh load on Windows. Retest in a fresh Guest window with no click before claiming Windows screen reader support."
     },
-    { id: 17, 
+    { id: 20, 
       title: "Verify Map Popup and Dialog Accessibility",
       priority: "low",  
       body: "Neither exists yet. Run docs/a11y-checklist.md when the map tickets and the first real modal are built, including focus return on close."
     },
+    { id: 21, 
+      title: "Lint cleanup (ROA-040 and ROA-041)",
+      priority: "low",  
+      body: "The baseline is 103 problems. About 99 are unescaped-entity errors (inferred), and 3 are set-state-in-effect errors in TabNav.jsx, CookieBanner.jsx, and LiveRegion.jsx."
+    },
+    { id: 22, 
+      title: "Small ROA-044 follow-ups",
+      priority: "low",  
+      body: "The route's 409 also covers 'no public.users row'. The ROA-044 dev-log entry (devlog-data.js line 1610) still reads as pending work."
+    }
   ],
 
   // ── Optimizations data ────────────────────────────────────────────────────
@@ -1948,6 +2177,46 @@ const DATA = {
     }, 
     */
 optimize: [
+    {
+      id: 41,
+      month: "October 2026",
+      date: "October 16, 2026",
+      title: "Cookie banner: reserve space instead of hiding content",
+      body: "The fixed bar covered the focused footer links, and a fixed height would break as the text wraps at different widths. Measuring the real height solved both.",
+      bullets: [
+        "A ResizeObserver effect writes `--cookie-banner-h` and cleans up on dismiss.",
+        "`body { padding-bottom }` gives the page room, and `scroll-padding-bottom` keeps focused elements clear of the bar.",
+        "The effect sets no React state, so the ROA-041 warning count doesn't grow."
+      ],
+      tags: "refactor"
+    }, 
+    {
+      id: 40,
+      month: "October 2026",
+      date: "October 15, 2026",
+      title: "Auth forms: announce errors without redesigning them",
+      body: "The errors were form-level server messages, so per-field wiring would have meant parsing error strings. A single attribute on the existing paragraph does the job and leaves the toast redesign to ROA-008C.",
+      bullets: [
+        "`role='alert'` on `.auth-error` across three pages.",
+        "No class, layout, or color changes.",
+        "Live-region behavior carries forward when the toasts replace the paragraph."
+      ],
+      tags: "refactor"
+    }, 
+    {
+      id: 39,
+      month: "October 2026",
+      date: "October 15, 2026",
+      title: "Dev-log TabNav: semantics over appearance",
+      body: "The page looked right but the markup said the wrong things: a second landmark, no current state on the active tab, a silent toast, and an emoji in the button name. The fix was all in structure, not styling.",
+      bullets: [
+        "`<main>` to `<div>`, with `className` and `ref` kept so scroll behavior is unchanged.",
+        "`aria-current` reuses the same comparison that sets the `active` class, so the two cannot drift.",
+        "The toast container stays mounted and only its text changes.",
+        "`aria-hidden` on the icon span leaves the emoji visible and out of the name."
+      ],
+      tags: "refactor"
+    }, 
     {
       id: 38,
       month: "October 2026",
@@ -2577,12 +2846,26 @@ optimize: [
     { id: 129, topic: "Lint reads source, not rendered colors", body: "`jsx-a11y` can't judge contrast. A rule passed with `--rule` on the command line applies to one run, not to the config." },
     { id: 130, topic: "Alt text depends on context", body: "A visible caption means `alt=''` so it isn't read twice, and `muted` satisfies `media-has-caption` only for silent clips." },
     { id: 131, topic: "Git hygiene", body: "A three-dot diff shows only what a branch changed since it left the base, and `git add -A` stages untracked scratch files. Read `git status` and stage by name." },
+    { id: 132, topic: "ARIA labels things, it never makes a page talk", body: "Speech comes from a screen reader the user runs. Some features need an OS setting, like prefers-reduced-motion for the motion override. Focus rings and contrast are always on." },
+    { id: 133, topic: "`??` respects an empty string, `||` does not", body: "`media.alt ?? fallback` keeps an explicit `alt=''`. This is why a captioned image can opt out of a description." },
+    { id: 134, topic: "A live region should already exist when its text changes", body: "Keep the status container mounted and change only its text. An element that fades with opacity stays in the accessibility tree, while `display: none` would not." },
+    { id: 135, topic: "alert interrupts, status waits", body: "`role='alert'` fits a failed submit that needs attention. `role='status'` fits a confirmation like 'Position saved'." },
+    { id: 136, topic: "Hooks must run before an early return", body: "A new useEffect has to sit above `if (!visible) return null;`, or React complains the hook order changed between renders." },
+    { id: 137, topic: "Measure a fixed element, don't guess its height", body: "A banner wraps to different heights at different widths. A ResizeObserver feeding a CSS variable, with a `0px` fallback, adapts to any width." },
+    { id: 138, topic: "A refusal is the evidence the fixed route is live", body: "The old admin.createUser route created users even with signups OFF. Seeing 'Signups not allowed' and 0 rows proves the signUp-based route is the one running." },
     //{ id: 10, topic: "", body: "" },
     //{ id: 10, topic: "", body: "" },
     //{ id: 10, topic: "", body: "" },
     //{ id: 10, topic: "", body: "" },
     //{ id: 10, topic: "", body: "" },
     //{ id: 10, topic: "", body: "" },
+    //{ id: 10, topic: "", body: "" },
+    //{ id: 10, topic: "", body: "" },
+    //{ id: 10, topic: "", body: "" },
+    //{ id: 10, topic: "", body: "" },
+    //{ id: 10, topic: "", body: "" },
+    //{ id: 10, topic: "", body: "" },
+
 
     //{ id: 10, topic: "", body: "" },
   ],
@@ -2604,6 +2887,80 @@ optimize: [
     },
   */
   bugs: [
+    { 
+      id: 37, 
+      title: "Fixed cookie banner hid focused footer links", 
+      status: "fixed", 
+      date: "October 16, 2026", 
+      body: [
+        "**Symptom:** the Tab focus ring on Privacy, Terms, and About was behind the bar (Test 4).",
+        "**Root cause:** `position: fixed` content overlapped the page bottom.",
+        "**Fix:** reserved space with the measured `--cookie-banner-h`, and the rings are now visible above the bar."
+      ] 
+    },
+    { 
+      id: 36, 
+      title: "Cookie banner had no role or name", 
+      status: "fixed", 
+      date: "October 16, 2026", 
+      body: [
+        "**Symptom:** the banner was a generic `div` with an empty name (Test 2).",
+        "**Fix:** `<section aria-label='Cookie consent'>`, confirmed as Role: region."
+      ] 
+    },
+    { 
+      id: 35, 
+      title: "Auth form errors were not announced", 
+      status: "fixed", 
+      date: "October 15, 2026", 
+      body: [
+        "**Symptom:** a failed submit changed the page with no announcement.",
+        "**Root cause:** a plain paragraph with no role.",
+        "**Fix:** `role='alert'` on all three auth pages."
+      ] 
+    },
+    { 
+      id: 34, 
+      title: "Emoji inside the tab button's accessible name", 
+      status: "fixed", 
+      date: "October 15, 2026", 
+      body: [
+        "**Symptom:** the name read '🚀 Progression'.",
+        "**Fix:** `aria-hidden='true'` on the icon span, and the name is now 'Progression'."
+      ] 
+    },
+    { 
+      id: 33, 
+      title: "Scroll dock toast was silent to screen readers", 
+      status: "fixed", 
+      date: "October 15, 2026", 
+      body: [
+        "**Symptom:** 'Position saved' appeared visually and was not a live region.",
+        "**Fix:** `role='status'` on the always-mounted container, verified as a polite, atomic live region."
+      ] 
+    },
+    { 
+      id: 32, 
+      title: "Active dev-log tab had no programmatic state", 
+      status: "fixed", 
+      date: "October 15, 2026", 
+      body: [
+        "**Symptom:** the active tab was shown only by a CSS class.",
+        "**Root cause:** no ARIA state on the button.",
+        "**Fix:** added `aria-current` using the existing active comparison."
+      ] 
+    },
+    { 
+      id: 31, 
+      title: "Dev-log had a second main landmark", 
+      status: "fixed", 
+      date: "October 15, 2026", 
+      body: [
+        "**Symptom:** two `<main>` elements on /dev-log, since the root layout already owns `main#page-root`.",
+        "**Root cause:** TabNav rendered its own `<main className='dn-main'>`.",
+        "**Fix:** changed it to a `<div>` after confirming no CSS selected the element."
+      ] 
+    },
     { 
       id: 30, 
       title: "Confirmation link landed on `localhost:3000`", 
@@ -3456,7 +3813,7 @@ optimize: [
     { id: 16, title: "Next.js: no-img-element", url: "https://nextjs.org/docs/messages/no-img-element", category: "build", note: "Why `<img>` raises a lint warning and when `next/image` is preferred." },
     { id: 17, title: "Tailwind CSS v4 Docs", url: "https://tailwindcss.com/docs", category: "styling", note: "v4 uses @theme in CSS instead of tailwind.config.js." },
     { id: 18, title: "WCAG 2.1", url: "https://www.w3.org/WAI/WCAG21/Understanding/non-text-contrast.html", category: "accessibility", note: "Globally recognized set of technical standards designed to make web content more accessible to people with disabilities" },
-    // { id: 4, title: "Tailwind CSS v4 Docs", url: "https://tailwindcss.com/docs", category: "styling", note: "v4 uses @theme in CSS instead of tailwind.config.js." },
+    { id: 19, title: "WAI-ARIA live regions (role='alert' and role='status')", url: "https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Guides/Live_regions", category: "accessibility", note: "Behind the toast and form-error changes: assertive versus polite announcements." },
     // { id: 4, title: "Tailwind CSS v4 Docs", url: "https://tailwindcss.com/docs", category: "styling", note: "v4 uses @theme in CSS instead of tailwind.config.js." },
     
     
