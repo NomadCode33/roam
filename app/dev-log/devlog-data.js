@@ -431,6 +431,181 @@ const DATA = {
       tag: ""
     },*/
     {
+      id: 185,
+      date: "October 14, 2026",
+      title: "ROA-016 build `19410ba` errored and the dev-log commit is unconfirmed",
+      body: "The Vercel build log for `19410ba` was never read, and 13e verification is pending.",
+      tag: "open"
+    },
+    {
+      id: 184,
+      date: "October 14, 2026",
+      title: "Old admin signup route still lives on `feature/roa-016`",
+      body: "It ignores the signups toggle. The fix is committed but unmerged, and the plan is to merge it into `staging` and then into ROA-016.",
+      tag: "open"
+    },
+    {
+      id: 183,
+      date: "October 14, 2026",
+      title: "`users` columns still exposed, live tests not run",
+      body: "Other users' dates of birth are probably readable, and a user can probably write their own directly. The authenticated read and write tests are ROA-044's Step A.",
+      tag: "open"
+    },
+    {
+      id: 182,
+      date: "October 14, 2026",
+      title: "Ticket and flag documents updated",
+      body: "ROA-008C is at v5 with 9 items, ROA-044 at v3, ROA-045 drafted, and the master flag list at v21. A session handoff was also written.",
+      tag: "documentation"
+    },
+    {
+      id: 181,
+      date: "October 14, 2026",
+      title: "Show-password checkboxes added to ROA-008C, Resend scoped as ROA-045",
+      body: "Neither kanban v5 nor checklist v6 mentioned show-password. It became item 9 of ROA-008C. Resend as the SMTP provider was already in checklist v6, and it became the draft ROA-045.",
+      tag: "decision"
+    },
+    {
+      id: 180,
+      date: "October 14, 2026",
+      title: "Signups-OFF test: the new route refuses, the old route doesn't",
+      body: "With the toggle off, the fixed route showed 'Signups not allowed for this instance' with no row created. The `feature/roa-016` preview, still on the old admin route, created an Auth user and a `users` row. Existing email and Google logins worked on both previews.",
+      tag: "decision"
+    },
+    {
+      id: 179,
+      date: "October 14, 2026",
+      title: "Supabase redirect list corrected, preview flow verified",
+      body: "A missing preview entry plus a double-slash typo had sent confirmation links to `localhost:3000`. After the fix, the link stayed on the preview domain, session cookies appeared, and the `users` row showed `signup_country` US.",
+      tag: "deployment"
+    },
+    {
+      id: 178,
+      date: "October 13, 2026",
+      title: "Email signup now sends a confirmation email",
+      body: "On `fix/auth-signup-email`, `signup/route.js` calls `signUp` on a cookie-aware server client. The 'Confirm your email address' mail arrived and the page showed a notice instead of silently going home.",
+      tag: "deployment"
+    },
+    {
+      id: 177,
+      date: "October 13, 2026",
+      title: "Dev-log image alt logic and video `muted`",
+      body: "Edited `CardMedia` in `devlog-data.js`. `npx eslint app/dev-log/` printed no `jsx-a11y` output. The commit is still unconfirmed.",
+      tag: "fixed"
+    },
+    {
+      id: 176,
+      date: "October 13, 2026",
+      title: "Revamped 3-file dev-log brought onto `feature/roa-016`",
+      body: "I copied `page.jsx`, `TabNav.jsx`, and `devlog-data.js` from `main` and pushed them as commit `677004e`. The Vercel preview built and the tabs worked.",
+      tag: "deployment"
+    },
+    {
+      id: 175,
+      date: "October 01, 2026",
+      title: "ROA-044 scoped: protect the `users` table (read and write)",
+      body: "`pg_policies` showed `users_select_all` is `true` and the update policy only pins `role`. Column privileges and a live `anon` test showed `anon` is blocked, while `authenticated` holds SELECT and UPDATE on the three age-gate columns.",
+      tag: "decision"
+    },
+    {
+      id: 174,
+      date: "October 01, 2026",
+      title: "Removed the unused dev-log `Sidebar.jsx`",
+      body: "The import check showed only a commented-out import. After `git rm`, the full `jsx-a11y` count dropped to the single media-caption hit, and `/dev-log` still rendered with every tab working.",
+      tag: "refactor"
+    },
+    {
+      id: 173,
+      date: "October 01, 2026",
+      title: "Date-of-birth row now has an accessible group name and per-select labels",
+      body: "`signup/page.js` and `age-gate/page.js` use `<fieldset>`, `<legend>`, and a hidden `<label htmlFor>` per select. The Accessibility pane showed the group as 'Date of birth' and the selects as Month, Day, and Year. It was checked at 320px with no overflow, and both label-association lint hits cleared.",
+      tag: "fixed"
+    },
+    {
+      id: 172,
+      date: "September 30, 2026",
+      title: "shadcn Dialog installed (Radix UI base)",
+      body: "Installed via the Rhea preset after two failed attempts at the custom preset flow. Smoke-tested on a temporary route: confirmed focus trap, Tab cycling, Escape-to-close, and focus-return-to-trigger all working correctly.",
+      tag: "feature"
+    },
+    {
+      id: 171,
+      date: "September 30, 2026",
+      title: "shadcn init overwrote `globals.css` wholesale",
+      body: "Running `npx shadcn@latest init` to install Dialog deleted the project's real `--background`/`--foreground` hex tokens and `body` font-family rule, replacing them with shadcn's oklch defaults. Diagnosed via `git show HEAD:app/globals.css` diff. Fixed by merging: kept shadcn's Dialog-required tokens, restored original theme tokens and fonts. Verified via screenshots across homepage, login, and signup.",
+      tag: "fixed"
+    },
+    {
+      id: 170,
+      date: "September 26, 2026",
+      title: "Logo doesn't navigate home when already on `/`; page nav doesn't reliably scroll to top",
+      body: "Discovered during manual skip-link testing. Scoped as ROA-042, unrelated to accessibility work so kept out of this branch.",
+      tag: "open"
+    },
+    {
+      id: 169,
+      date: "September 26, 2026",
+      title: "~95 unescaped JSX entity lint warnings + 2 setState-in-effect warnings",
+      body: "Found during the ROA-016 baseline lint run. Not accessibility issues, so deliberately deferred. Scoped as ROA-040 and ROA-041.",
+      tag: "open"
+    },
+    {
+      id: 168,
+      date: "September 26, 2026",
+      title: "npm audit: 1 critical, 4 high severity advisories",
+      body: "Next.js RCE (Windows-hosted servers + AVIF Image Optimization API), plus postcss/sharp/js-yaml/nanoid, mostly transitive via next. Scoped as ROA-039 and deliberately not fixed mid-ticket, it requires its own branch and full regression pass.",
+      tag: "open"
+    },
+    {
+      id: 167,
+      date: "September 26, 2026",
+      title: "`docs/a11y-checklist.md` created",
+      body: "Standing pre-close checklist for any ticket touching UI. Later appended with Mapbox-specific popup rules and the Tailwind cascade-layers gotcha.",
+      tag: "documentation"
+    },
+    {
+      id: 166,
+      date: "September 26, 2026",
+      title: "`LiveRegion` component",
+      body: "Built `components/a11y/LiveRegion.jsx`, a reusable `aria-live` announcer using a clear-then-set-after-50ms pattern so identical repeated messages still get announced to screen readers.",
+      tag: "feature"
+    },
+    {
+      id: 165,
+      date: "September 26, 2026",
+      title: "Reduced-motion override silently losing to Tailwind v4 cascade layers",
+      body: "`.pulse`'s animation kept running with Reduce Motion enabled despite an `!important` override. Root cause: Tailwind v4's `@import 'tailwindcss'` places subsequent rules inside a named `@layer`, and unlayered CSS always beats layered CSS regardless of specificity or `!important`. Fixed by keeping the reduced-motion media query unlayered, before layer context is established. Confirmed via DevTools Computed panel (`animation-duration` 2s → 0.01ms).",
+      tag: "fixed"
+    },
+    {
+      id: 164,
+      date: "September 26, 2026",
+      title: "Global `:focus-visible` ring",
+      body: "Added a global `outline: 2px solid #2563eb` rule scoped to `:focus-visible` only, so keyboard focus is visible without adding a ring on every mouse click.",
+      tag: "feature"
+    },
+    {
+      id: 163,
+      date: "September 26, 2026",
+      title: "Skip-to-content link",
+      body: "Added a `sr-only focus:not-sr-only` link as the first child of `<body>`, targeting `#page-root`. Verified with screenshots showing the link appearing on first Tab press and correctly jumping past the nav.",
+      tag: "feature"
+    },
+    {
+      id: 162,
+      date: "September 26, 2026",
+      title: "Duplicate `<main>` landmarks across 8 files",
+      body: "Root layout and nested route-group layouts/pages were each rendering their own `<main>`, producing 2–3 nested landmarks per page. Swapped all nested instances to `<div>`, keeping only the outermost `<main id='page-root'>` in root `app/layout.js`.",
+      tag: "fixed"
+    },
+    {
+      id: 161,
+      date: "September 26, 2026",
+      title: "ESLint jsx-a11y integration",
+      body: "Installed `eslint-plugin-jsx-a11y` and `@axe-core/react`. Resolved a flat-config plugin collision (eslint-config-next already registers jsx-a11y) by extracting only `.rules` from `flatConfigs.recommended` instead of the full config object. Verified via `--print-config` showing `jsx-a11y/alt-text` at severity 2.",
+      tag: "feature"
+    },
+    {
       id: 160,
       date: "September 23, 2026",
       title: "Defer `proxy.js` → Node Runtime Migration",
@@ -1774,6 +1949,95 @@ const DATA = {
     */
 optimize: [
     {
+      id: 38,
+      month: "October 2026",
+      date: "October 13, 2026",
+      title: "Dev-log `CardMedia`: smarter alt and video attributes",
+      body: "I wanted a screenshot never to vanish for a blind user, and a caption never to be read twice.",
+      bullets: [
+        "`alt={media.alt ?? (media.caption ? '' : 'Dev log screenshot')}`.",
+        "`muted` added to the `<video>` for silent clips."
+      ],
+      tags: "refactor"
+    }, 
+    {
+      id: 37,
+      month: "October 2026",
+      date: "October 13, 2026",
+      title: "Callback: age-gate completeness no longer needs `signup_country`",
+      body: "A failed IP lookup (localhost, VPN) looped email users back into the age gate.",
+      bullets: [
+        "Check reduced to `!date_of_birth || !tos_accepted_at`.",
+        "Google users still reach the gate because they have neither."
+      ],
+      tags: "refactor"
+    }, 
+    {
+      id: 36,
+      month: "October 2026",
+      date: "October 13, 2026",
+      title: "Signup route: `admin.createUser` to `signUp`",
+      body: "The admin call sends no email and ignores the signups toggle.",
+      bullets: [
+        "New `createServerClient` with `cookieStore`, `emailRedirectTo` set to `{origin}/auth/callback`.",
+        "`supabaseAdmin` kept for the `users` row update only.",
+        "Repeat emails return 'That email is already registered.' via an `identities.length === 0` check."
+      ],
+      tags: "refactor"
+    }, 
+    {
+      id: 35,
+      month: "October 2026",
+      date: "October 01, 2026",
+      title: "Dev-log: delete the unused Sidebar",
+      body: "A leftover from another project (React Router `to` props, 'SonicVerse' text) carried a failing overlay `div`.",
+      bullets: [
+        "Confirmed with an import grep before `git rm components/dev-log/Sidebar.jsx`.",
+        "Left `devlog.css` alone and logged the dead `sidebar-*` rules."
+      ],
+      tags: "refactor"
+    },   
+    {
+      id: 34,
+      month: "September 2026",
+      date: "September 30, 2026",
+      title: "ROA-016 walkthrough: Phase F reordered",
+      body: "I realized a screen reader session shouldn't be spent on something a linter would have shown me.",
+      bullets: [
+        "Linter re-run moved first, then keyboard-only test, then screen reader, then commit.",
+        "Step numbers stayed stable so the handoff references still match."
+      ],
+      tags: "refactor"
+    },  
+    {
+      id: 33,
+      month: "September 2026",
+      date: "September 30, 2026",
+      title: "`globals.css` token merge after shadcn overwrite",
+      body: "Realized a one-component install could silently nuke the entire theme system if I didn't check the diff immediately after running a scaffolding tool.",
+      bullets: [
+        "Restored original hex-based `--background`/`--foreground` tokens and the `@media (prefers-color-scheme: dark)` block",
+        "Pointed `--font-sans` at the project's actual `--font-dm-sans` variable instead of shadcn's generic default",
+        "Removed `html { @apply font-sans; }`, which would have silently overridden the project's existing font classes",
+        "Kept shadcn's `--card`, `--popover`, `--ring`, and `--radius-*` tokens intact since Dialog depends on them"
+      ],
+      tags: "refactor"
+    },   
+    {
+      id: 32,
+      month: "September 2026",
+      date: "September 26, 2026",
+      title: "Landmark structure: `<main>` → `<div>` across route-group layouts",
+      body: "Realized that showing a clean accessibility tree mattered more than I'd assumed. A screen reader's jump-to-content shortcut is meaningless with 2–3 competing 'main' landmarks per page.",
+      bullets: [
+        "Removed `<main>` from `(main)/layout.js`, `(auth)/layout.js`, and all three auth page files",
+        "Removed `<main>` from `privacy/page.jsx`, `terms/page.js`, `dev-log/page.jsx`",
+        "Confirmed `className`, `id`, and `ref` props all survive the tag swap unchanged, since they're independent of the element name",
+        "Left one dead-code `<main>` inside a commented-out block untouched, since it never executes"
+      ],
+      tags: "refactor"
+    }, 
+    {
       id: 31,
       month: "September 2026",
       date: "September 22, 2026",
@@ -2292,6 +2556,28 @@ optimize: [
     { id: 108, topic: "Vercel Environment Variables Are Scoped Per Environment, Independently", body: "A variable saved only under 'Production' in Vercel will not exist during a Preview build, even though the same underlying secret would work identically in both." },
     { id: 109, topic: "Vercel's 'Development' Env Scope Is a Red Herring for Local Dev", body: "That environment checkbox only matters if you're running the `vercel dev` CLI tool. Plain `next dev` never touches it, it reads exclusively from `.env.local`." },
     { id: 110, topic: "Two Independent Timing/Evidence Sources Agreeing Is Real Proof", body: "When two separately-generated measurements or confirmations point the same direction, that's meaningful evidence. When they *disagree*, like a green 'Error sent to Sentry' button next to an unchanged Issues list, that mismatch is the signal something's actually wrong and not something to explain away." },
+    { id: 111, topic: "Tailwind v4 cascade layers beat specificity and `!important`", body: "Rules declared inside a named `@layer` (which `@import 'tailwindcss'` establishes) always lose to unlayered CSS, no matter how specific the selector or how many `!important` flags are stacked. Any global override meant to beat a plain stylesheet must sit before layer context is established." },
+    { id: 112, topic: "`npx shadcn@latest init` can rewrite `globals.css` wholesale", body: "Even when the goal is 'just add one component,' `init` on an existing project can delete custom theme tokens and font rules outright. Always diff the file immediately after running it rather than assuming only new content was added." },
+    { id: 113, topic: "`jsx-a11y`'s recommended config can collide with `eslint-config-next`", body: "Both register the same plugin name under flat config. Adding the full `flatConfigs.recommended` object throws a hard `ConfigError` on duplicate plugin registration, only the `.rules` key should be merged in." },
+    { id: 114, topic: "Placeholder text is not an accessible label", body: "Placeholder attributes disappear on input and aren't reliably announced as a field's name by screen readers. A real `<label>` (via `htmlFor`/`id` or `aria-label`) is required regardless of visual design constraints." },
+    { id: 115, topic: "A `<div>` with `onClick` is invisible to keyboard users", body: "It can't receive Tab focus and Enter does nothing by default. Swapping to a real `<button>` or `<a>` gets focus handling and key support for free, rebuilding that behavior by hand with `role`/`tabIndex` is more code and easier to get wrong." },
+    { id: 116, topic: "shadcn's Dialog (Radix UI base) solves focus management that's hard to hand-build", body: "Focus trapping, escape-to-close, and returning focus to the trigger element on close are all handled automatically. Confirmed via a real smoke test rather than assumed from documentation." },
+    { id: 117, topic: "A label names one control; a fieldset names a group", body: "A single `<label>` around three selects names none of them. Use `<fieldset>` and `<legend>` for the group and one label per control." },
+    { id: 118, topic: "A placeholder is not a name", body: "Chrome's Accessibility pane strikes it through when a label exists. It also vanishes on typing and tends to fail contrast." },
+    { id: 119, topic: "ARIA changes announcements, not behavior", body: "`role='button'` on a `div` adds no focus or Enter and Space handling. A native `<button>` does." },
+    { id: 120, topic: "Untracked files and `.next` don't belong to a branch", body: "`.next` is gitignored and shared on disk, so a stale copy after a branch switch caused the `instrumentation.js` MODULE_UNPARSABLE error. Run `rm -rf .next` after switching." },
+    { id: 121, topic: "Supabase silently falls back to the Site URL", body: "A `redirect_to` that isn't on the allow list lands on the Site URL (`localhost:3000`). A double slash in an entry does the same." },
+    { id: 122, topic: "`admin.createUser` vs `signUp`", body: "The admin call sends no confirmation email and bypasses 'Allow new users to sign up'. `signUp` on a server client with cookies does both properly." },
+    { id: 123, topic: "Confirmation links are single use", body: "The auth log showed the same token requested twice. The second request returned `otp_expired`, which can arrive in the query string and the hash." },
+    { id: 124, topic: "Session cookies come in two parts", body: "`sb-…-auth-token.0` and `.1` are the session. `…-code-verifier` and `…-flow-…` cookies are handshake leftovers, so a blocked signup leaves only those." },
+    { id: 125, topic: "RLS is per row; grants decide columns", body: "A row policy of `true` plus a column SELECT grant exposes that column. Check `pg_policies`, `information_schema.column_privileges`, and a live test as the target role." },
+    { id: 126, topic: "A preview runs only what was pushed", body: "A country of US means a deployed server handled the request, because localhost can't geolocate. Reverting code locally doesn't change a deployed preview." },
+    { id: 127, topic: "Geo lookups fail, so gates must not depend on them", body: "`lib/geo.js` returns null on localhost, VPNs, and outages. Requiring a country made working users loop." },
+    { id: 128, topic: "Built-in Supabase email is limited project-wide", body: "One tester can block everyone. Custom SMTP such as Resend, plus DNS records, is the fix." },
+    { id: 129, topic: "Lint reads source, not rendered colors", body: "`jsx-a11y` can't judge contrast. A rule passed with `--rule` on the command line applies to one run, not to the config." },
+    { id: 130, topic: "Alt text depends on context", body: "A visible caption means `alt=''` so it isn't read twice, and `muted` satisfies `media-has-caption` only for silent clips." },
+    { id: 131, topic: "Git hygiene", body: "A three-dot diff shows only what a branch changed since it left the base, and `git add -A` stages untracked scratch files. Read `git status` and stage by name." },
+    //{ id: 10, topic: "", body: "" },
     //{ id: 10, topic: "", body: "" },
     //{ id: 10, topic: "", body: "" },
     //{ id: 10, topic: "", body: "" },
@@ -2318,6 +2604,116 @@ optimize: [
     },
   */
   bugs: [
+    { 
+      id: 30, 
+      title: "Confirmation link landed on `localhost:3000`", 
+      status: "fixed", 
+      date: "October 14, 2026", 
+      body: [
+        "**Symptom:** the link opened localhost, then `otp_expired` on a second click.",
+        "**Cause:** the preview URL was missing from the allow list (and one entry had `//`), and Supabase fell back to the Site URL.",
+        "**Fix:** correct entry added, and one click per link."
+      ] 
+    },
+    { 
+      id: 29, 
+      title: "Dev-log `<video>` failed `media-has-caption`", 
+      status: "fixed", 
+      date: "October 13, 2026", 
+      body: [
+        "**Symptom:** the last baseline lint error.",
+        "**Cause:** no captions track.",
+        "**Fix:** `muted` for silent clips, with real captions deferred for narrated video. The `jsx-a11y` output is now empty (commit pending)."
+      ] 
+    },
+    { 
+      id: 28, 
+      title: "Email signups looped into the age gate", 
+      status: "fixed", 
+      date: "October 13, 2026", 
+      body: [
+        "**Symptom:** `/age-gate` appeared after email confirmation.",
+        "**Cause:** the callback treated an empty `signup_country` as incomplete.",
+        "**Fix:** completeness now needs only date of birth and consent."
+      ] 
+    },
+    { 
+      id: 27, 
+      title: "Email signup returned home silently with no confirmation email", 
+      status: "fixed", 
+      date: "October 13, 2026", 
+      body: [
+        "**Symptom:** no message, no mail, no session.",
+        "**Cause:** `admin.createUser` sends no email, and the client navigated to `/auth/callback` with no `code`.",
+        "**Fix:** `signUp` on a cookie-aware client plus a notice."
+      ] 
+    },
+    { 
+      id: 26, 
+      title: "Localhost crash: `instrumentation.js` MODULE_UNPARSABLE on `main`", 
+      status: "fixed", 
+      date: "October 13, 2026", 
+      body: [
+        "**Symptom:** the dev server errored on start.",
+        "**Cause:** a stale `.next` from another branch pointing at a file `main` doesn't have.",
+        "**Fix:** `rm -rf .next` and `npm run dev`."
+      ] 
+    },
+    { 
+      id: 61, 
+      title: "Sidebar overlay `div` failed `click-events-have-key-events` and `no-static-element-interactions`", 
+      status: "fixed", 
+      date: "October 01, 2026", 
+      body: [
+        "**Symptom:** two baseline hits at one element.",
+        "**Cause:** a `div` with `onClick` and no keyboard support.",
+        "**Fix:** the component was unused, so it was deleted."
+      ] 
+    },
+    { 
+      id: 60, 
+      title: "Orphan DOB label flagged twice by `jsx-a11y/label-has-associated-control`", 
+      status: "fixed", 
+      date: "October 01, 2026", 
+      body: [
+        "**Symptom:** two baseline lint errors on signup and age-gate.",
+        "**Cause:** the 'Date of birth' label wasn't associated with any control (age-gate's selects had no ids).",
+        "**Fix:** fieldset, legend, and one hidden label per select."
+      ] 
+    },
+    { 
+      id: 59, 
+      title: "`globals.css` overwritten by shadcn's `init` command", 
+      status: "fixed", 
+      date: "September 30, 2026", 
+      body: [
+        "**Symptom:** homepage lost its purple background scheme and reverted toward shadcn's grayscale defaults after running `npx shadcn@latest add dialog`.",
+        "**Root cause:** `init` (triggered because no `components.json` existed yet) fully regenerated `globals.css`, deleting custom tokens and the font-family rule.",
+        "**Fix:** diffed against the last committed version via `git show HEAD:app/globals.css`, manually merged shadcn's required tokens back in alongside the restored originals. Verified via screenshots of homepage, login, and signup pages."
+      ] 
+    },
+    { 
+      id: 58, 
+      title: "Reduced-motion override not applying to `.pulse` animation", 
+      status: "fixed", 
+      date: "September 26, 2026", 
+      body: [
+        "**Symptom:** macOS Reduce Motion enabled, but the homepage pulse animation kept running. ",
+        "**Root cause:** the override lived inside Tailwind v4's `base` layer, and unlayered CSS (the plain `.pulse` rule in `landing.css`) always wins the cascade over layered CSS regardless of `!important`.",
+        "**Fix:** repositioned the media query to sit unlayered, immediately after the Tailwind import. Verified via DevTools Computed panel before and after."
+      ] 
+    },
+    { 
+      id: 57, 
+      title: "Duplicate `<main>` landmarks breaking screen reader navigation", 
+      status: "fixed", 
+      date: "September 26, 2026", 
+      body: [
+        "**Symptom:** a screen reader's landmark list showed 2–3 'main' entries per page, making the jump-to-content shortcut ambiguous.",
+        "**Root cause:** every nested layout and page was wrapping its content in its own `<main>`, in addition to the root layout's `<main id='page-root'>`.",
+        "**Fix:** swapped every nested instance to `<div>`, confirmed via `grep -rn '<main>'` showing exactly one real hit left (plus one harmless dead-code false positive)."
+      ] 
+    },
     { 
       id: 56, 
       title: "Age-Gate Redirect Loop on Real Signup", 
@@ -2928,6 +3324,12 @@ optimize: [
     { id: 17, name: "Uptime Robot", icon: "🤖", version: "v3 API", role: "External synthetics & monitoring" },
     { id: 18, name: "Google Cloud Console / Google Auth Platform", icon: "☁️🛡️", version: "Google OAuth 2.0 API", role: "External / OAuth provider" },
     { id: 19, name: "@sentry/nextjs", icon: "🚨🔍", version: "^11.10.0", role: "Error monitoring & performance tracking" },
+    { id: 20, name: "eslint-plugin-jsx-a11y", icon: "👓🛠️", version: "^6.10.2", role: "Static JSX accessibility linting" },
+    { id: 21, name: "@axe-core/react", icon: "🪓⚛️", version: "^4.13.0", role: "Runtime DOM accessibility auditing (dev-only)" },
+    { id: 22, name: "Radix UI", icon: "🦴🎨", version: "^1.6.7", role: "Headless primitives underlying shadcn's Dialog (focus trap, ARIA roles)" },
+    //{ id: 6, name: "MongoDB", icon: "🍃", version: "Atlas", role: "NoSQL database" },
+    //{ id: 6, name: "MongoDB", icon: "🍃", version: "Atlas", role: "NoSQL database" },
+    //{ id: 6, name: "MongoDB", icon: "🍃", version: "Atlas", role: "NoSQL database" },
     //{ id: 6, name: "MongoDB", icon: "🍃", version: "Atlas", role: "NoSQL database" },
     //{ id: 6, name: "MongoDB", icon: "🍃", version: "Atlas", role: "NoSQL database" },
     //{ id: 6, name: "MongoDB", icon: "🍃", version: "Atlas", role: "NoSQL database" },
@@ -3036,29 +3438,29 @@ optimize: [
   // category, note (used as the card body, not `body`)
 
   resources: [
-    { id: 1, title: "npm audit Documentation", url: "https://docs.npmjs.com/cli/v8/commands/npm-audit", category: "security & vulnerability remediation",    note: "Referenced conceptually while diagnosing the `next@9.3.3` false-positive downgrade path. Covers how `npm audit fix --force` resolves transitive dependency chains and why 'breaking change' warnings should be read before accepting a proposed fix." },
-    { id: 2, title: "Tailwind CSS v4 Docs", url: "https://tailwindcss.com/docs", category: "styling",    note: "v4 uses @theme in CSS instead of tailwind.config.js." },
-    { id: 3, title: "Supabase Docs", url: "https://supabase.com/docs", category: "backend",    note: "Full documentation for Supabase database, auth, storage, RLS, and JavaScript client. Primary reference for all backend work on Roam." },
-    { id: 4, title: "Supabase RLS Guide", url: "https://supabase.com/docs/guides/database/postgres/row-level-security", category: "styling",    note: "Row Level Security concepts, USING vs WITH CHECK distinction, policy creation patterns, and testing approaches." },
-    { id: 5, title: "Supabase Auth Guide", url: "https://supabase.com/docs/guides/auth", category: "auth",    note: "Session management, user management, OAuth providers, and auth hooks." },
-    { id: 6, title: "Supabase PostGIS Guide", url: "https://supabase.com/docs/guides/database/extensions/postgis", category: "database",    note: "PostGIS extension setup, geometry column types, spatial query functions, and GIST indexing. Reference for all coordinate and proximity query work." },
-    { id: 7, title: "Supabase JavaScript Client Reference", url: "https://supabase.com/docs/reference/javascript/introduction", category: "backend",    note: "Complete API reference for the Supabase JS client. Every Supabase query written in Next.js uses this reference for syntax." },
-    { id: 8, title: "Supabase CLI — `db dump` Reference", url: "https://supabase.com/docs/reference/cli/introduction", category: "deployment",    note: "Covers the full flag set for `supabase db dump`, including `--data-only`, `--schema-only` (the current default behavior), and connection string requirements." },
-    { id: 9, title: "Cloudflare R2 — S3 Compatibility API", url: "https://developers.cloudflare.com/r2/api/s3/api/", category: "database",    note: "Documents R2's S3-compatible endpoint structure and authentication, needed for pointing the AWS CLI at R2 instead of actual AWS S3 (`--endpoint-url` usage)." },
-    { id: 10, title: "React hydration mismatch guide", url: "https://react.dev/link/hydration-mismatch", category: "routing",    note: "Referenced directly from the console error this session when diagnosing the transient div/Link SSR mismatch on `AuthNav.jsx`" },
-    { id: 11, title: "Next.js: Middleware to Proxy Migration", url: "https://nextjs.org/docs/messages/middleware-to-proxy", category: "routing",    note: "Referenced directly from the dev server's deprecation warning; covers migrating from `middleware.js` to the newer `proxy.js` convention required by Next.js 16.2.12." },
-    { id: 12, title: "Next.js: Prerender Error", url: "https://nextjs.org/docs/messages/prerender-error", category: "build",    note: "Referenced directly from the Vercel build log during the initial `supabaseUrl is required` crash investigation; covers common causes of prerendering failures." },
-    { id: 13, title: "Vercel: MIDDLEWARE_INVOCATION_FAILED Error Reference", url: "https://vercel.com/docs/errors/middleware_invocation_failed", category: "build",    note: "Vercel's documentation page linked directly from the 500 error page itself, describing the error code encountered during the production `/api/health` outage investigation." },
-    // { id: 4, title: "Tailwind CSS v4 Docs", url: "https://tailwindcss.com/docs", category: "styling",    note: "v4 uses @theme in CSS instead of tailwind.config.js." },
-    // { id: 4, title: "Tailwind CSS v4 Docs", url: "https://tailwindcss.com/docs", category: "styling",    note: "v4 uses @theme in CSS instead of tailwind.config.js." },
-    // { id: 4, title: "Tailwind CSS v4 Docs", url: "https://tailwindcss.com/docs", category: "styling",    note: "v4 uses @theme in CSS instead of tailwind.config.js." },
-    // { id: 4, title: "Tailwind CSS v4 Docs", url: "https://tailwindcss.com/docs", category: "styling",    note: "v4 uses @theme in CSS instead of tailwind.config.js." },
-    // { id: 4, title: "Tailwind CSS v4 Docs", url: "https://tailwindcss.com/docs", category: "styling",    note: "v4 uses @theme in CSS instead of tailwind.config.js." },
-    // { id: 4, title: "Tailwind CSS v4 Docs", url: "https://tailwindcss.com/docs", category: "styling",    note: "v4 uses @theme in CSS instead of tailwind.config.js." },
-    // { id: 4, title: "Tailwind CSS v4 Docs", url: "https://tailwindcss.com/docs", category: "styling",    note: "v4 uses @theme in CSS instead of tailwind.config.js." },
+    { id: 1, title: "npm audit Documentation", url: "https://docs.npmjs.com/cli/v8/commands/npm-audit", category: "security & vulnerability remediation", note: "Referenced conceptually while diagnosing the `next@9.3.3` false-positive downgrade path. Covers how `npm audit fix --force` resolves transitive dependency chains and why 'breaking change' warnings should be read before accepting a proposed fix." },
+    { id: 2, title: "Tailwind CSS v4 Docs", url: "https://tailwindcss.com/docs", category: "styling", note: "v4 uses @theme in CSS instead of tailwind.config.js." },
+    { id: 3, title: "Supabase Docs", url: "https://supabase.com/docs", category: "backend", note: "Full documentation for Supabase database, auth, storage, RLS, and JavaScript client. Primary reference for all backend work on Roam." },
+    { id: 4, title: "Supabase RLS Guide", url: "https://supabase.com/docs/guides/database/postgres/row-level-security", category: "styling", note: "Row Level Security concepts, USING vs WITH CHECK distinction, policy creation patterns, and testing approaches." },
+    { id: 5, title: "Supabase Auth Guide", url: "https://supabase.com/docs/guides/auth", category: "auth", note: "Session management, user management, OAuth providers, and auth hooks." },
+    { id: 6, title: "Supabase PostGIS Guide", url: "https://supabase.com/docs/guides/database/extensions/postgis", category: "database", note: "PostGIS extension setup, geometry column types, spatial query functions, and GIST indexing. Reference for all coordinate and proximity query work." },
+    { id: 7, title: "Supabase JavaScript Client Reference", url: "https://supabase.com/docs/reference/javascript/introduction", category: "backend", note: "Complete API reference for the Supabase JS client. Every Supabase query written in Next.js uses this reference for syntax." },
+    { id: 8, title: "Supabase CLI — `db dump` Reference", url: "https://supabase.com/docs/reference/cli/introduction", category: "deployment", note: "Covers the full flag set for `supabase db dump`, including `--data-only`, `--schema-only` (the current default behavior), and connection string requirements." },
+    { id: 9, title: "Cloudflare R2 — S3 Compatibility API", url: "https://developers.cloudflare.com/r2/api/s3/api/", category: "database", note: "Documents R2's S3-compatible endpoint structure and authentication, needed for pointing the AWS CLI at R2 instead of actual AWS S3 (`--endpoint-url` usage)." },
+    { id: 10, title: "React hydration mismatch guide", url: "https://react.dev/link/hydration-mismatch", category: "routing", note: "Referenced directly from the console error this session when diagnosing the transient div/Link SSR mismatch on `AuthNav.jsx`" },
+    { id: 11, title: "Next.js: Middleware to Proxy Migration", url: "https://nextjs.org/docs/messages/middleware-to-proxy", category: "routing", note: "Referenced directly from the dev server's deprecation warning; covers migrating from `middleware.js` to the newer `proxy.js` convention required by Next.js 16.2.12." },
+    { id: 12, title: "Next.js: Prerender Error", url: "https://nextjs.org/docs/messages/prerender-error", category: "build", note: "Referenced directly from the Vercel build log during the initial `supabaseUrl is required` crash investigation; covers common causes of prerendering failures." },
+    { id: 13, title: "Vercel: MIDDLEWARE_INVOCATION_FAILED Error Reference", url: "https://vercel.com/docs/errors/middleware_invocation_failed", category: "build", note: "Vercel's documentation page linked directly from the 500 error page itself, describing the error code encountered during the production `/api/health` outage investigation." },
+    { id: 14, title: "Tailwind CSS v4 Cascade Layers", url: "https://tailwindcss.com/blog/tailwindcss-v4", category: "styling", note: "Covers how `@layer base, components, utilities;` establishes layer precedence, and why unlayered CSS always wins against layered rules regardless of specificity. The root cause behind this session's reduced-motion bug." },
+    { id: 15, title: "shadcn/ui CLI — `init` vs `add`", url: "https://ui.shadcn.com/docs/cli", category: "build", note: "Documents what `init` does differently from `add` on an existing project, including when it will regenerate `globals.css`. It's relevant after this session's overwrite incident." },
+    { id: 16, title: "Next.js: no-img-element", url: "https://nextjs.org/docs/messages/no-img-element", category: "build", note: "Why `<img>` raises a lint warning and when `next/image` is preferred." },
+    { id: 17, title: "Tailwind CSS v4 Docs", url: "https://tailwindcss.com/docs", category: "styling", note: "v4 uses @theme in CSS instead of tailwind.config.js." },
+    { id: 18, title: "WCAG 2.1", url: "https://www.w3.org/WAI/WCAG21/Understanding/non-text-contrast.html", category: "accessibility", note: "Globally recognized set of technical standards designed to make web content more accessible to people with disabilities" },
+    // { id: 4, title: "Tailwind CSS v4 Docs", url: "https://tailwindcss.com/docs", category: "styling", note: "v4 uses @theme in CSS instead of tailwind.config.js." },
+    // { id: 4, title: "Tailwind CSS v4 Docs", url: "https://tailwindcss.com/docs", category: "styling", note: "v4 uses @theme in CSS instead of tailwind.config.js." },
     
     
-    // { id: 4, title: "Tailwind CSS v4 Docs", url: "https://tailwindcss.com/docs", category: "styling",    note: "v4 uses @theme in CSS instead of tailwind.config.js." },
+    //{ id: 4, title: "Tailwind CSS v4 Docs", url: "https://tailwindcss.com/docs", category: "styling", note: "v4 uses @theme in CSS instead of tailwind.config.js." },
   ],
 };
 
