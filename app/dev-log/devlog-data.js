@@ -459,8 +459,8 @@ const DATA = {
       id: 241,
       date: "November 03, 2026",
       title: "/api/auth/age-gate is now write-once and server-written",
-      body: "feature",
-      tag: "The route identifies the user with `getUser()` and writes through the service-role client, using `.eq('id', user.id).eq('confirmed_age', false)`, which sets `confirmed_age: true`. Zero rows returns 409, and the 500 path no longer leaks the raw database error."
+      body: "The route identifies the user with `getUser()` and writes through the service-role client, using `.eq('id', user.id).eq('confirmed_age', false)`, which sets `confirmed_age: true`. Zero rows returns 409, and the 500 path no longer leaks the raw database error.",
+      tag: "feature"
     },
     {
       id: 240,
