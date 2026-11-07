@@ -393,6 +393,69 @@ const DATA = {
   // Fields per entry: id, date, title, body (string/array), tag/tags (optional)
   progression: [
     {
+      id: 259,
+      date: "November 05, 2026",
+      title: "Per-address cooldown verified with a control",
+      body: "Two requests in a row to the recover endpoint on two addresses. Request 1 returned HTTP 200 and request 2 returned HTTP 429, so the 60-second interval works.",
+      tag: "feature"
+    },
+    /*{
+      id: 258,
+      date: "November 05, 2026",
+      title: "Gmail vacation responder on the sender mailbox",
+      body: "The Gmail setting is named "Vacation responder", not "Out of office". It replies "This mailbox is not monitored" and was tested from a second inbox. Whether to keep it is undecided.",
+      tag: "feature"
+    },*/
+    {
+      id: 257,
+      date: "November 05, 2026",
+      title: "Both templates revised after the first send test",
+      body: "Added 'The link works once.', the ignore wording (the reset email also tells users who keep getting these emails to reset from the login page), and an unmonitored-address notice. Both saved and persisted.",
+      tag: "refactor"
+    },
+    {
+      id: 256,
+      date: "November 05, 2026",
+      title: "Reset-password email template",
+      body: "Same structure as the confirm template, subject 'Reset your Roam password'. It saved and persisted after a reload.",
+      tag: "feature"
+    },
+    {
+      id: 255,
+      date: "November 05, 2026",
+      title: "Confirm-signup email template",
+      body: "Roam-branded and inline-styled, with a button plus a pasted-link fallback. It saved and persisted after a reload. The dashboard preview prints {{ .ConfirmationURL }} as literal text, which is normal; the real link appears only in a sent email.",
+      tag: "feature"
+    },
+    {
+      id: 254,
+      date: "November 05, 2026",
+      title: "Email limit set to 30 per hour, not 300",
+      body: "Gmail's ceiling is about 500 messages a day (third-party sources, unconfirmed) and Supabase's limit is per hour, so 300 an hour would use the whole day in under 2 hours. I kept 30 for a small-scale launch and will raise it only if traffic grows, at which point the move is to a domain with Resend.",
+      tag: "decision"
+    },
+    {
+      id: 253,
+      date: "November 05, 2026",
+      title: "Custom SMTP enabled through Gmail",
+      body: "After creating custom settings, the email limit became editable (default 30 per hour) and the per-address minimum interval became active.",
+      tag: "feature"
+    },
+    {
+      id: 252,
+      date: "November 04, 2026",
+      title: "Baseline of the Supabase auth settings",
+      body: "Captured before changing anything. The built-in email service banner was showing, the email limit was locked at 2 per hour, and 'Minimum interval per user' (60 seconds) applied only with custom SMTP. Signups were OFF, Confirm email was ON, Site URL was already the production domain, and Redirect URLs listed 6 entries. I also read authLimiter in lib/ratelimit.js (5 requests per 60 seconds, keyed on x-forwarded-for).",
+      tag: "documentation"
+    },
+    {
+      id: 251,
+      date: "November 04, 2026",
+      title: "Interim Gmail SMTP instead of Resend",
+      body: "Roam owns no domain and the project must stay free, so Resend (which needs a verified sending domain) was deferred. I compared a free eu.org subdomain, Resend's sandbox sender, and Mailtrap or local SMTP. Gmail SMTP needs no domain, so it became the interim sender.",
+      tag: "decision"
+    },
+    {
       id: 250,
       date: "November 03, 2026",
       title: "ROA-044 design decisions recorded",
