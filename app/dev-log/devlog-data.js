@@ -392,20 +392,139 @@ const DATA = {
   // ── progression: flat list, rendered by ProgressionPane ──────────────────
   // Fields per entry: id, date, title, body (string/array), tag/tags (optional)
   progression: [
+    /*{
+      id: ,
+      date: "November 05, 2026",
+      title: "",
+      body: "",
+      tag: ""
+    },
+    {
+      id: ,
+      date: "November 05, 2026",
+      title: "",
+      body: "",
+      tag: ""
+    },
+    {
+      id: ,
+      date: "November 05, 2026",
+      title: "",
+      body: "",
+      tag: ""
+    },
+    {
+      id: ,
+      date: "November 05, 2026",
+      title: "",
+      body: "",
+      tag: ""
+    },
+    {
+      id: ,
+      date: "November 05, 2026",
+      title: "",
+      body: "",
+      tag: ""
+    },
+    {
+      id: ,
+      date: "November 05, 2026",
+      title: "",
+      body: "",
+      tag: ""
+    },
+    {
+      id: ,
+      date: "November 05, 2026",
+      title: "",
+      body: "",
+      tag: ""
+    },
+    {
+      id: ,
+      date: "November 05, 2026",
+      title: "",
+      body: "",
+      tag: ""
+    },*/
+    {
+      id: 268,
+      date: "November 05, 2026",
+      title: "One-off 'This page couldn't load' on /signup",
+      body: "Appeared once on the main alias and cleared on reload; the cause is unknown and it has not reproduced.",
+      tag: "open"
+    },
+    {
+      id: 267,
+      date: "November 05, 2026",
+      title: "Public recover endpoint can be used to send reset emails",
+      body: "Anyone with the public anon key can trigger reset emails to any existing address, even with signups OFF. Only the 60-second interval and the 30-per-hour project limit protect it. Fix is ROA-008C item 10.",
+      tag: "open"
+    },
+    {
+      id: 266,
+      date: "November 05, 2026",
+      title: "Auth emails land in spam or junk",
+      body: "SPF, DKIM, and DMARC pass, but reset emails went to Gmail spam on two inboxes and both confirmation emails went to Outlook Junk (headers show SCL 5). Reputation or content is the likely cause (inference). Mitigation is a check-spam notice in ROA-008C, and the real fix is ROA-050.",
+      tag: "open"
+    },
+    {
+      id: 265,
+      date: "November 05, 2026",
+      title: "Tickets, flag list, and handoff produced",
+      body: "The ROA-008C ticket was regenerated (items 2, 3, 6, 7, 8, new items 10 and 11, new Done-When lines). The final ROA-045 text and ROA-050 were drafted, the master flag list v27 was written, and a new-chat handoff was prepared. No application code changed in ROA-045, and the unused branch was deleted locally.",
+      tag: "documentation"
+    },
+    {
+      id: 264,
+      date: "November 05, 2026",
+      title: "Where leftover work goes",
+      body: "Support address, template footers, vacation-responder text, and the Privacy page contact move to ROA-008C item 11. The About page contact waits for ROA-047. Resend and the domain move to ROA-050, to be done once a domain exists.",
+      tag: "decision"
+    },
+    {
+      id: 263,
+      date: "November 05, 2026",
+      title: "App-level limit decisions",
+      body: "authLimiter (5 requests per 60 seconds per IP) is adequate for a normal signup, with the shared-IP risk noted. A per-email limiter is a yes and is built in ROA-008C through one shared helper with forgot-password. A CAPTCHA decision also lives in ROA-008C.",
+      tag: "decision"
+    },
+    {
+      id: 262,
+      date: "November 05, 2026",
+      title: "SMTP failure behavior documented from a real test",
+      body: "A deliberately wrong SMTP password made the recover endpoint return HTTP 500, error_code unexpected_failure, msg 'Error sending recovery email'. After restoring the password, the same call returned HTTP 200 at 22:57.",
+      tag: "documentation"
+    },
+    {
+      id: 261,
+      date: "November 05, 2026",
+      title: "Confirmation flow verified on the main-branch alias with Outlook",
+      body: "Two Outlook signups (10:07 PM and 10:15 PM) produced emails that landed in Junk. The link click set session cookies and landed on /. The test ran on production deployment, not roam-dusky-alpha.vercel.app.",
+      tag: "deployment"
+    },
+    {
+      id: 260,
+      date: "November 05, 2026",
+      title: "Confirmation flow verified on localhost and the staging preview",
+      body: "Real signups with Gmail plus-aliases produced emails in the inbox. Each link click set sb-...-auth-token cookies and landed on /. The staging preview's callback has no exact Redirect URLs entry, so the wildcard entry matched.",
+      tag: "deployment"
+    },
     {
       id: 259,
+      date: "November 05, 2026",
+      title: "Email delivery timing measured",
+      body: "Signups clicked at 9:37 PM (localhost) and 9:39 PM (preview) each produced an email in the same minute. Headers show Outlook received messages 1 to 2 seconds after Gmail handed them off (06:07:02Z to 06:07:03Z and 06:15:25Z to 06:15:27Z).",
+      tag: "performance"
+    },
+    {
+      id: 258,
       date: "November 05, 2026",
       title: "Per-address cooldown verified with a control",
       body: "Two requests in a row to the recover endpoint on two addresses. Request 1 returned HTTP 200 and request 2 returned HTTP 429, so the 60-second interval works.",
       tag: "feature"
     },
-    /*{
-      id: 258,
-      date: "November 05, 2026",
-      title: "Gmail vacation responder on the sender mailbox",
-      body: "The Gmail setting is named "Vacation responder", not "Out of office". It replies "This mailbox is not monitored" and was tested from a second inbox. Whether to keep it is undecided.",
-      tag: "feature"
-    },*/
     {
       id: 257,
       date: "November 05, 2026",
@@ -2255,116 +2374,173 @@ const DATA = {
     // ROA-016: SESSION 18.4 - 18.5
     // ROA-044: SESSION 20
     /* high */
+    /*
+    { id: , 
+      title: "",
+      priority: "",  
+      body: ""
+    },
+    */
     { id: 1, 
-      title: "ROA-045: Resend as Supabase SMTP Provider",
+      title: "Toast component, hash and query error reader, friendly send-failure text (ROA-008C items 1, 6, 7)",
       priority: "high",  
-      body: "The built-in Supabase email sender is rate limited across the whole project. Needs a verified sending domain, custom SMTP, rate limits, and branded templates. Required before signups reopen."
+      body: "Replace static red text with a toast that sets its own colors and announces through the live region. Read errors from both the URL hash and the query string, map codes (signup_disabled, access_denied, otp_expired) to friendly text, and clear them so a refresh does not repeat them. Map the Supabase 500 'Error sending recovery email' to 'We couldn't send the email. Please try again in a few minutes.' so users never see raw errors."
     },
     { id: 2, 
-      title: "ROA-008C: Auth UX Gaps and Redirect Configuration",
+      title: "Check-your-email page with a spam notice (ROA-008C item 2)",
       priority: "high",  
-      body: "Toast feedback for errors, a check-your-email page, forgot password, show password, a hash-and-query error reader, and OAuth disclosure research. It also owns the Redirect URL cleanup and setting Site URL to the production domain. Required before signups reopen."
+      body: "Today users get a temporary notice with no explanation. The page tells them to check spam or junk, add roamnoreply@gmail.com to their contacts, and that the link works once. This is the cheapest mitigation for the spam placement finding."
     },
     { id: 3, 
+      title: "Forgot-password flow and reset page (ROA-008C item 3)",
+      priority: "high",  
+      body: "The reset email already points users at a login-page reset that does not exist, and /login's link is still '#'. Build the route and page, pass redirectTo through /auth/callback, and add that URL to Redirect URLs. Otherwise reset links land on the home page and do nothing."
+    },
+    { id: 4, 
+      title: "Per-email limiter shared by signup and forgot-password (ROA-008C item 10)",
+      priority: "high",  
+      body: "An Upstash limiter keyed on the lowercased email (for example 3 per hour) in one helper. Review the x-forwarded-for fallback to 127.0.0.1 in proxy.js and decide on CAPTCHA (Cloudflare Turnstile through Supabase, believed free, unverified)."
+    },
+    { id: 5, 
+      title: "Support mailbox and email footers (ROA-008C item 11)",
+      priority: "high",  
+      body: "Create a separate free support address, add 'Need help? Contact …' to both templates in the Supabase dashboard, update or turn off the vacation responder, and check the Privacy page contact."
+    },
+    { id: 6, 
+      title: "Reset-link rules checked",
+      priority: "high",  
+      body: "Check the token expiry (believed default 1 hour), test whether a newer reset request kills the older link, and research email scanners burning single-use tokens."
+    },
+    { id: 7, 
+      title: "Account-change notification emails",
+      priority: "high",  
+      body: "The Password changed and Email address changed notifications are all OFF. They are where 'this wasn't you' belongs. Availability on the current plan is unverified, and each email counts toward the 30-per-hour limit and Gmail's daily cap."
+    },
+    { id: 8, 
+      title: "Verification on the real production host and Redirect URLs cleanup",
+      priority: "high",  
+      body: "Tests ran on the main alias; run a login and a signup refusal on roam-dusky-alpha.vercel.app because cookies are per host. Delete the two dead Redirect URLs entries and test a Google login on a preview."
+    },
+    { id: 9, 
+      title: "Pre-launch audits before signups reopen",
+      priority: "high",  
+      body: "Column-grant audit on the other 13 tables, the ROA-001 policy check, and ROA-044 paperwork. Signups stay OFF until these and the ROA-008C pieces are done."
+    },
+    { id: 10, 
       title: "Verify `redact()` against a real sensitive payload",
       priority: "high",  
       body: "The redaction logic in `lib/logger.js` was explained and understood via code walkthrough but never exercised with a live call passing a real `password`/`token`-shaped key through `logRequest`. Needed before trusting the 'no sensitive data leaks' Done-When item in a real production scenario rather than on code-reading alone."
     },
-    { id: 4, 
+    { id: 11, 
       title: "Column-grant audit of every other table",
       priority: "high",  
       body: "The same default grants probably exist on posts, comments, and the rest (inferred). RLS does not hide columns, so the grant queries need running per table before signups reopen."
     },
-    { id: 5, 
-      title: "ROA-017 — Sentry error tracking",
-      priority: "high",  
-      body: "Confirmed as the next ticket to start. No dependency blockers; equally unblocked alongside ROA-016 per Wave 2 sequencing, but explicitly chosen as next. Needed so real errors in production (currently only visible via the ROA-015 logger's stdout) get proper alerting and aggregation instead of requiring a manual log search."
-    },
-    { id: 6, 
+    { id: 12, 
       title: "ROA-018 — Install and Initialize PostHog",
       priority: "high",  
       body: "Now fully unblocked (`deps: ['ROA-002','ROA-007'], both closed`). The consent gate point already exists inside `CookieBanner.jsx`'s `handleAccept`. This ticket just needs to install `posthog-js`, wire the init call into that exact gate, and add the seven listed manual tracking events (post created, upvoted, map pin clicked, place viewed, user followed, translate clicked, profile viewed)."
     },
     
     /* medium */
-    { id: 7, 
+    { id: 13, 
       title: "ROA-041: Fix setState Inside Effects",
       priority: "medium",  
       body: "Locations are TabNav.jsx line 193 and CookieBanner.jsx line 20, plus a third effect that calls setAnnounced(message ?? '') whose file wasn't shown (probably the LiveRegion component, unverified). Derive values during render where possible and keep the cookie banner focus handlers working."
     },
-    { id: 8, 
+    { id: 14, 
       title: "ROA-040: Escape Unescaped JSX Entities",
       priority: "medium",  
       body: "The old ~95 count is stale. The 10/31 baseline is 104 problems (102 errors, 2 warnings) in total, which includes the ROA-041 errors, so recount by rule before editing."
     },
-    { id: 9, 
+    { id: 15, 
       title: "ROA-049: Clear the Remaining Non-Breaking Audit Findings",
       priority: "medium",  
       body: "Run `npm audit fix --dry-run` first, apply the six non-breaking fixes in their own commit, repeat the Sentry test error if @sentry/nextjs, the bundler plugin, or next changes, and decide on shadcn, zod, and moving shadcn to devDependencies. Keeps the audit clean enough that a new critical or high finding stands out. Any time after ROA-044."
     },
-    { id: 10, 
+    { id: 16, 
       title: "Sentry Coverage: global-error.jsx and Sentry.setUser()",
       priority: "medium",  
       body: "ROA-017's cleanup removed app/global-error.jsx, the file Sentry generates to report root-level React render errors (inference). Decide whether to add it back, and extend Sentry.setUser() beyond auth/signup/route.js."
     },
-    { id: 11, 
+    { id: 17, 
       title: "Decide on revoking TRUNCATE and TRIGGER",
       priority: "medium",  
       body: "anon and authenticated hold both on public.users, likely on other tables too. The API probably doesn't expose TRUNCATE (inferred, untested), but the grants should be a conscious choice."
     },
-    { id: 12, 
+    { id: 18, 
       title: "Route guard coverage for new pages and APIs",
       priority: "medium",  
       body: "The age-gate guard covers only /dashboard. Add each new route to the guard or give it a `getUser()` plus `confirmed_age` check, and review /api/posts, /api/comments, and /api/translate."
     },
-    { id: 13, 
+    { id: 19, 
       title: "Profile columns after the lockdown",
       priority: "medium",  
       body: "location_preference is readable and editable by every signed-in user. Each new column needs an explicit GRANT, and a logged-out profile page needs a view or an API route."
     },
-    { id: 14, 
+    { id: 20, 
       title: "Country source for the age rule",
       priority: "medium",  
       body: "Decide between the Vercel header and the ip-api.com lookup. The lookup runs over plain HTTP (I believe the free tier has no HTTPS, unverified) and sends user IPs. The fail-safe to age 16 stays."
     },
 
     /* low */
-    { id: 15, 
+    { id: 21, 
+      title: "Show-password checkbox component (ROA-008C item 9)",
+      priority: "low",  
+      body: "A native checkbox with a visible label on /login and /signup, defaulting to hidden, shared so the behavior cannot drift, with password-manager autocomplete kept."
+    },
+    { id: 22, 
+      title: "Account linking and OAuth Terms/Privacy decision (ROA-008C items 4 and 5)",
+      priority: "low",  
+      body: "Decide whether to split these into their own tickets, since the ticket has grown past its 8 points."
+    },
+    { id: 23, 
+      title: "ROA-050: Resend on a verified domain",
+      priority: "low",  
+      body: "Blocked until a domain exists. Swaps the sender, publishes SPF, DKIM, and DMARC, retests inbox placement on fresh Gmail and Outlook accounts, and retires the Gmail app password. It becomes high priority before real traffic if placement is still mixed."
+    },
+    { id: 24, 
+      title: "Check the vendor beliefs written into tickets",
+      priority: "low",  
+      body: "Outlook SCL 5 meaning, the Turnstile free tier, Supabase's custom-domain add-on, Resend's SMTP details and daily cap, and Gmail's daily ceiling. Confirm each on the vendor's own page before relying on it."
+    },
+    { id: 25, 
       title: "ROA-042: Logo Navigation and Scroll Reset",
       priority: "low",  
       body: "The Roam logo doesn't navigate home when already on `/`, and page navigation doesn't reliably scroll to top. Wrap the logo in a real <Link href="/"> with forced scroll reset."
     },
-    { id: 16, 
+    { id: 26, 
       title: "ROA-046: Dev-Log Tabs Keep the Previous Scroll Position",
       priority: "low",  
       body: "Three decisions are open: dock save and restore behavior, back and forward behavior, and direct ?tab= loads."
     },
-    { id: 17, 
+    { id: 27, 
       title: "ROA-047: Build the About Page",
       priority: "low",  
       body: "The footer About link points to # on every page. Needs owner copy before build, one h1, and the shared page shell."
     },
-    { id: 18, 
+    { id: 28, 
       title: "ROA-048: Dev-Log Input Delay (Conditional)",
       priority: "low",  
       body: "Open only if slowness is reported on a real device or field INP on /dev-log exceeds 200ms. Start with a Chrome Performance trace."
     },
-    { id: 19, 
+    { id: 29, 
       title: "Windows NVDA Skip Link Retest",
       priority: "low",  
       body: "The skip link was not announced on a fresh load on Windows. Retest in a fresh Guest window with no click before claiming Windows screen reader support."
     },
-    { id: 20, 
+    { id: 30, 
       title: "Verify Map Popup and Dialog Accessibility",
       priority: "low",  
       body: "Neither exists yet. Run docs/a11y-checklist.md when the map tickets and the first real modal are built, including focus return on close."
     },
-    { id: 21, 
+    { id: 31, 
       title: "Lint cleanup (ROA-040 and ROA-041)",
       priority: "low",  
       body: "The baseline is 103 problems. About 99 are unescaped-entity errors (inferred), and 3 are set-state-in-effect errors in TabNav.jsx, CookieBanner.jsx, and LiveRegion.jsx."
     },
-    { id: 22, 
+    { id: 32, 
       title: "Small ROA-044 follow-ups",
       priority: "low",  
       body: "The route's 409 also covers 'no public.users row'. The ROA-044 dev-log entry (devlog-data.js line 1610) still reads as pending work."
@@ -2454,6 +2630,61 @@ const DATA = {
     }, 
     */
 optimize: [
+    {
+      id: 63,
+      month: "November 2026",
+      date: "November 05, 2026",
+      title: "ROA-008C: absorb findings into one ordered scope",
+      body: "ROA-045 testing surfaced work that belongs elsewhere, so the ticket was regenerated instead of patched.",
+      bullets: [
+        "Reset-flow requirements merged into item 3",
+        "New item 10 (abuse protection) and item 11 (support contact)",
+        "Test evidence written into items 2, 7, and 8",
+        "Done-When lines marked with what was verified and on which hosts"
+      ],
+      tags: "refactor"
+    }, 
+    {
+      id: 62,
+      month: "November 2026",
+      date: "November 05, 2026",
+      title: "Test method: from one-sided checks to control-based tests",
+      body: "I realized a test that can only fail proves nothing.",
+      bullets: [
+        "Cooldown test pairs a request that must succeed with an immediate repeat that must be refused",
+        "Signup refusal test includes a known-existing address in the same query",
+        "Cleanup checked by a union query over both tables, not a dashboard message",
+        "Each test records the exact host it ran on"
+      ],
+      tags: "refactor"
+    }, 
+    {
+      id: 61,
+      month: "November 2026",
+      date: "November 05, 2026",
+      title: "Email rate limit: from a locked 2 per hour to a sized 30 per hour",
+      body: "I first wanted a high number for traffic, then realized the Supabase limit is per hour while Gmail's cap is per day.",
+      bullets: [
+        "Compared candidate values against Gmail's ceiling of about 500 a day",
+        "Chose 30 per hour for a small-scale launch",
+        "Recorded that the real fix when traffic grows is a domain with Resend, not a bigger number"
+      ],
+      tags: "refactor"
+    }, 
+    {
+      id: 60,
+      month: "November 2026",
+      date: "November 05, 2026",
+      title: "Auth email templates: teach the user in the email itself",
+      body: "My first template version only said 'ignore this email.' After watching the real link get spent on the first click, I realized users needed to know the link works once, what to do if they keep getting requests, and not to reply.",
+      bullets: [
+        "Added 'The link works once.' to both templates",
+        "Added repeated-request guidance to the reset email only (the confirm email's ignore line is enough, because an unconfirmed account does nothing)",
+        "Added an unmonitored-address notice to both",
+        "Kept {{ .ConfirmationURL }} intact and repeated as plain text for clients that strip buttons"
+      ],
+      tags: "refactor"
+    }, 
     {
       id: 59,
       month: "November 2026",
@@ -3405,15 +3636,15 @@ optimize: [
     { id: 182, topic: "A test needs a control", body: "A harness that can only print DENIED proves nothing. The bio control showed it could print ALLOWED. A combined test can't prove each column is locked on its own." },
     { id: 183, topic: "The signup trigger copies almost nothing", body: "`handle_new_auth_user` inserts only id, email, display_name, and `confirmed_age = false`. Direct sign-up with fake metadata can't plant a date of birth." },
     { id: 184, topic: "The landing header doesn't show login state", body: "'Log in' and 'Sign up' appear even when logged in. A redirect from /age-gate to / (not /login) is the evidence of a valid session." },
-    //{ id: 10, topic: "", body: "" },
-    //{ id: 10, topic: "", body: "" },
-    //{ id: 10, topic: "", body: "" },
-    //{ id: 10, topic: "", body: "" },
-    //{ id: 10, topic: "", body: "" },
-    //{ id: 10, topic: "", body: "" },
-    //{ id: 10, topic: "", body: "" },
-    //{ id: 10, topic: "", body: "" },
-    //{ id: 10, topic: "", body: "" },
+    { id: 185, topic: "Custom SMTP unlocks Supabase's email limits", body: "The built-in sender is locked at 2 emails per hour for the whole project. Once custom SMTP is saved, the limit becomes editable (default 30 per hour) and the 60-second 'Minimum interval per use' starts to apply." },
+    { id: 186, topic: "Passing SPF, DKIM, and DMARC does not guarantee the inbox", body: "Every message passed all three and arrived in seconds, yet Gmail put reset emails in spam and Outlook put confirmation emails in Junk (SCL 5). Authentication proves who sent it, not whether the filter trusts the sender, so reputation and content decide." },
+    { id: 187, topic: "Reset and confirmation links are single-use, and the first click that reaches Supabase spends them", body: "The button and the pasted link in one email share one token. If the landing page ignores the result, the token is still spent. A recover request with no redirectTo falls back to the Site URL, and the result sits in the URL hash, which the home page ignores." },
+    { id: 188, topic: "Supabase's recover endpoint is public", body: "Anyone with the public anon key can trigger a reset email to any existing address. Limits are the only protection, so they need per-email and CAPTCHA layers." },
+    { id: 189, topic: "A test needs a control that can pass", body: "A refusal, a 429, or '0 rows' means nothing unless the same test can show the opposite. 'Success. No rows returned' on a SELECT is a true zero; it proves something only when a control query can return a row." },
+    { id: 190, topic: "Gmail SMTP specifics and its limits", body: "smtp.gmail.com with an app password needs 2-Step Verification, and the From address must be the account itself. A vacation responder replies at most once every 4 days per sender. A true noreply that bounces replies needs an address with no mailbox on a domain you control." },
+    { id: 191, topic: "Cookies are per host, and wildcard Redirect URLs work for email links", body: "A session on roam-git-main is not a session on roam-dusky-alpha.vercel.app. A preview link that matched only the wildcard entry landed on its own host with a session, so Supabase did not fall back." },
+    { id: 192, topic: "A failed SMTP send fails loudly", body: "A wrong SMTP password returned HTTP 500 (unexpected_failure, 'Error sending recovery email'), so the send is synchronous. A 200 after restoring means Supabase handed the message to the SMTP server." },
+    { id: 193, topic: "Dashboard messages are not evidence", body: "A 'deleted' message and a template preview can mislead. The template preview shows the placeholder as text, and deleted users were still in the tables at first, so only a query shows the real state." },
     //{ id: 10, topic: "", body: "" },
     //{ id: 10, topic: "", body: "" },
     //{ id: 10, topic: "", body: "" },
@@ -3447,7 +3678,18 @@ optimize: [
   */
   bugs: [
     { 
-      id: 56, 
+      id: 93, 
+      title: "Signup emails throttled at 2 per hour", 
+      status: "fixed", 
+      date: "November 05, 2026", 
+      body: [
+        "**Symptom:** the built-in sender's email limit was locked at 2 per hour for the whole project, which would block real signups.",
+        "**Root cause:** Supabase's built-in service is rate-limited and not meant for production.",
+        "**Fix:** enabled custom SMTP (Gmail), which unlocked the limit, then set it to 30 per hour."
+      ] 
+    },
+    { 
+      id: 92, 
       title: "Age-gate navigation lint warning", 
       status: "fixed", 
       date: "November 03, 2026", 
@@ -3459,7 +3701,7 @@ optimize: [
       ] 
     },
     { 
-      id: 55, 
+      id: 91, 
       title: "confirmed_age stayed false after the age gate", 
       status: "fixed", 
       date: "November 03, 2026", 
@@ -3471,7 +3713,7 @@ optimize: [
       ] 
     },
     { 
-      id: 54, 
+      id: 90, 
       title: "Null signup_country looped users back to /age-gate", 
       status: "fixed", 
       date: "November 03, 2026", 
@@ -3483,7 +3725,7 @@ optimize: [
       ] 
     },
     { 
-      id: 53, 
+      id: 89, 
       title: "proxy.js let a logged-out browser pass with a leftover cookie", 
       status: "fixed", 
       date: "November 03, 2026", 
@@ -3495,7 +3737,7 @@ optimize: [
       ] 
     },
     { 
-      id: 52, 
+      id: 88, 
       title: "Age gate wasn't write-once and stayed reachable", 
       status: "fixed", 
       date: "November 03, 2026", 
@@ -3507,7 +3749,7 @@ optimize: [
       ] 
     },
     { 
-      id: 51, 
+      id: 87, 
       title: "Users could overwrite their own age-gate and consent fields directly", 
       status: "fixed", 
       date: "November 03, 2026", 
@@ -3519,7 +3761,7 @@ optimize: [
       ] 
     },
     { 
-      id: 50, 
+      id: 86, 
       title: "Any signed-in user could read other users' date of birth, country, consent time, and email", 
       status: "fixed", 
       date: "November 03, 2026", 
@@ -3531,49 +3773,49 @@ optimize: [
       ] 
     },
     { 
-      id: 49, 
+      id: 85, 
       title: "`eslint -f unix` command failed", 
       status: "fixed", 
       date: "October 31, 2026", 
       body: "The terminal printed that the unix formatter is no longer in core ESLint. Replaced it with `-f json -o ~/eslint-after-roa039.json` and a node script that prints entries with severity 1." 
     },
     { 
-      id: 48, 
+      id: 84, 
       title: "Server Sentry event looked missing", 
       status: "fixed", 
       date: "October 31, 2026", 
       body: "Only the frontend issue (ROAM-2) appeared on the page I was looking at, so the server error seemed lost. The cause was that it's a separate issue (ROAM-6), visible in the Issues list. Confirmed by the Vercel runtime log and the matching trace ID." 
     },
     { 
-      id: 47, 
+      id: 83, 
       title: "js-yaml and nanoid still flagged after the Next.js upgrade", 
       status: "fixed", 
       date: "October 31, 2026", 
       body: "Both remained in the audit. The cause was that their parents (eslint, shadcn, Tailwind's postcss) were untouched by the bump. `npm update js-yaml nanoid` refreshed them within existing ranges, lockfile only (4d955cc)." 
     },
     { 
-      id: 46, 
+      id: 82, 
       title: "withSentryConfig deprecation warning in dev and builds", 
       status: "fixed", 
       date: "October 31, 2026", 
       body: "Dev start-up and every Vercel build printed that the root import will stop working in Sentry v11. The cause was importing from @sentry/nextjs. Changed the import at next.config.mjs line 1 to @sentry/nextjs/config (8d56963); the warning count went from 4 lines to 0." 
     },
     { 
-      id: 45, 
+      id: 81, 
       title: "Critical Next.js advisories in npm audit", 
       status: "fixed", 
       date: "October 31, 2026", 
       body: "The audit reported 1 critical and 12 high findings on Next.js 16.2.12 (vulnerable range ended at 16.4.0). The cause was an outdated Next.js. Upgraded to 16.4.1 with eslint-config-next 16.4.1 (7c63051); the critical finding cleared and the audit dropped from 39 to 37." 
     },
     { 
-      id: 44, 
+      id: 80, 
       title: "Focus Lost After Dismissing the Cookie Banner", 
       status: "fixed", 
       date: "October 30, 2026", 
       body: "After pressing Decline, focus reset to body and the next Tab left the page for the browser toolbar. The focused button unmounted with the banner. Added moveFocusToMain() to both click handlers. Verified by activeElement.id returning 'main-content' on both buttons, BODY on an untouched load, and VoiceOver saying 'main' followed by 'Sign up free' on the next Tab."
     },
     { 
-      id: 43, 
+      id: 79, 
       title: "Skip link hidden under the dev-log top bar", 
       status: "fixed", 
       date: "October 20, 2026", 
@@ -3584,7 +3826,7 @@ optimize: [
       ] 
     },
     { 
-      id: 42, 
+      id: 78, 
       title: "Skip link jumped to the nav, so it skipped nothing", 
       status: "fixed", 
       date: "October 19, 2026", 
@@ -3595,7 +3837,7 @@ optimize: [
       ] 
     },
     { 
-      id: 41, 
+      id: 77, 
       title: "Form error messages nearly invisible", 
       status: "fixed", 
       date: "October 18, 2026", 
@@ -3606,7 +3848,7 @@ optimize: [
       ] 
     },
     { 
-      id: 40, 
+      id: 76, 
       title: "Focus ring invisible on the landing hero", 
       status: "fixed", 
       date: "October 18, 2026", 
@@ -3617,7 +3859,7 @@ optimize: [
       ] 
     },
     { 
-      id: 39, 
+      id: 75, 
       title: "Dev-log scroll column not keyboard reachable", 
       status: "fixed", 
       date: "October 18, 2026", 
@@ -3628,7 +3870,7 @@ optimize: [
       ] 
     },
     { 
-      id: 38, 
+      id: 74, 
       title: "60 color-contrast failures across 11 color pairs", 
       status: "fixed", 
       date: "October 17, 2026", 
@@ -3639,7 +3881,7 @@ optimize: [
       ] 
     },
     { 
-      id: 37, 
+      id: 73, 
       title: "Fixed cookie banner hid focused footer links", 
       status: "fixed", 
       date: "October 16, 2026", 
@@ -3650,7 +3892,7 @@ optimize: [
       ] 
     },
     { 
-      id: 36, 
+      id: 72, 
       title: "Cookie banner had no role or name", 
       status: "fixed", 
       date: "October 16, 2026", 
@@ -3660,7 +3902,7 @@ optimize: [
       ] 
     },
     { 
-      id: 35, 
+      id: 71, 
       title: "Auth form errors were not announced", 
       status: "fixed", 
       date: "October 15, 2026", 
@@ -3671,7 +3913,7 @@ optimize: [
       ] 
     },
     { 
-      id: 34, 
+      id: 70, 
       title: "Emoji inside the tab button's accessible name", 
       status: "fixed", 
       date: "October 15, 2026", 
@@ -3681,7 +3923,7 @@ optimize: [
       ] 
     },
     { 
-      id: 33, 
+      id: 69, 
       title: "Scroll dock toast was silent to screen readers", 
       status: "fixed", 
       date: "October 15, 2026", 
@@ -3691,7 +3933,7 @@ optimize: [
       ] 
     },
     { 
-      id: 32, 
+      id: 68, 
       title: "Active dev-log tab had no programmatic state", 
       status: "fixed", 
       date: "October 15, 2026", 
@@ -3702,7 +3944,7 @@ optimize: [
       ] 
     },
     { 
-      id: 31, 
+      id: 67, 
       title: "Dev-log had a second main landmark", 
       status: "fixed", 
       date: "October 15, 2026", 
@@ -3713,7 +3955,7 @@ optimize: [
       ] 
     },
     { 
-      id: 30, 
+      id: 66, 
       title: "Confirmation link landed on `localhost:3000`", 
       status: "fixed", 
       date: "October 14, 2026", 
@@ -3724,7 +3966,7 @@ optimize: [
       ] 
     },
     { 
-      id: 29, 
+      id: 65, 
       title: "Dev-log `<video>` failed `media-has-caption`", 
       status: "fixed", 
       date: "October 13, 2026", 
@@ -3735,7 +3977,7 @@ optimize: [
       ] 
     },
     { 
-      id: 28, 
+      id: 64, 
       title: "Email signups looped into the age gate", 
       status: "fixed", 
       date: "October 13, 2026", 
@@ -3746,7 +3988,7 @@ optimize: [
       ] 
     },
     { 
-      id: 27, 
+      id: 63, 
       title: "Email signup returned home silently with no confirmation email", 
       status: "fixed", 
       date: "October 13, 2026", 
@@ -3757,7 +3999,7 @@ optimize: [
       ] 
     },
     { 
-      id: 26, 
+      id: 62, 
       title: "Localhost crash: `instrumentation.js` MODULE_UNPARSABLE on `main`", 
       status: "fixed", 
       date: "October 13, 2026", 
@@ -4435,8 +4677,8 @@ optimize: [
     { id: 20, name: "eslint-plugin-jsx-a11y", icon: "👓🛠️", version: "^6.10.2", role: "Static JSX accessibility linting" },
     { id: 21, name: "@axe-core/react", icon: "🪓⚛️", version: "^4.13.0", role: "Runtime DOM accessibility auditing (dev-only)" },
     { id: 22, name: "Radix UI", icon: "🦴🎨", version: "^1.6.7", role: "Headless primitives underlying shadcn's Dialog (focus trap, ARIA roles)" },
-    //{ id: 6, name: "MongoDB", icon: "🍃", version: "Atlas", role: "NoSQL database" },
-    //{ id: 6, name: "MongoDB", icon: "🍃", version: "Atlas", role: "NoSQL database" },
+    { id: 23, name: "Gmail SMTP", icon: "📧", version: "SMTP (://gmail.com)", role: "Interim sender for Supabase auth emails through a dedicated account and app password." },
+    { id: 24, name: "Resend", icon: "📨", version: "Planned", role: "Planned sender once a domain exists (ROA-050); not configured." },
     //{ id: 6, name: "MongoDB", icon: "🍃", version: "Atlas", role: "NoSQL database" },
     //{ id: 6, name: "MongoDB", icon: "🍃", version: "Atlas", role: "NoSQL database" },
     //{ id: 6, name: "MongoDB", icon: "🍃", version: "Atlas", role: "NoSQL database" },
@@ -4568,10 +4810,10 @@ optimize: [
     { id: 20, title: "Chrome DevTools: Rendering and element states", url: "https://developer.chrome.com/docs/devtools/rendering/apply-effects?st_source=ai_mode", category: "devtools", note: "Emulate a focused page, emulate `prefers-color-scheme`, and force `:focus` or `:focus-visible` from the `:hov` panel in Elements." },
     { id: 21, title: "You Might Not Need an Effect", url: "https://react.dev/learn/you-might-not-need-an-effect", category: "react", note: "The page linked from the react-hooks/set-state-in-effect lint error in CookieBanner.jsx (ROA-041)." },
     { id: 22, title: "React DevTools", url: "https://react.dev/link/react-devtools", category: "tooling", note: "The install prompt printed in the dev console during the INP checks." },
-    //{ id: 4, title: "Tailwind CSS v4 Docs", url: "https://tailwindcss.com/docs", category: "styling", note: "v4 uses @theme in CSS instead of tailwind.config.js." },
-    //{ id: 4, title: "Tailwind CSS v4 Docs", url: "https://tailwindcss.com/docs", category: "styling", note: "v4 uses @theme in CSS instead of tailwind.config.js." },
-    //{ id: 4, title: "Tailwind CSS v4 Docs", url: "https://tailwindcss.com/docs", category: "styling", note: "v4 uses @theme in CSS instead of tailwind.config.js." },
-    //{ id: 4, title: "Tailwind CSS v4 Docs", url: "https://tailwindcss.com/docs", category: "styling", note: "v4 uses @theme in CSS instead of tailwind.config.js." },
+    { id: 23, title: "Gmail sending limits (warmforge)", url: "https://www.warmforge.ai/blog/gmail-sending-limits", category: "email limits", note: "Third-party summary of Gmail's daily message and recipient caps and the per-message recipient cap over SMTP. Used for the 500-per-day estimate." },
+    { id: 24, title: "Max emails per day over Gmail SMTP (systutorials)", url: "https://www.systutorials.com/qa/1593/max-number-of-emails-allowed-to-sent-from-gmail-smtp-per-day", category: "email limits", note: "Q&A on daily SMTP limits and a sustained hourly rate of about 20 that stays under the daily cap." },
+    { id: 25, title: "Gmail SMTP settings (Nylas)", url: "https://cli.nylas.com/guides/gmail-smtp-settings", category: "email setup", note: "Gmail SMTP host and port settings, app password requirements, and the temporary sending suspension when limits are exceeded." },
+    { id: 26, title: "Free Gmail account limits (unanswered.io)", url: "https://unanswered.io/guide/gmail-email-sending-limits", category: "email limits", note: "Source of the conflicting claim that SMTP on a free account is limited to 100 emails a day. Most other sources disagree, so it's unconfirmed." },
     //{ id: 4, title: "Tailwind CSS v4 Docs", url: "https://tailwindcss.com/docs", category: "styling", note: "v4 uses @theme in CSS instead of tailwind.config.js." },
     //{ id: 4, title: "Tailwind CSS v4 Docs", url: "https://tailwindcss.com/docs", category: "styling", note: "v4 uses @theme in CSS instead of tailwind.config.js." },
     //{ id: 4, title: "Tailwind CSS v4 Docs", url: "https://tailwindcss.com/docs", category: "styling", note: "v4 uses @theme in CSS instead of tailwind.config.js." },
