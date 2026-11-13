@@ -306,3 +306,16 @@ input[type="password"]:-webkit-autofill:focus {
   color: rgba(237, 232, 255, .55);
   font-family: var(--font-dm-sans), sans-serif;
 }
+
+.check-email-list {
+  list-style: disc;
+  padding-left: 1.25rem;
+  margin: 0 0 1.5rem;
+  font-size: 0.8125rem;
+  line-height: 1.6;
+  color: #374151;
+}
+
+.check-email-list li + li {
+  margin-top: 0.5rem;
+}

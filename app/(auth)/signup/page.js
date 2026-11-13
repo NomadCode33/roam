@@ -1,9 +1,11 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { IconBrandGoogle } from '@tabler/icons-react';
 import { supabase } from '../../../lib/supabase';
+import { useToast } from '@/components/toast/ToastProvider';
 
 const currentYear = new Date().getFullYear();
 const months = Array.from({ length: 12 }, (_, i) => i + 1);
@@ -11,37 +13,46 @@ const days = Array.from({ length: 31 }, (_, i) => i + 1);
 const years = Array.from({ length: 100 }, (_, i) => currentYear - i);
 
 export default function Signup() {
+  const router = useRouter();
+  const toast = useToast();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [dobMonth, setDobMonth] = useState('');
   const [dobDay, setDobDay] = useState('');
   const [dobYear, setDobYear] = useState('');
   const [tosAccepted, setTosAccepted] = useState(false);
-  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [notice, setNotice] = useState('');
 
   const handleGoogleSignup = async () => {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: { redirectTo: `${window.location.origin}/auth/callback` }
     });
-    if (error) setError(error.message);
+    if (error) toast.error('We could not start Google sign-up. Please try again.');
   };
 
   const handleEmailSignup = async (e) => {
     e.preventDefault();
-    setError('');
-    setNotice('');
+    toast.clear();
+
+    if (!email.trim() || !password) {
+      toast.error('Please enter your email and password.');
+      return;
+    }
+    
+    if (!/^\S+@\S+\.\S+$/.test(email.trim())) {
+      toast.error('Please enter a valid email address.');
+      return;
+    }
 
     // client-side plausibility gate only — real 13/16 threshold enforced server-side
     if (!dobMonth || !dobDay || !dobYear) {
-      setError('Please enter your date of birth.');
+      toast.error('Please enter your date of birth.');
       return;
     }
 
     if (!tosAccepted) {
-      setError('Please confirm you agree to the Terms and Privacy Policy.');
+      toast.error('Please confirm you agree to the Terms and Privacy Policy.');
       return;
     }
 
@@ -64,15 +75,14 @@ export default function Signup() {
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.error || 'Something went wrong. Please try again.');
-        setLoading(false);
+        toast.error(data.error || 'Something went wrong. Please try again.');
         return;
       }
 
-      setNotice('Check your email to confirm your account, then log in.');
-      setLoading(false);
-    } catch (err) {
-      setError('Network error. Please try again.');
+      router.push('/check-email');
+    } catch {
+      toast.error('Network error. Please try again.');
+    } finally {
       setLoading(false);
     }
   };
@@ -95,7 +105,7 @@ export default function Signup() {
         </div>
 
         {/* Get rid of 'or phone' */}
-        <form onSubmit={handleEmailSignup}>
+        <form onSubmit={handleEmailSignup} noValidate>
           <div className="field-wrap">
             <label className="field-label" htmlFor="email">Email or phone</label>
             <input
@@ -104,6 +114,7 @@ export default function Signup() {
               placeholder="you@email.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              autoComplete="email"
               required
             />
           </div>
@@ -115,6 +126,7 @@ export default function Signup() {
               placeholder="Create a password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              autoComplete="new-password"
               required
             />
           </div>
@@ -174,9 +186,6 @@ export default function Signup() {
               <Link href="/terms" target="_blank" rel="noopener noreferrer">Terms</Link> and <Link href="/privacy" target="_blank" rel="noopener noreferrer">Privacy Policy</Link>.
             </label>
           </div>
-
-          {notice && <p className="auth-notice" role="status">{notice}</p>}
-          {error && <p className="auth-error" role="alert">{error}</p>}
 
           <button type="submit" className="submit-btn" disabled={loading}>
             {loading ? 'Creating account...' : 'Create account'}

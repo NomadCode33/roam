@@ -1,5 +1,7 @@
 import { Playfair_Display, DM_Sans, Russo_One, Exo_2 } from "next/font/google"; // How to import fonts
 import "./globals.css";
+import { ToastProvider } from "@/components/toast/ToastProvider";
+import AuthErrorReader from "@/components/auth/AuthErrorReader";
 
 // To add in fonts
 // If you don't want size or weight, don't include them
@@ -44,15 +46,18 @@ export default function RootLayout({ children }) {
       className={`${playfair.variable} ${dmSans.variable} ${russoOne.variable} ${exo2.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <a
-          href="#main-content"
-          className="sr-only focus:not-sr-only focus:fixed focus:top-[8px] focus:left-[8px] focus:z-[10000] focus:rounded focus:bg-white focus:px-[16px]! focus:py-[8px]! focus:text-black"
-        >
-          Skip to main content
-        </a>
-        <div id="page-root" className="flex-1 flex flex-col">
-          {children}
-        </div>
+        <ToastProvider>
+          <AuthErrorReader />
+          <a
+            href="#main-content"
+            className="sr-only focus:not-sr-only focus:fixed focus:top-[8px] focus:left-[8px] focus:z-[10000] focus:rounded focus:bg-white focus:px-[16px]! focus:py-[8px]! focus:text-black"
+          >
+            Skip to main content
+          </a>
+          <div id="page-root" className="flex-1 flex flex-col">
+            {children}
+          </div>
+        </ToastProvider>
       </body>
     </html>
   );

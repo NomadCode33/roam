@@ -5,6 +5,17 @@ import { NextResponse } from 'next/server'
 
 export async function GET(request) {
   const { searchParams, origin } = new URL(request.url)
+
+  // Provider or Supabase reported a failure (for example, Google consent cancelled)
+  if (searchParams.get('error') || searchParams.get('error_code')) {
+    const login = new URL('/login', origin)
+    for (const key of ['error', 'error_code']) {
+      const value = searchParams.get(key)
+      if (value) login.searchParams.set(key, value)
+    }
+    return NextResponse.redirect(login)
+  }
+
   const code = searchParams.get('code')
 
   if (code) {
@@ -17,7 +28,14 @@ export async function GET(request) {
       }}}
     )
 
-    const { data: { session } } = await supabase.auth.exchangeCodeForSession(code)
+    const { data: { session }, error } = await supabase.auth.exchangeCodeForSession(code)
+
+    if (error) {
+      const login = new URL('/login', origin)
+      login.searchParams.set('error_code', 'exchange_failed')
+      return NextResponse.redirect(login)
+    }
+    cookieStore.delete('roam_check_email')
 
     if (session?.user) {
       const { data: userRow } = await supabase

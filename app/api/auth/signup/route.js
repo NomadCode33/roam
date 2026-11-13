@@ -13,22 +13,43 @@ const supabaseAdmin = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY
 );
 
+function fail(status, code, error) {
+  return NextResponse.json({ error, code }, { status });
+}
+
+// Map a Supabase signUp error to a message we control. Never return error.message.
+function classifySignupError(error) {
+  const code = error.code;
+  const status = error.status;
+
+  if (code === 'signup_disabled') {
+    return fail(403, 'signup_disabled', 'Sign-ups are closed right now. Please check back soon.');
+  }
+  if (code === 'over_email_send_rate_limit' || code === 'over_request_rate_limit' || status === 429) {
+    return fail(429, 'rate_limited', 'Too many attempts. Please wait a few minutes and try again.');
+  }
+  if (code === 'weak_password') {
+    return fail(400, 'weak_password', 'Please choose a stronger password.');
+  }
+
+  Sentry.captureException(error);
+
+  if (code === 'unexpected_failure' || status >= 500) {
+    return fail(503, 'email_send_failed', "We couldn't send the email. Please try again in a few minutes.");
+  }
+  return fail(400, 'signup_failed', 'We could not create your account. Please try again.');
+}
+
 async function handler(req) {
   const body = await req.json();
   const { email, password, dateOfBirth, tosAccepted } = body;
 
   if (!tosAccepted) {
-    return NextResponse.json(
-      { error: 'You must accept the Terms and Privacy Policy.' },
-      { status: 400 }
-    );
+    return fail(400, 'tos_required', 'You must accept the Terms and Privacy Policy.');
   }
 
   if (!dateOfBirth) {
-    return NextResponse.json(
-      { error: 'Date of birth is required.' },
-      { status: 400 }
-    );
+    return fail(400, 'dob_required', 'Date of birth is required.');
   }
 
   const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || null;
@@ -37,10 +58,7 @@ async function handler(req) {
 
   if (!meetsMinimumAge(dateOfBirth, isEU)) {
     const minimumAge = isEU ? 16 : 13;
-    return NextResponse.json(
-      { error: `You must be at least ${minimumAge} to sign up.` },
-      { status: 403 }
-    );
+    return fail(403, 'underage', `You must be at least ${minimumAge} to sign up.`);
   }
 
   const tosAcceptedAt = new Date().toISOString();
@@ -75,11 +93,11 @@ async function handler(req) {
   });
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 400 });
+    return classifySignupError(error);
   }
 
   if (!data.user || data.user.identities?.length === 0) {
-    return NextResponse.json({ error: 'That email is already registered.' }, { status: 400 });
+    return fail(400, 'email_exists', 'That email is already registered.');
   }
 
   Sentry.setUser({ id: data.user.id });
@@ -95,10 +113,19 @@ async function handler(req) {
     .eq('id', data.user.id);
 
   if (updateError) {
-    return NextResponse.json({ error: updateError.message }, { status: 500 });
+    Sentry.captureException(updateError);
+    return fail(500, 'profile_update_failed', 'We could not finish creating your account. Please try again.');
   }
 
-  return NextResponse.json({ success: true, userId: data.user.id });
+  const response = NextResponse.json({ success: true, userId: data.user.id });
+  response.cookies.set('roam_check_email', '1', {
+    httpOnly: true,
+    sameSite: 'lax',
+    secure: process.env.NODE_ENV === 'production',
+    path: '/',
+    maxAge: 3600,
+  });
+  return response;
 }
 
 export const POST = withLogging(handler);

@@ -5,33 +5,64 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { IconBrandGoogle } from '@tabler/icons-react';
 import { supabase } from '../../../lib/supabase';
+import { useToast } from '@/components/toast/ToastProvider';
+
+function loginMessage(error) {
+  switch (error.code) {
+    case 'invalid_credentials':
+      return 'Incorrect email or password.';
+    case 'email_not_confirmed':
+      return 'Please confirm your email first. Check your inbox and spam folder for the link.';
+    case 'over_request_rate_limit':
+      return 'Too many attempts. Please wait a few minutes and try again.';
+    default:
+      return 'We could not sign you in. Please try again.';
+  }
+}
 
 export default function Login() {
   const router = useRouter();
+  const toast = useToast();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleGoogleLogin = async () => {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: { redirectTo: `${window.location.origin}/auth/callback` }
     });
-    if (error) setError(error.message);
-    //console.log('Google login disabled temporarily');
+    if (error) toast.error('We could not start Google sign-in. Please try again.');
   };
 
   const handleEmailLogin = async (e) => {
     e.preventDefault();
-    setError('');
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) {
-      setError(error.message);
-    } else {
+    toast.clear();
+
+    if (!email.trim() || !password) {
+      toast.error('Please enter your email and password.');
+      return;
+    }
+    
+    if (!/^\S+@\S+\.\S+$/.test(email.trim())) {
+      toast.error('Please enter a valid email address.');
+      return;
+    }
+    setLoading(true);
+
+    try {
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) {
+        toast.error(loginMessage(error));
+        return;
+      }
       router.push('/');
       router.refresh();
+    } catch {
+      toast.error('Network error. Please try again.');
+    } finally {
+      setLoading(false);
     }
-    //console.log('Email login disabled temporarily');
   };
 
   return (
@@ -51,7 +82,7 @@ export default function Login() {
           <div className="div-line"></div>
         </div>
 
-        <form onSubmit={handleEmailLogin}>
+        <form onSubmit={handleEmailLogin} noValidate>
           <div className="field-wrap">
             <label className="field-label" htmlFor="email">Email or phone</label>
             <input
@@ -77,10 +108,10 @@ export default function Login() {
             />
           </div>
 
-          {error && <p className="auth-error" role="alert">{error}</p>}
-
           <Link href="#" className="forgot">Forgot password?</Link>
-          <button type="submit" className="submit-btn">Sign in</button>
+          <button type="submit" className="submit-btn" disabled={loading}>
+            {loading ? 'Signing in...' : 'Sign in'}
+          </button>
         </form>
 
         <div className="auth-switch">
