@@ -6,6 +6,7 @@ import { cookies } from 'next/headers';
 import { lookupCountryFromIp } from '@/lib/geo';
 import { meetsMinimumAge } from '@/lib/age';
 import { withLogging } from '@/lib/withLogging';
+import { getClientIp } from '@/lib/client-ip';
 
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -41,7 +42,7 @@ async function handler(req) {
     return NextResponse.json({ error: 'Date of birth is required.' }, { status: 400 });
   }
 
-  const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || null;
+  const ip = getClientIp(req);
   const { countryCode, isEU } = await lookupCountryFromIp(ip);
 
   if (!meetsMinimumAge(dateOfBirth, isEU)) {

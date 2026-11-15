@@ -5,6 +5,7 @@ import {
   translateLimiter, generalLimiter
 } from "./lib/ratelimit";
 import { createRequestId, logRequest } from "./lib/logger";
+import { getClientIp } from "./lib/client-ip";
 import * as Sentry from "@sentry/nextjs";
 
 function pickLimiter(pathname) {
@@ -20,7 +21,7 @@ export async function proxy(req) {
   const limiter = pickLimiter(req.nextUrl.pathname);
 
   if (limiter) {
-    const ip = req.headers.get("x-forwarded-for") ?? "127.0.0.1";
+    const ip = getClientIp(req) ?? "unknown";
     const { success, limit, remaining, reset } = await limiter.limit(ip);
 
     if (!success) {

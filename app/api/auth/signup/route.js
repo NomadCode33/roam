@@ -4,6 +4,7 @@ import { createClient } from '@supabase/supabase-js';
 import { lookupCountryFromIp } from '@/lib/geo';
 import { meetsMinimumAge } from '@/lib/age';
 import { withLogging } from '@/lib/withLogging';
+import { getClientIp } from '@/lib/client-ip';
 import * as Sentry from "@sentry/nextjs";
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
@@ -52,7 +53,7 @@ async function handler(req) {
     return fail(400, 'dob_required', 'Date of birth is required.');
   }
 
-  const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || null;
+  const ip = getClientIp(req);
 
   const { countryCode, isEU } = await lookupCountryFromIp(ip);
 
