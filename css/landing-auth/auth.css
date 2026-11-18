@@ -319,3 +319,13 @@ input[type="password"]:-webkit-autofill:focus {
 .check-email-list li + li {
   margin-top: 0.5rem;
 }
+
+/* Visible focus for auth form fields */
+.field-wrap input:focus,
+.field-wrap select:focus,
+.dob-row select:focus {
+  outline: 2px solid #5C4E9E;
+  outline-offset: 1px;
+  border-color: #5C4E9E;
+  box-shadow: 0 0 0 4px rgba(92, 78, 158, 0.18);
+}
