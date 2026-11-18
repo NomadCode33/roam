@@ -1,25 +1,16 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useToast } from '@/components/toast/ToastProvider';
 import { requestResend } from '@/lib/resend-confirmation';
-
-const COOLDOWN_SECONDS = 60;
+import { useCooldown } from '@/lib/use-cooldown';
 
 export default function ResendForm() {
   const toast = useToast();
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
-  const [cooldown, setCooldown] = useState(0);
-  const counting = cooldown > 0;
-
-  useEffect(() => {
-    if (!counting) return;
-    const timer = setInterval(() => {
-      setCooldown((seconds) => seconds - 1);
-    }, 1000);
-    return () => clearInterval(timer);
-  }, [counting]);
+  const { secondsLeft, start } = useCooldown('resend-confirmation');
+  const counting = secondsLeft > 0;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -36,7 +27,7 @@ export default function ResendForm() {
 
     if (result.ok) {
       toast.success(result.message);
-      setCooldown(COOLDOWN_SECONDS);
+      start();
     } else {
       toast.error(result.message);
     }
@@ -61,7 +52,7 @@ export default function ResendForm() {
         {loading
           ? 'Sending...'
           : counting
-            ? `Resend available in ${cooldown}s`
+            ? `Resend available in ${secondsLeft}s`
             : 'Resend confirmation email'}
       </button>
     </form>

@@ -7,6 +7,7 @@ import { IconBrandGoogle } from '@tabler/icons-react';
 import { supabase } from '../../../lib/supabase';
 import { useToast } from '@/components/toast/ToastProvider';
 import { requestResend } from '@/lib/resend-confirmation';
+import { useCooldown } from '@/lib/use-cooldown';
 
 function loginMessage(error) {
   switch (error.code) {
@@ -29,6 +30,7 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const [needsConfirm, setNeedsConfirm] = useState(false);
   const [resending, setResending] = useState(false);
+  const { secondsLeft: resendWait, start: startResendWait } = useCooldown('resend-confirmation');
 
   const handleGoogleLogin = async () => {
     const { error } = await supabase.auth.signInWithOAuth({
@@ -80,6 +82,7 @@ export default function Login() {
     setResending(false);
     if (result.ok) {
       toast.success(result.message);
+      startResendWait();
     } else {
       toast.error(result.message);
     }
@@ -133,8 +136,12 @@ export default function Login() {
             {loading ? 'Signing in...' : 'Sign in'}
           </button>
           {needsConfirm && (
-            <button type="button" className="oauth-btn" onClick={handleResend} disabled={resending}>
-              {resending ? 'Sending...' : 'Resend confirmation email'}
+            <button type="button" className="oauth-btn" onClick={handleResend} disabled={resending || resendWait > 0}>
+              {resending
+                ? 'Sending...'
+                : resendWait > 0
+                  ? `Resend available in ${resendWait}s`
+                  : 'Resend confirmation email'}
             </button>
           )}
         </form>
