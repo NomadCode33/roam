@@ -6,6 +6,7 @@ import { meetsMinimumAge } from '@/lib/age';
 import { withLogging } from '@/lib/withLogging';
 import { getClientIp } from '@/lib/client-ip';
 import { checkEmailLimit } from '@/lib/email-ratelimit';
+import { emailLimitRefusal } from '@/lib/email-limit-response';
 import * as Sentry from "@sentry/nextjs";
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
@@ -60,14 +61,7 @@ async function handler(req) {
 
   const limit = await checkEmailLimit(email);
   if (!limit.allowed) {
-    const minutes = Math.max(1, Math.ceil(limit.retryAfterSeconds / 60));
-    const refusal = fail(
-      429,
-      'email_rate_limited',
-      `Too many attempts for this email. Please try again in about ${minutes} minute${minutes === 1 ? '' : 's'}.`
-    );
-    refusal.headers.set('Retry-After', String(limit.retryAfterSeconds));
-    return refusal;
+    return emailLimitRefusal(limit);
   }
 
   const ip = getClientIp(req);
