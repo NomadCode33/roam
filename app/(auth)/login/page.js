@@ -128,7 +128,7 @@ export default function Login() {
             />
           </div>
 
-          <Link href="#" className="forgot">Forgot password?</Link>
+          <Link href="/forgot-password" className="forgot">Forgot password?</Link>
           <button type="submit" className="submit-btn" disabled={loading}>
             {loading ? 'Signing in...' : 'Sign in'}
           </button>
