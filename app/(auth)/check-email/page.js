@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
+import ResendForm from '@/components/auth/ResendForm';
 
 export const metadata = { title: 'Check your email | Roam' };
 
@@ -22,6 +23,7 @@ export default async function CheckEmail() {
           <li>Add <strong>roamnoreply@gmail.com</strong> to your contacts or safe senders.</li>
           <li>The link works once.</li>
         </ul>
+        <ResendForm />
         <div className="auth-switch">
           Used the wrong email? <Link href="/signup">Sign up again</Link>
         </div>

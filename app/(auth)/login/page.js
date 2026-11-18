@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { IconBrandGoogle } from '@tabler/icons-react';
 import { supabase } from '../../../lib/supabase';
 import { useToast } from '@/components/toast/ToastProvider';
+import { requestResend } from '@/lib/resend-confirmation';
 
 function loginMessage(error) {
   switch (error.code) {
@@ -26,6 +27,8 @@ export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [needsConfirm, setNeedsConfirm] = useState(false);
+  const [resending, setResending] = useState(false);
 
   const handleGoogleLogin = async () => {
     const { error } = await supabase.auth.signInWithOAuth({
@@ -53,6 +56,7 @@ export default function Login() {
     try {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) {
+        setNeedsConfirm(error.code === 'email_not_confirmed');
         toast.error(loginMessage(error));
         return;
       }
@@ -62,6 +66,22 @@ export default function Login() {
       toast.error('Network error. Please try again.');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleResend = async () => {
+    toast.clear();
+    if (!/^\S+@\S+\.\S+$/.test(email.trim())) {
+      toast.error('Please enter a valid email address.');
+      return;
+    }
+    setResending(true);
+    const result = await requestResend(email.trim());
+    setResending(false);
+    if (result.ok) {
+      toast.success(result.message);
+    } else {
+      toast.error(result.message);
     }
   };
 
@@ -112,6 +132,11 @@ export default function Login() {
           <button type="submit" className="submit-btn" disabled={loading}>
             {loading ? 'Signing in...' : 'Sign in'}
           </button>
+          {needsConfirm && (
+            <button type="button" className="oauth-btn" onClick={handleResend} disabled={resending}>
+              {resending ? 'Sending...' : 'Resend confirmation email'}
+            </button>
+          )}
         </form>
 
         <div className="auth-switch">
