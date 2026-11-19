@@ -1,16 +1,11 @@
 // app/api/auth/resend/route.js
 import { NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { createServerClient } from '@supabase/ssr';
+import { cookies } from 'next/headers';
 import { withLogging } from '@/lib/withLogging';
 import { checkEmailLimit } from '@/lib/email-ratelimit';
 import { emailLimitRefusal } from '@/lib/email-limit-response';
 import * as Sentry from '@sentry/nextjs';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-  { auth: { persistSession: false, autoRefreshToken: false } }
-);
 
 const SUCCESS_MESSAGE =
   'If that address has an unconfirmed account, a new confirmation link is on its way. It can take a minute, so check your spam folder too.';
@@ -38,6 +33,20 @@ async function handler(req) {
   }
 
   const origin = req.headers.get('origin') ?? new URL(req.url).origin;
+
+  const cookieStore = await cookies();
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    {
+      cookies: {
+        getAll: () => cookieStore.getAll(),
+        setAll: (cookiesToSet) => {
+          cookiesToSet.forEach(({ name, value, options }) => cookieStore.set(name, value, options));
+        },
+      },
+    }
+  );
 
   const { error } = await supabase.auth.resend({
     type: 'signup',
