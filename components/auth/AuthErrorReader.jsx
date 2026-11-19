@@ -2,12 +2,16 @@
 
 import { useEffect } from 'react';
 import { useToast } from '@/components/toast/ToastProvider';
+import { usePathname } from 'next/navigation';
 
 const MESSAGES = {
   signup_disabled: 'Sign-ups are closed right now. Please check back soon.',
   otp_expired: 'That link has expired or was already used. Request a new one and try again.',
   access_denied: 'Sign-in was cancelled. You can try again whenever you are ready.',
   exchange_failed: 'We could not complete that sign-in. Please try again.',
+};
+const NOTICES = {
+  password_updated: 'Password updated. Please log in with your new password.',
 };
 const FALLBACK = 'Something went wrong. Please try again.';
 const ERROR_KEYS = ['error', 'error_code', 'error_description'];
@@ -22,6 +26,7 @@ function messageFor(code, error) {
 
 export default function AuthErrorReader() {
   const toast = useToast();
+  const pathname = usePathname();
 
   useEffect(() => {
     const hash = new URLSearchParams(window.location.hash.replace(/^#/, ''));
@@ -29,17 +34,23 @@ export default function AuthErrorReader() {
 
     const inHash = hash.has('error') || hash.has('error_code');
     const inQuery = query.has('error') || query.has('error_code');
-    if (!inHash && !inQuery) return;
+    const notice = query.get('notice');
+    const hasNotice = Boolean(notice) && Object.hasOwn(NOTICES, notice);
+    if (!inHash && !inQuery && !hasNotice) return;
 
-    const source = inHash ? hash : query;
-    toast.error(messageFor(source.get('error_code'), source.get('error')));
+    if (inHash || inQuery) {
+      const source = inHash ? hash : query;
+      toast.error(messageFor(source.get('error_code'), source.get('error')));
+    } else {
+      toast.success(NOTICES[notice]);
+    }
 
-    // Remove the error from the address bar so a refresh does not repeat it
+    // Remove the message source from the address bar so a refresh does not repeat it
     const url = new URL(window.location.href);
     if (inHash) url.hash = '';
-    ERROR_KEYS.forEach((key) => url.searchParams.delete(key));
+    [...ERROR_KEYS, 'notice'].forEach((key) => url.searchParams.delete(key));
     window.history.replaceState(null, '', url.pathname + url.search + url.hash);
-  }, [toast]);
+  }, [toast, pathname]);
 
   return null;
 }
