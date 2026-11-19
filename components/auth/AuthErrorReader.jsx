@@ -11,7 +11,7 @@ const MESSAGES = {
   exchange_failed: 'We could not complete that sign-in. Please try again.',
 };
 const NOTICES = {
-  password_updated: 'Password updated. Please log in with your new password.',
+  password_updated: 'Password updated. You have been signed out of all devices. Please log in with your new password.',
 };
 const FALLBACK = 'Something went wrong. Please try again.';
 const ERROR_KEYS = ['error', 'error_code', 'error_description'];

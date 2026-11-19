@@ -35,7 +35,7 @@ export default async function ResetPassword() {
     <div className="auth-panel-body">
       <div className="auth-form-inner">
         <h1 className="auth-title">Choose a new password</h1>
-        <p className="auth-sub">Pick a password you have not used on Roam before.</p>
+        <p className="auth-sub">Choose a new password. For your security, this signs you out of all your devices.</p>
         <ResetPasswordForm />
       </div>
     </div>
