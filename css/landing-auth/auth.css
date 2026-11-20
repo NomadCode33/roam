@@ -256,6 +256,16 @@ input[type="password"]:-webkit-autofill:focus {
   background: #f0ce55;
 }
 
+.submit-btn.is-cooling,
+.submit-btn.is-cooling:hover {
+  background: #efe0a3;
+  cursor: not-allowed;
+}
+
+.oauth-btn.is-cooling {
+  cursor: not-allowed;
+}
+
 .auth-switch {
   font-size: 0.75rem;     /* 12px */
   color: #6b7280;
@@ -320,12 +330,30 @@ input[type="password"]:-webkit-autofill:focus {
   margin-top: 0.5rem;
 }
 
-/* Visible focus for auth form fields */
+/* Auth form fields: animated focus highlight */
+.field-wrap input,
+.field-wrap select,
+.dob-row select {
+  outline: 2px solid transparent;
+  outline-offset: 1px;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    outline-color 0.15s ease;
+}
+
 .field-wrap input:focus,
 .field-wrap select:focus,
 .dob-row select:focus {
-  outline: 2px solid #5C4E9E;
-  outline-offset: 1px;
+  outline-color: #5C4E9E;
   border-color: #5C4E9E;
   box-shadow: 0 0 0 4px rgba(92, 78, 158, 0.18);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .field-wrap input,
+  .field-wrap select,
+  .dob-row select {
+    transition: none;
+  }
 }

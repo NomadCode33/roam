@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useToast } from '@/components/toast/ToastProvider';
 import { requestPasswordReset } from '@/lib/request-password-reset';
-import { useCooldown } from '@/lib/use-cooldown';
+import { useCooldown, cooldownMessage } from '@/lib/use-cooldown';
 
 export default function ForgotPassword() {
   const toast = useToast();
@@ -16,6 +16,11 @@ export default function ForgotPassword() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     toast.clear();
+
+    if (counting) {
+      toast.info(cooldownMessage(secondsLeft));
+      return;
+    }
 
     if (!/^\S+@\S+\.\S+$/.test(email.trim())) {
       toast.error('Please enter a valid email address.');
@@ -54,7 +59,12 @@ export default function ForgotPassword() {
               autoComplete="email"
             />
           </div>
-          <button type="submit" className="submit-btn" disabled={loading || counting}>
+          <button
+            type="submit"
+            className={counting ? 'submit-btn is-cooling' : 'submit-btn'}
+            disabled={loading}
+            aria-disabled={counting || undefined}
+          >
             {loading
               ? 'Sending...'
               : counting
