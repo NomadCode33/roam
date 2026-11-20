@@ -8,7 +8,7 @@ import { emailLimitRefusal } from '@/lib/email-limit-response';
 import * as Sentry from '@sentry/nextjs';
 
 const SUCCESS_MESSAGE =
-  'If that address has an account, a password reset link is on its way. It can take a minute, so check your spam folder too.';
+  'If that address has an account, a password reset link is on its way. It can take a minute, so check your spam folder too. If you request more than one, use the newest email.';
 
 function fail(status, code, error) {
   return NextResponse.json({ error, code }, { status });
