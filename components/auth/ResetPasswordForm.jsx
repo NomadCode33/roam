@@ -15,6 +15,8 @@ function updateMessage(error) {
     case 'session_expired':
     case 'session_not_found':
       return 'This link has expired. Please request a new one.';
+    case 'reauthentication_needed':
+      return 'For your security, please request a new reset link and try again.';
     default:
       return 'We could not update your password. Please try again.';
   }
