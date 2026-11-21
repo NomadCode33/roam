@@ -264,10 +264,12 @@ input[data-password-field]:-webkit-autofill:focus {
 .submit-btn.is-cooling,
 .submit-btn.is-cooling:hover {
   background: #efe0a3;
+  color: #6b5a14;
   cursor: not-allowed;
 }
 
 .oauth-btn.is-cooling {
+  color: #6b7280;
   cursor: not-allowed;
 }
 
