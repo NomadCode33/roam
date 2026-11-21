@@ -369,6 +369,7 @@ input[data-password-field]:-webkit-autofill:focus {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  width: fit-content;
   margin-top: 0.5rem;
   font-size: 0.8125rem;
   color: #6b7280;
@@ -380,4 +381,10 @@ input[data-password-field]:-webkit-autofill:focus {
   height: 1rem;
   margin: 0;
   accent-color: #5C4E9E;
+}
+
+.forgot {
+  display: block;
+  width: fit-content;
+  margin-left: auto;
 }
