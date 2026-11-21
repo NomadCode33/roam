@@ -18,18 +18,37 @@ const ToastContext = createContext(null);
 const DEFAULT_DURATION = { error: null, success: 8000, info: 8000 };
 const MAX_VISIBLE = 3;
 
+// 'fade' or 'slide'. Change this one word to compare the two animations.
+const TOAST_ANIMATION = 'slide';
+// Must be at least as long as the longest exit animation in toast.css.
+const EXIT_MS = 180;
+
+function prefersReducedMotion() {
+  return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+}
+
 function ToastItem({ toast, onDismiss }) {
   const [paused, setPaused] = useState(false);
+  const [leaving, setLeaving] = useState(false);
+
+  const beginDismiss = useCallback(() => setLeaving(true), []);
 
   useEffect(() => {
-    if (paused || toast.duration === null) return;
-    const timer = setTimeout(() => onDismiss(toast.id), toast.duration);
+    if (paused || leaving || toast.duration === null) return;
+    const timer = setTimeout(beginDismiss, toast.duration);
     return () => clearTimeout(timer);
-  }, [paused, toast.id, toast.duration, onDismiss]);
+  }, [paused, leaving, toast.duration, beginDismiss]);
+
+  useEffect(() => {
+    if (!leaving) return;
+    const wait = prefersReducedMotion() ? 0 : EXIT_MS;
+    const timer = setTimeout(() => onDismiss(toast.id), wait);
+    return () => clearTimeout(timer);
+  }, [leaving, toast.id, onDismiss]);
 
   return (
     <div
-      className={'toast toast-' + toast.type}
+      className={'toast toast-' + toast.type + (leaving ? ' toast-leaving' : '')}
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       onFocus={() => setPaused(true)}
@@ -40,7 +59,7 @@ function ToastItem({ toast, onDismiss }) {
         type="button"
         className="toast-close"
         aria-label="Dismiss notification"
-        onClick={() => onDismiss(toast.id)}
+        onClick={beginDismiss}
       >
         &times;
       </button>
@@ -99,7 +118,7 @@ export function ToastProvider({ children }) {
   return (
     <ToastContext.Provider value={api}>
       {children}
-      <div className="toast-region">
+      <div className="toast-region" data-anim={TOAST_ANIMATION}>
         <div role="alert" aria-atomic="false">
           {toasts
             .filter((t) => t.type === 'error')
