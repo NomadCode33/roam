@@ -10,6 +10,7 @@ import { emailLimitRefusal } from '@/lib/email-limit-response';
 import * as Sentry from "@sentry/nextjs";
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
+import { passwordProblem } from '@/lib/password-policy';
 
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -57,6 +58,11 @@ async function handler(req) {
 
   if (typeof email !== 'string' || !/^\S+@\S+\.\S+$/.test(email.trim())) {
     return fail(400, 'invalid_email', 'Please enter a valid email address.');
+  }
+
+  const passwordIssue = passwordProblem(password);
+  if (passwordIssue) {
+    return fail(400, 'weak_password', passwordIssue);
   }
 
   const limit = await checkEmailLimit(email);

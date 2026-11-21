@@ -7,6 +7,7 @@ import { IconBrandGoogle } from '@tabler/icons-react';
 import { supabase } from '../../../lib/supabase';
 import { useToast } from '@/components/toast/ToastProvider';
 import PasswordField from '@/components/auth/PasswordField';
+import { MIN_PASSWORD_LENGTH, passwordProblem } from '@/lib/password-policy';
 
 const currentYear = new Date().getFullYear();
 const months = Array.from({ length: 12 }, (_, i) => i + 1);
@@ -43,6 +44,12 @@ export default function Signup() {
     
     if (!/^\S+@\S+\.\S+$/.test(email.trim())) {
       toast.error('Please enter a valid email address.');
+      return;
+    }
+
+    const passwordIssue = passwordProblem(password);
+    if (passwordIssue) {
+      toast.error(passwordIssue);
       return;
     }
 
@@ -123,7 +130,7 @@ export default function Signup() {
             id="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            placeholder="Create a password"
+            placeholder={`At least ${MIN_PASSWORD_LENGTH} characters`}
             autoComplete="new-password"
             required
           />
