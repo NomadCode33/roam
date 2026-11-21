@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { useToast } from '@/components/toast/ToastProvider';
 import { MIN_PASSWORD_LENGTH, passwordProblem } from '@/lib/password-policy';
+import PasswordField from '@/components/auth/PasswordField';
 
 function updateMessage(error) {
   switch (error.code) {
@@ -12,11 +13,11 @@ function updateMessage(error) {
       return 'Please choose a password different from your current one.';
     case 'weak_password':
       return 'Please choose a stronger password.';
+    case 'reauthentication_needed':
+      return 'For your security, please request a new reset link and try again.';
     case 'session_expired':
     case 'session_not_found':
       return 'This link has expired. Please request a new one.';
-    case 'reauthentication_needed':
-      return 'For your security, please request a new reset link and try again.';
     default:
       return 'We could not update your password. Please try again.';
   }
@@ -27,7 +28,10 @@ export default function ResetPasswordForm() {
   const router = useRouter();
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
+  const [showPasswords, setShowPasswords] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [leaving, setLeaving] = useState(false);
+  const busy = loading || leaving;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -61,33 +65,54 @@ export default function ResetPasswordForm() {
     }
   };
 
+  const handleCancel = async () => {
+    toast.clear();
+    setLeaving(true);
+    try {
+      const { error } = await supabase.auth.signOut({ scope: 'local' });
+      if (error) {
+        toast.error('We could not cancel right now. Please try again.');
+        setLeaving(false);
+        return;
+      }
+      router.replace('/login');
+    } catch {
+      toast.error('Network error. Please try again.');
+      setLeaving(false);
+    }
+  };
+
   return (
     <form onSubmit={handleSubmit} noValidate>
-      <div className="field-wrap">
-        <label className="field-label" htmlFor="new-password">New password</label>
-        <input
-          id="new-password"
-          type="password"
-          placeholder={`At least ${MIN_PASSWORD_LENGTH} characters`}
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          autoComplete="new-password"
-        />
+      <PasswordField
+        id="new-password"
+        label="New password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        placeholder={`At least ${MIN_PASSWORD_LENGTH} characters`}
+        autoComplete="new-password"
+        visible={showPasswords}
+        showToggle={false}
+      />
+      <PasswordField
+        id="confirm-password"
+        label="Confirm new password"
+        value={confirm}
+        onChange={(e) => setConfirm(e.target.value)}
+        placeholder="Type it again"
+        autoComplete="new-password"
+        visible={showPasswords}
+        onVisibleChange={setShowPasswords}
+      />
+      <div className="auth-actions">
+        <button type="button" className="cancel-btn" onClick={handleCancel} disabled={busy}>
+          {leaving ? 'Cancelling...' : 'Cancel'}
+        </button>
+        <button type="submit" className="submit-btn" disabled={busy}>
+          {loading ? 'Updating...' : 'Update password'}
+        </button>
       </div>
-      <div className="field-wrap">
-        <label className="field-label" htmlFor="confirm-password">Confirm new password</label>
-        <input
-          id="confirm-password"
-          type="password"
-          placeholder="Type it again"
-          value={confirm}
-          onChange={(e) => setConfirm(e.target.value)}
-          autoComplete="new-password"
-        />
-      </div>
-      <button type="submit" className="submit-btn" disabled={loading}>
-        {loading ? 'Updating...' : 'Update password'}
-      </button>
+      <p className="auth-help">Cancel signs you out without changing your password.</p>
     </form>
   );
 }

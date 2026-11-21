@@ -12,9 +12,22 @@ export default function PasswordField({
   required = false,
   ariaInvalid = false,
   describedBy,
+  visible,
+  onVisibleChange,
+  showToggle = true,
 }) {
-  const [visible, setVisible] = useState(false);
+  const [ownVisible, setOwnVisible] = useState(false);
+  const controlled = visible !== undefined;
+  const isVisible = controlled ? visible : ownVisible;
   const toggleId = id + '-show';
+
+  const handleToggle = (e) => {
+    if (controlled) {
+      if (onVisibleChange) onVisibleChange(e.target.checked);
+    } else {
+      setOwnVisible(e.target.checked);
+    }
+  };
 
   return (
     <div className="field-wrap">
@@ -22,7 +35,7 @@ export default function PasswordField({
       <input
         id={id}
         data-password-field="true"
-        type={visible ? 'text' : 'password'}
+        type={isVisible ? 'text' : 'password'}
         placeholder={placeholder}
         value={value}
         onChange={onChange}
@@ -31,15 +44,17 @@ export default function PasswordField({
         aria-invalid={ariaInvalid || undefined}
         aria-describedby={describedBy}
       />
-      <label className="show-password" htmlFor={toggleId}>
-        <input
-          id={toggleId}
-          type="checkbox"
-          checked={visible}
-          onChange={(e) => setVisible(e.target.checked)}
-        />
-        Show password
-      </label>
+      {showToggle && (
+        <label className="show-password" htmlFor={toggleId}>
+          <input
+            id={toggleId}
+            type="checkbox"
+            checked={isVisible}
+            onChange={handleToggle}
+          />
+          Show password
+        </label>
+      )}
     </div>
   );
 }

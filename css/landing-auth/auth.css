@@ -388,3 +388,50 @@ input[data-password-field]:-webkit-autofill:focus {
   width: fit-content;
   margin-left: auto;
 }
+
+.auth-actions {
+  display: flex;
+  gap: 0.75rem;
+  margin: 1rem 0 0.75rem;
+}
+
+.auth-actions .submit-btn {
+  flex: 1;
+  width: auto;
+  margin: 0;
+}
+
+.cancel-btn {
+  flex: 1;
+  padding: 0.8125rem;
+  background: #fff;
+  border: 1px solid rgba(92, 78, 158, 0.35);
+  border-radius: 0.625rem;
+  font-family: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #5C4E9E;
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.cancel-btn:hover {
+  background: #F0EEFF;
+}
+
+.cancel-btn:disabled {
+  cursor: not-allowed;
+}
+
+.auth-help {
+  margin: 0;
+  font-size: 0.75rem;
+  color: #6b7280;
+  text-align: center;
+}
+
+@media (max-width: 22rem) {
+  .auth-actions {
+    flex-direction: column-reverse;
+  }
+}
