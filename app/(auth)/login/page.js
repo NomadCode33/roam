@@ -8,6 +8,7 @@ import { supabase } from '../../../lib/supabase';
 import { useToast } from '@/components/toast/ToastProvider';
 import { requestResend } from '@/lib/resend-confirmation';
 import { useCooldown, cooldownMessage } from '@/lib/use-cooldown';
+import PasswordField from '@/components/auth/PasswordField';
 
 function loginMessage(error) {
   switch (error.code) {
@@ -114,29 +115,25 @@ export default function Login() {
 
         <form onSubmit={handleEmailLogin} noValidate>
           <div className="field-wrap">
-            <label className="field-label" htmlFor="email">Email or phone</label>
+            <label className="field-label" htmlFor="email">Email</label>
             <input
               id="email"
               type="email"
-              placeholder="you@email.com"
+              placeholder="example@email.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               autoComplete="email"
               required
             />
           </div>
-          <div className="field-wrap">
-            <label className="field-label" htmlFor="password">Password</label>
-            <input
-              id="password"
-              type="password"
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              autoComplete="current-password"
-              required
-            />
-          </div>
+          <PasswordField
+            id="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="••••••••"
+            autoComplete="current-password"
+            required
+          />
 
           <Link href="/forgot-password" className="forgot">Forgot password?</Link>
           <button type="submit" className="submit-btn" disabled={loading}>

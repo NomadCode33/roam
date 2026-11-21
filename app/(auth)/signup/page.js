@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { IconBrandGoogle } from '@tabler/icons-react';
 import { supabase } from '../../../lib/supabase';
 import { useToast } from '@/components/toast/ToastProvider';
+import PasswordField from '@/components/auth/PasswordField';
 
 const currentYear = new Date().getFullYear();
 const months = Array.from({ length: 12 }, (_, i) => i + 1);
@@ -107,29 +108,25 @@ export default function Signup() {
         {/* Get rid of 'or phone' */}
         <form onSubmit={handleEmailSignup} noValidate>
           <div className="field-wrap">
-            <label className="field-label" htmlFor="email">Email or phone</label>
+            <label className="field-label" htmlFor="email">Email</label>
             <input
               id="email"
               type="email"
-              placeholder="you@email.com"
+              placeholder="example@email.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               autoComplete="email"
               required
             />
           </div>
-          <div className="field-wrap">
-            <label className="field-label" htmlFor="password">Password</label>
-            <input
-              id="password"
-              type="password"
-              placeholder="Create a password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              autoComplete="new-password"
-              required
-            />
-          </div>
+          <PasswordField
+            id="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Create a password"
+            autoComplete="new-password"
+            required
+          />
 
           <fieldset className="field-wrap dob-fieldset">
             <legend className="field-label">Date of birth</legend>

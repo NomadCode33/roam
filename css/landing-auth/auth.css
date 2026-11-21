@@ -161,7 +161,8 @@ Due to tailwind we have to do this math:
 }
 
 input[type="email"],
-input[type="password"] {
+input[type="password"],
+input[data-password-field] {
   width: 100%;
   font-size: 0.8125rem;     /* 13px */
   padding: 0.6875rem 0.875rem;    /* 11px 14px */
@@ -174,19 +175,23 @@ input[type="password"] {
 }
 
 input[type="email"]::placeholder,
-input[type="password"]::placeholder {
+input[type="password"]::placeholder,
+input[data-password-field]::placeholder {
   opacity: 0.8;
 }
 
 input[type="email"],
-input[type="password"] {
+input[type="password"],
+input[data-password-field] {
   border-color: #5C4E9E;
 }
 
 input[type="email"]:-webkit-autofill,
 input[type="password"]:-webkit-autofill,
+input[data-password-field]:-webkit-autofill,
 input[type="email"]:-webkit-autofill:focus,
-input[type="password"]:-webkit-autofill:focus {
+input[type="password"]:-webkit-autofill:focus,
+input[data-password-field]:-webkit-autofill:focus {
   -webkit-box-shadow: 0 0 0 1000px #F0EEFF inset;
   -webkit-text-fill-color: #111827;
   transition: background-color 5000s ease-in-out 0s;
@@ -356,4 +361,21 @@ input[type="password"]:-webkit-autofill:focus {
   .dob-row select {
     transition: none;
   }
+}
+
+.show-password {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  font-size: 0.8125rem;
+  color: #6b7280;
+  cursor: pointer;
+}
+
+.show-password input[type="checkbox"] {
+  width: 1rem;
+  height: 1rem;
+  margin: 0;
+  accent-color: #5C4E9E;
 }
