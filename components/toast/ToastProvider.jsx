@@ -18,8 +18,6 @@ const ToastContext = createContext(null);
 const DEFAULT_DURATION = { error: null, success: 8000, info: 8000 };
 const MAX_VISIBLE = 3;
 
-// 'fade' or 'slide'. Change this one word to compare the two animations.
-const TOAST_ANIMATION = 'slide';
 // Must be at least as long as the longest exit animation in toast.css.
 const EXIT_MS = 180;
 
@@ -118,7 +116,7 @@ export function ToastProvider({ children }) {
   return (
     <ToastContext.Provider value={api}>
       {children}
-      <div className="toast-region" data-anim={TOAST_ANIMATION}>
+      <div className="toast-region">
         <div role="alert" aria-atomic="false">
           {toasts
             .filter((t) => t.type === 'error')
