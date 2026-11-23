@@ -31,7 +31,18 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const [needsConfirm, setNeedsConfirm] = useState(false);
   const [resending, setResending] = useState(false);
+  const [problem, setProblem] = useState(null);
   const { secondsLeft: resendWait, start: startResendWait } = useCooldown('resend-confirmation');
+
+  const reportProblem = (field, message, focusId = field) => {
+    setProblem({ field, message });
+    toast.error(message);
+    document.getElementById(focusId)?.focus();
+  };
+
+  const clearProblem = (field) => {
+    setProblem((current) => (current && current.field === field ? null : current));
+  };
 
   const handleGoogleLogin = async () => {
     const { error } = await supabase.auth.signInWithOAuth({
@@ -44,14 +55,15 @@ export default function Login() {
   const handleEmailLogin = async (e) => {
     e.preventDefault();
     toast.clear();
+    setProblem(null);
 
     if (!email.trim() || !password) {
-      toast.error('Please enter your email and password.');
+      reportProblem(!email.trim() ? 'email' : 'password', 'Please enter your email and password.');
       return;
     }
-    
+
     if (!/^\S+@\S+\.\S+$/.test(email.trim())) {
-      toast.error('Please enter a valid email address.');
+      reportProblem('email', 'Please enter a valid email address.');
       return;
     }
     setLoading(true);
@@ -74,6 +86,7 @@ export default function Login() {
 
   const handleResend = async () => {
     toast.clear();
+    setProblem(null);
 
     if (resendWait > 0) {
       toast.info(cooldownMessage(resendWait));
@@ -81,7 +94,7 @@ export default function Login() {
     }
 
     if (!/^\S+@\S+\.\S+$/.test(email.trim())) {
-      toast.error('Please enter a valid email address.');
+      reportProblem('email', 'Please enter a valid email address.');
       return;
     }
 
@@ -99,7 +112,7 @@ export default function Login() {
   return (
     <div className="auth-panel-body">
       <div className="auth-form-inner">
-        <div className="auth-title">Log in</div>
+        <h1 className="auth-title">Log in</h1>
         <div className="auth-sub">Continue to see what's new on the map.</div>
 
         <button className="oauth-btn" onClick={handleGoogleLogin}>
@@ -121,19 +134,35 @@ export default function Login() {
               type="email"
               placeholder="example@email.com"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                clearProblem('email');
+              }}
               autoComplete="email"
-              required
+              aria-required="true"
+              aria-invalid={problem?.field === 'email' ? 'true' : undefined}
+              aria-describedby={problem?.field === 'email' ? 'email-error' : undefined}
             />
+            {problem?.field === 'email' && (
+              <span id="email-error" className="sr-only">{problem.message}</span>
+            )}
           </div>
           <PasswordField
             id="password"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={(e) => {
+              setPassword(e.target.value);
+              clearProblem('password');
+            }}
             placeholder="••••••••"
             autoComplete="current-password"
             required
+            ariaInvalid={problem?.field === 'password'}
+            describedBy={problem?.field === 'password' ? 'password-error' : undefined}
           />
+          {problem?.field === 'password' && (
+            <span id="password-error" className="sr-only">{problem.message}</span>
+          )}
 
           <Link href="/forgot-password" className="forgot">Forgot password?</Link>
           <button type="submit" className="submit-btn" disabled={loading}>

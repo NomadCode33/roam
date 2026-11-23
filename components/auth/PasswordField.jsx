@@ -40,7 +40,7 @@ export default function PasswordField({
         value={value}
         onChange={onChange}
         autoComplete={autoComplete}
-        required={required}
+        aria-required={required || undefined}
         aria-invalid={ariaInvalid || undefined}
         aria-describedby={describedBy}
       />

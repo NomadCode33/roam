@@ -24,6 +24,19 @@ export default function Signup() {
   const [dobYear, setDobYear] = useState('');
   const [tosAccepted, setTosAccepted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [problem, setProblem] = useState(null);
+
+  const dobInvalid = problem?.field === 'dob' && (!dobMonth || !dobDay || !dobYear);
+
+  const reportProblem = (field, message, focusId = field) => {
+    setProblem({ field, message });
+    toast.error(message);
+    document.getElementById(focusId)?.focus();
+  };
+
+  const clearProblem = (field) => {
+    setProblem((current) => (current && current.field === field ? null : current));
+  };
 
   const handleGoogleSignup = async () => {
     const { error } = await supabase.auth.signInWithOAuth({
@@ -36,31 +49,36 @@ export default function Signup() {
   const handleEmailSignup = async (e) => {
     e.preventDefault();
     toast.clear();
+    setProblem(null);
 
     if (!email.trim() || !password) {
-      toast.error('Please enter your email and password.');
+      reportProblem(!email.trim() ? 'email' : 'password', 'Please enter your email and password.');
       return;
     }
-    
+
     if (!/^\S+@\S+\.\S+$/.test(email.trim())) {
-      toast.error('Please enter a valid email address.');
+      reportProblem('email', 'Please enter a valid email address.');
       return;
     }
 
     const passwordIssue = passwordProblem(password);
     if (passwordIssue) {
-      toast.error(passwordIssue);
+      reportProblem('password', passwordIssue);
       return;
     }
 
     // client-side plausibility gate only — real 13/16 threshold enforced server-side
     if (!dobMonth || !dobDay || !dobYear) {
-      toast.error('Please enter your date of birth.');
+      reportProblem(
+        'dob',
+        'Please enter your date of birth.',
+        !dobMonth ? 'dob-month' : !dobDay ? 'dob-day' : 'dob-year'
+      );
       return;
     }
 
     if (!tosAccepted) {
-      toast.error('Please confirm you agree to the Terms and Privacy Policy.');
+      reportProblem('tos', 'Please confirm you agree to the Terms and Privacy Policy.', 'tosgate');
       return;
     }
 
@@ -98,7 +116,7 @@ export default function Signup() {
   return (
     <div className="auth-panel-body">
       <div className="auth-form-inner">
-        <div className="auth-title">Create account</div>
+        <h1 className="auth-title">Create account</h1>
         <div className="auth-sub">Drop your first pin and start sharing the places you love.</div>
 
         <button className="oauth-btn" onClick={handleGoogleSignup}>
@@ -121,19 +139,35 @@ export default function Signup() {
               type="email"
               placeholder="example@email.com"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                clearProblem('email');
+              }}
               autoComplete="email"
-              required
+              aria-required="true"
+              aria-invalid={problem?.field === 'email' ? 'true' : undefined}
+              aria-describedby={problem?.field === 'email' ? 'email-error' : undefined}
             />
+            {problem?.field === 'email' && (
+              <span id="email-error" className="sr-only">{problem.message}</span>
+            )}
           </div>
           <PasswordField
             id="password"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={(e) => {
+              setPassword(e.target.value);
+              clearProblem('password');
+            }}
             placeholder={`At least ${MIN_PASSWORD_LENGTH} characters`}
             autoComplete="new-password"
             required
+            ariaInvalid={problem?.field === 'password'}
+            describedBy={problem?.field === 'password' ? 'password-error' : undefined}
           />
+          {problem?.field === 'password' && (
+            <span id="password-error" className="sr-only">{problem.message}</span>
+          )}
 
           <fieldset className="field-wrap dob-fieldset">
             <legend className="field-label">Date of birth</legend>
@@ -143,7 +177,9 @@ export default function Signup() {
                 id="dob-month"
                 value={dobMonth}
                 onChange={(e) => setDobMonth(e.target.value)}
-                required
+                aria-required="true"
+                aria-invalid={problem?.field === 'dob' && !dobMonth ? 'true' : undefined}
+                aria-describedby={dobInvalid ? 'dob-error' : undefined}
               >
                 <option value="">Month</option>
                 {months.map((m) => (
@@ -155,7 +191,9 @@ export default function Signup() {
                 id="dob-day"
                 value={dobDay}
                 onChange={(e) => setDobDay(e.target.value)}
-                required
+                aria-required="true"
+                aria-invalid={problem?.field === 'dob' && !dobDay ? 'true' : undefined}
+                aria-describedby={dobInvalid ? 'dob-error' : undefined}
               >
                 <option value="">Day</option>
                 {days.map((d) => (
@@ -167,7 +205,9 @@ export default function Signup() {
                 id="dob-year"
                 value={dobYear}
                 onChange={(e) => setDobYear(e.target.value)}
-                required
+                aria-required="true"
+                aria-invalid={problem?.field === 'dob' && !dobYear ? 'true' : undefined}
+                aria-describedby={dobInvalid ? 'dob-error' : undefined}
               >
                 <option value="">Year</option>
                 {years.map((y) => (
@@ -175,6 +215,7 @@ export default function Signup() {
                 ))}
               </select>
             </div>
+            {dobInvalid && <span id="dob-error" className="sr-only">{problem.message}</span>}
           </fieldset>
 
           <div className="age-row">
@@ -182,13 +223,21 @@ export default function Signup() {
               type="checkbox"
               id="tosgate"
               checked={tosAccepted}
-              onChange={(e) => setTosAccepted(e.target.checked)}
-              required
+              onChange={(e) => {
+                setTosAccepted(e.target.checked);
+                clearProblem('tos');
+              }}
+              aria-required="true"
+              aria-invalid={problem?.field === 'tos' ? 'true' : undefined}
+              aria-describedby={problem?.field === 'tos' ? 'tos-error' : undefined}
             />
             <label className="age-text" htmlFor="tosgate">
               I agree to Roam's{' '}
               <Link href="/terms" target="_blank" rel="noopener noreferrer">Terms</Link> and <Link href="/privacy" target="_blank" rel="noopener noreferrer">Privacy Policy</Link>.
             </label>
+            {problem?.field === 'tos' && (
+              <span id="tos-error" className="sr-only">{problem.message}</span>
+            )}
           </div>
 
           <button type="submit" className="submit-btn" disabled={loading}>
