@@ -25,7 +25,7 @@ function prefersReducedMotion() {
   return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 }
 
-function ToastItem({ toast, onDismiss }) {
+function ToastItem({ toast, onDismiss, isNewest }) {
   const [paused, setPaused] = useState(false);
   const [leaving, setLeaving] = useState(false);
 
@@ -43,6 +43,16 @@ function ToastItem({ toast, onDismiss }) {
     const timer = setTimeout(() => onDismiss(toast.id), wait);
     return () => clearTimeout(timer);
   }, [leaving, toast.id, onDismiss]);
+
+  // Escape closes the newest toast only, so one press closes one toast.
+  useEffect(() => {
+    if (!isNewest || leaving) return;
+    const onKeyDown = (e) => {
+      if (e.key === 'Escape' && !e.defaultPrevented) beginDismiss();
+    };
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, [isNewest, leaving, beginDismiss]);
 
   return (
     <div
@@ -113,6 +123,8 @@ export function ToastProvider({ children }) {
     [show, dismiss, clear]
   );
 
+  const newestId = toasts.length > 0 ? toasts[toasts.length - 1].id : null;
+
   return (
     <ToastContext.Provider value={api}>
       {children}
@@ -121,14 +133,14 @@ export function ToastProvider({ children }) {
           {toasts
             .filter((t) => t.type === 'error')
             .map((t) => (
-              <ToastItem key={t.id} toast={t} onDismiss={dismiss} />
+              <ToastItem key={t.id} toast={t} onDismiss={dismiss} isNewest={t.id === newestId} />
             ))}
         </div>
         <div role="status" aria-atomic="false">
           {toasts
             .filter((t) => t.type !== 'error')
             .map((t) => (
-              <ToastItem key={t.id} toast={t} onDismiss={dismiss} />
+              <ToastItem key={t.id} toast={t} onDismiss={dismiss} isNewest={t.id === newestId} />
             ))}
         </div>
       </div>
